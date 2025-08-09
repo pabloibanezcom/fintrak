@@ -1,0 +1,21 @@
+{
+  "name": "fintrak",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "dev-api": "pnpm --filter api dev",
+    "debug-api": "pnpm --filter api debug",
+    "dev-mobile": "pnpm --filter mobile start",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "lint-fix": "pnpm -r lint-fix",
+    "format": "pnpm -r format",
+    "format-fix": "pnpm -r format-fix"
+  },
+  "author": "Pablo Ibanez",
+  "license": "ISC",
+  "description": "Financial tracking monorepo",
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.4"
+  }
+}
