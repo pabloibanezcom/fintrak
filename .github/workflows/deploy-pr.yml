@@ -52,14 +52,14 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: pr-${{ github.event.pull_request.number }}-${{ github.sha }}
       run: |
-        # Build image with PR-specific tag
+        # Build image with PR-specific tag from monorepo root
         docker buildx build \
-          --file apps/api/Dockerfile \
+          --file apps/api/Dockerfile.monorepo \
           --platform linux/amd64 \
           --push \
           --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
           --tag $ECR_REGISTRY/$ECR_REPOSITORY:pr-${{ github.event.pull_request.number }} \
-          apps/api
+          .
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
         
     - name: Create PR-specific task definition

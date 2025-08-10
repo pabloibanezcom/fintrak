@@ -1,0 +1,32 @@
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files from root
+COPY package*.json ./
+COPY pnpm-lock.yaml* ./
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy packages and apps
+COPY packages/ ./packages/
+COPY apps/ ./apps/
+
+# Install dependencies from root (this handles workspace dependencies)
+RUN pnpm install --frozen-lockfile
+
+# Build types package first
+WORKDIR /app/packages/types
+RUN pnpm build
+
+# Build API
+WORKDIR /app/apps/api
+RUN pnpm build
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["pnpm", "start"]
