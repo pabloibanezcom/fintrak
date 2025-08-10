@@ -7,8 +7,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm and TypeScript globally
+RUN npm install -g pnpm typescript
 
 # Copy packages and apps
 COPY packages/ ./packages/
@@ -19,7 +19,7 @@ RUN pnpm install --frozen-lockfile
 
 # Build types package first
 WORKDIR /app/packages/types
-RUN pnpm build
+RUN tsc
 
 # Build API
 WORKDIR /app/apps/api
