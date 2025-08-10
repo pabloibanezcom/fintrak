@@ -6,6 +6,7 @@ WORKDIR /app
 # Copy package files from root
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
+COPY tsconfig.json ./
 
 # Install pnpm and TypeScript globally
 RUN npm install -g pnpm typescript
