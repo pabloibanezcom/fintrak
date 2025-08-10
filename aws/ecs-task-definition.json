@@ -1,0 +1,66 @@
+{
+  "family": "fintrak-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "fintrak-api",
+      "image": "YOUR_ECR_REPO_URI:latest",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/fintrak-api",
+          "awslogs-region": "eu-west-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "3000"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "MONGODB_URI",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mongodb-uri"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/jwt-secret"
+        },
+        {
+          "name": "MI_AUTH_UI",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-auth-ui"
+        },
+        {
+          "name": "MI_API",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-api"
+        },
+        {
+          "name": "MI_USER",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-user"
+        },
+        {
+          "name": "MI_PASS",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-pass"
+        }
+      ]
+    }
+  ]
+}
