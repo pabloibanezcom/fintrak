@@ -12,7 +12,7 @@ env:
   AWS_REGION: eu-west-1
   ECR_REPOSITORY: fintrak-api
   ECS_CLUSTER: fintrak-cluster
-  
+
 permissions:
   contents: read
   pull-requests: write
