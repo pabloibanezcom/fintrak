@@ -18,14 +18,16 @@ COPY apps/ ./apps/
 # Install dependencies from root (this handles workspace dependencies)
 RUN pnpm install --frozen-lockfile
 
-# Build from root to handle workspace dependencies correctly
+# Build types package only (API will run with ts-node)
 WORKDIR /app
 RUN pnpm --filter @fintrak/types build
-RUN pnpm --filter @fintrak/api build
 
-# Expose port
+# Install ts-node globally for production
+RUN npm install -g ts-node
+
+# Expose port  
 EXPOSE 3000
 
-# Start the application from API directory
+# Start the application from API directory with ts-node
 WORKDIR /app/apps/api
-CMD ["pnpm", "start"]
+CMD ["ts-node", "src/index.ts"]
