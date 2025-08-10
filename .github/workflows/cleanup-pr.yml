@@ -11,6 +11,11 @@ env:
   AWS_REGION: eu-west-1
   ECS_CLUSTER: fintrak-cluster
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   cleanup:
     name: Cleanup PR Environment
