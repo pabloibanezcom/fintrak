@@ -2,132 +2,278 @@ import type {
   CashAccount,
   Deposit,
   IndexedFund,
+  MILoginResponse,
+  TokenData,
   UserProducts,
 } from '@fintrak/types';
-import axios from 'axios';
+import { MIServiceError } from '@fintrak/types';
+import axios, { type AxiosError } from 'axios';
 import {
   MICashAccountsToUserCashAccounts,
   MIDepositsToUserDeposits,
   MIIndexedFundsToIndexedFunds,
 } from './MICast';
 
-let token: string | null = null;
-let expiresAt = 0;
+let tokenData: TokenData | null = null;
 
-async function loginToMI(): Promise<{
-  token: string;
-  refreshToken: string;
-  expiresIn: number;
-  refreshExpiresIn: number;
-}> {
-  if (!process.env.MI_AUTH_UI) {
-    throw new Error('MI_AUTH_UI environment variable is not defined');
+// Environment validation
+const validateEnvironment = (): void => {
+  const requiredVars = ['MI_AUTH_UI', 'MI_API', 'MI_USER', 'MI_PASS'];
+  const missing = requiredVars.filter((varName) => !process.env[varName]);
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missing.join(', ')}`
+    );
   }
-  const response = await axios.post(process.env.MI_AUTH_UI, {
-    accessType: 'USERNAME',
-    customerId: process.env.MI_USER,
-    password: process.env.MI_PASS,
-  });
+};
 
-  const accessToken = response.data.payload.data.accessToken;
-  const refreshToken = response.data.payload.data.refreshToken;
-  const expiresIn = response.data.payload.data.expiresIn || 3600;
-  const refreshExpiresIn = response.data.payload.data.refreshExpiresIn || 3600;
+// Configure axios with timeouts
+const axiosConfig = {
+  timeout: 30000, // 30 seconds
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
 
-  return { token: accessToken, refreshToken, expiresIn, refreshExpiresIn };
+async function loginToMI(): Promise<TokenData> {
+  validateEnvironment();
+
+  try {
+    const response = await axios.post<MILoginResponse>(
+      process.env.MI_AUTH_UI as string,
+      {
+        accessType: 'USERNAME',
+        customerId: process.env.MI_USER,
+        password: process.env.MI_PASS,
+      },
+      axiosConfig
+    );
+
+    const {
+      accessToken,
+      refreshToken,
+      expiresIn = 3600,
+      refreshExpiresIn = 3600,
+    } = response.data.payload.data;
+
+    const now = Date.now();
+    return {
+      accessToken,
+      refreshToken,
+      expiresAt: now + expiresIn * 1000,
+      refreshExpiresAt: now + refreshExpiresIn * 1000,
+    };
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    throw new MIServiceError(
+      `Failed to login to MI service: ${axiosError.message}`,
+      axiosError.response?.status,
+      axiosError
+    );
+  }
+}
+
+async function refreshTokenIfNeeded(): Promise<void> {
+  if (!tokenData) return;
+
+  const now = Date.now();
+  const bufferTime = 5 * 60 * 1000; // 5 minutes buffer
+
+  // If refresh token is about to expire, force re-login
+  if (now >= tokenData.refreshExpiresAt - bufferTime) {
+    tokenData = null;
+    return;
+  }
+
+  // If access token needs refresh
+  if (now >= tokenData.expiresAt - bufferTime) {
+    try {
+      // For now, we'll re-login instead of using refresh token
+      // This can be enhanced later if MI service supports token refresh
+      tokenData = await loginToMI();
+    } catch (error) {
+      console.error(
+        'Failed to refresh token, will re-login on next request:',
+        error
+      );
+      tokenData = null;
+    }
+  }
 }
 
 async function getToken(): Promise<string> {
-  const now = Date.now();
-  if (!token || now >= expiresAt) {
-    const result = await loginToMI();
-    token = result.token;
-    expiresAt = now + result.expiresIn * 1000;
+  if (!tokenData || Date.now() >= tokenData.expiresAt) {
+    tokenData = await loginToMI();
+  } else {
+    await refreshTokenIfNeeded();
   }
-  return token;
+
+  return tokenData.accessToken;
+}
+
+// Generic retry mechanism
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 2,
+  isRetryableError?: (error: AxiosError) => boolean
+): Promise<T> {
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+      const axiosError = error as AxiosError;
+
+      // Don't retry on the last attempt
+      if (attempt === maxRetries) break;
+
+      // Check if error is retryable
+      if (axiosError.response?.status === 401) {
+        // Clear token on 401 and retry
+        tokenData = null;
+        continue;
+      }
+
+      if (isRetryableError && !isRetryableError(axiosError)) {
+        break;
+      }
+
+      // Wait before retry (exponential backoff)
+      const delay = Math.min(1000 * 2 ** attempt, 5000);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError || new Error('Unknown error occurred during retry');
+}
+
+// Generic fetch function for MI endpoints
+async function fetchFromMI<TInput, TOutput>(
+  endpoint: string,
+  transformer: (data: TInput[]) => TOutput[],
+  dataExtractor?: (responseData: any) => TInput[],
+  dataTypeName?: string
+): Promise<TOutput[]> {
+  return withRetry(async () => {
+    const accessToken = await getToken();
+    const response = await axios.get(
+      `${process.env.MI_API as string}${endpoint}`,
+      {
+        ...axiosConfig,
+        headers: {
+          ...axiosConfig.headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    // Extract data using custom extractor or default to payload.data
+    const rawData = dataExtractor
+      ? dataExtractor(response.data?.payload?.data)
+      : response.data?.payload?.data;
+
+    if (!Array.isArray(rawData)) {
+      console.warn(
+        `MI API returned non-array ${dataTypeName || 'data'}:`,
+        rawData
+      );
+      return [];
+    }
+
+    return transformer(rawData);
+  });
 }
 
 async function fetchDeposits(): Promise<Deposit[]> {
-  try {
-    const accessToken = await getToken();
-    const response = await axios.get(`${process.env.MI_API}/deposits/self`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    return MIDepositsToUserDeposits(response.data?.payload?.data);
-  } catch (err: any) {
-    console.error('Error fetching deposits:', err.message);
-    if (err.response?.status === 401) {
-      token = null; // clear token and retry
-      return fetchDeposits();
-    }
-    return [];
-  }
+  return fetchFromMI(
+    '/deposits/self',
+    MIDepositsToUserDeposits,
+    undefined,
+    'deposits data'
+  );
 }
 
 async function fetchCashAccounts(): Promise<CashAccount[]> {
-  try {
-    const accessToken = await getToken();
-    const response = await axios.get(
-      `${process.env.MI_API}/cash-accounts/self`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return MICashAccountsToUserCashAccounts(response.data?.payload?.data);
-  } catch (err: any) {
-    console.error('Error fetching cash accounts:', err.message);
-    if (err.response?.status === 401) {
-      token = null; // clear token and retry
-      return fetchCashAccounts();
-    }
-    return [];
-  }
+  return fetchFromMI(
+    '/cash-accounts/self',
+    MICashAccountsToUserCashAccounts,
+    undefined,
+    'cash accounts data'
+  );
 }
 
 async function fetchIndexedFunds(): Promise<IndexedFund[]> {
-  try {
-    const accessToken = await getToken();
-    const response = await axios.get(
-      `${process.env.MI_API}/securities-accounts/self`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+  return fetchFromMI(
+    '/securities-accounts/self',
+    MIIndexedFundsToIndexedFunds,
+    (securitiesData) => {
+      if (!Array.isArray(securitiesData)) {
+        console.warn(
+          'MI API returned non-array securities data:',
+          securitiesData
+        );
+        return [];
       }
-    );
-    return MIIndexedFundsToIndexedFunds(
-      response.data?.payload?.data?.find(
-        (e: any) => e.accountType === 'SECURITIES_ACCOUNT'
-      )?.securitiesAccountInvestments?.INDEXED_FUND?.investmentList || []
-    );
-  } catch (err: any) {
-    console.error('Error fetching indexed funds:', err.message);
-    if (err.response?.status === 401) {
-      token = null; // clear token and retry
-      return fetchIndexedFunds();
-    }
-    return [];
-  }
+
+      const securitiesAccount = securitiesData.find(
+        (account: any) => account.accountType === 'SECURITIES_ACCOUNT'
+      );
+
+      return (
+        securitiesAccount?.securitiesAccountInvestments?.INDEXED_FUND
+          ?.investmentList || []
+      );
+    },
+    'indexed funds data'
+  );
 }
 
 export const fetchUserProducts = async (): Promise<UserProducts> => {
   try {
     console.log('Fetching user products...');
-    const deposits = await fetchDeposits();
-    const cashAccounts = await fetchCashAccounts();
-    const indexedFunds = await fetchIndexedFunds();
+
+    // Fetch all products in parallel for better performance
+    const [deposits, cashAccounts, indexedFunds] = await Promise.allSettled([
+      fetchDeposits(),
+      fetchCashAccounts(),
+      fetchIndexedFunds(),
+    ]);
+
     return {
-      cashAccounts,
-      deposits,
-      indexedFunds,
+      deposits: deposits.status === 'fulfilled' ? deposits.value : [],
+      cashAccounts:
+        cashAccounts.status === 'fulfilled' ? cashAccounts.value : [],
+      indexedFunds:
+        indexedFunds.status === 'fulfilled' ? indexedFunds.value : [],
     };
-  } catch (err: any) {
-    console.error('Error fetching user products:', err.message);
-    // Handle error appropriately, e.g., return empty products or throw
-    return { deposits: [], cashAccounts: [], indexedFunds: [] };
+  } catch (error) {
+    console.error('Unexpected error fetching user products:', error);
+    throw new MIServiceError(
+      'Failed to fetch user products',
+      500,
+      error as Error
+    );
   }
 };
+
+// Health check function
+export const checkMIServiceHealth = async (): Promise<boolean> => {
+  try {
+    await getToken();
+    return true;
+  } catch (error) {
+    console.error('MI service health check failed:', error);
+    return false;
+  }
+};
+
+// Clear cached tokens (useful for testing or manual token refresh)
+export const clearTokenCache = (): void => {
+  tokenData = null;
+};
+
+// Re-export MIServiceError for convenience
+export { MIServiceError };
