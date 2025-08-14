@@ -11,6 +11,7 @@ import axios, { type AxiosError } from 'axios';
 import {
   MICashAccountsToUserCashAccounts,
   MIDepositsToUserDeposits,
+  MIETCsToETCs,
   MIIndexedFundsToIndexedFunds,
 } from './MICast';
 
@@ -205,30 +206,49 @@ async function fetchCashAccounts(): Promise<CashAccount[]> {
   );
 }
 
-async function fetchIndexedFunds(): Promise<IndexedFund[]> {
-  return fetchFromMI(
-    '/securities-accounts/self',
-    MIIndexedFundsToIndexedFunds,
-    (securitiesData) => {
-      if (!Array.isArray(securitiesData)) {
-        console.warn(
-          'MI API returned non-array securities data:',
-          securitiesData
-        );
-        return [];
+async function fetchSecuritiesData(): Promise<{
+  indexedFunds: IndexedFund[];
+  etcs: IndexedFund[];
+}> {
+  return withRetry(async () => {
+    const accessToken = await getToken();
+    const response = await axios.get(
+      `${process.env.MI_API as string}/securities-accounts/self`,
+      {
+        ...axiosConfig,
+        headers: {
+          ...axiosConfig.headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
       }
+    );
 
-      const securitiesAccount = securitiesData.find(
-        (account: any) => account.accountType === 'SECURITIES_ACCOUNT'
-      );
+    const securitiesData = response.data?.payload?.data;
 
-      return (
-        securitiesAccount?.securitiesAccountInvestments?.INDEXED_FUND
-          ?.investmentList || []
+    if (!Array.isArray(securitiesData)) {
+      console.warn(
+        'MI API returned non-array securities data:',
+        securitiesData
       );
-    },
-    'indexed funds data'
-  );
+      return { indexedFunds: [], etcs: [] };
+    }
+
+    const securitiesAccount = securitiesData.find(
+      (account: any) => account.accountType === 'SECURITIES_ACCOUNT'
+    );
+
+    const indexedFundsList =
+      securitiesAccount?.securitiesAccountInvestments?.INDEXED_FUND
+        ?.investmentList || [];
+    const etcsList =
+      securitiesAccount?.securitiesAccountInvestments?.BROKER?.investmentList ||
+      [];
+
+    return {
+      indexedFunds: MIIndexedFundsToIndexedFunds(indexedFundsList),
+      etcs: MIETCsToETCs(etcsList),
+    };
+  });
 }
 
 export const fetchUserProducts = async (): Promise<UserProducts> => {
@@ -236,10 +256,10 @@ export const fetchUserProducts = async (): Promise<UserProducts> => {
     console.log('Fetching user products...');
 
     // Fetch all products in parallel for better performance
-    const [deposits, cashAccounts, indexedFunds] = await Promise.allSettled([
+    const [deposits, cashAccounts, securities] = await Promise.allSettled([
       fetchDeposits(),
       fetchCashAccounts(),
-      fetchIndexedFunds(),
+      fetchSecuritiesData(),
     ]);
 
     return {
@@ -247,7 +267,8 @@ export const fetchUserProducts = async (): Promise<UserProducts> => {
       cashAccounts:
         cashAccounts.status === 'fulfilled' ? cashAccounts.value : [],
       indexedFunds:
-        indexedFunds.status === 'fulfilled' ? indexedFunds.value : [],
+        securities.status === 'fulfilled' ? securities.value.indexedFunds : [],
+      etcs: securities.status === 'fulfilled' ? securities.value.etcs : [],
     };
   } catch (error) {
     console.error('Unexpected error fetching user products:', error);

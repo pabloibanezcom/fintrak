@@ -48,6 +48,31 @@ export interface MIIndexedFund {
   infoFundUrl: string;
 }
 
+export interface MIETC {
+  accountId: string;
+  name: string;
+  productTypeCode: string;
+  marketCode: string;
+  isin: string;
+  initialInvestment: number;
+  initialInvestmentCurrency: number;
+  marketValue: number;
+  profit: number;
+  totalReturn: number;
+  shares: number;
+  availableShares: number;
+  averageCost: number;
+  liquidationValue: number;
+  liquidationValueDate: string;
+  originCurrencyLiquidationValue: number;
+  liquidationValueCurrency: string;
+  ytdFundReturn: number;
+  firstYearFundReturn: number;
+  thirdYearFundReturn: number;
+  fifthYearFundReturn: number;
+  infoFundUrl: string;
+}
+
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -73,6 +98,6 @@ export class MIServiceError extends Error {
     public originalError?: Error
   ) {
     super(message);
-    this.name = 'MIServiceError';
+    this.name = "MIServiceError";
   }
 }

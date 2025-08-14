@@ -1,9 +1,11 @@
 import type {
   CashAccount,
   Deposit,
+  ETC,
   IndexedFund,
   MICashAccount,
   MIDeposit,
+  MIETC,
   MIIndexedFund,
 } from '@fintrak/types';
 
@@ -65,4 +67,8 @@ export const MIIndexedFundsToIndexedFunds = (
   MIIndexedFunds: MIIndexedFund[]
 ): IndexedFund[] => {
   return mapArrayWithTransforms<MIIndexedFund, IndexedFund>(MIIndexedFunds);
+};
+
+export const MIETCsToETCs = (MIETCs: MIETC[]): ETC[] => {
+  return mapArrayWithTransforms<MIETC, ETC>(MIETCs);
 };
