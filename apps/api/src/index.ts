@@ -23,7 +23,7 @@ app.use('/api/auth/', authRoutes);
 app.use('/api', productRoutes);
 
 app.use('/', (_req, res) => {
-  res.send('Welcome to the Fintrak API');
+  res.send('Welcome to Fintrak');
 });
 
 app.use((req, res) => {

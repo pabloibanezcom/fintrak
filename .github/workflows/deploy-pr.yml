@@ -12,7 +12,12 @@ env:
   AWS_REGION: eu-west-1
   ECR_REPOSITORY: fintrak-api
   ECS_CLUSTER: fintrak-cluster
-  
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   deploy-pr:
     name: Deploy PR Environment
@@ -26,7 +31,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
         
     - name: Install pnpm
       uses: pnpm/action-setup@v4
@@ -53,10 +57,9 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: pr-${{ github.event.pull_request.number }}-${{ github.sha }}
       run: |
-        # Build image with PR-specific tag
+        # Build image with PR-specific tag from monorepo root
         docker buildx build \
-          --context apps/api \
-          --file apps/api/Dockerfile \
+          --file apps/api/Dockerfile.monorepo \
           --platform linux/amd64 \
           --push \
           --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \

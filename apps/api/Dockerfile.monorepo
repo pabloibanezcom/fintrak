@@ -1,0 +1,33 @@
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files from root
+COPY package*.json ./
+COPY pnpm-lock.yaml* ./
+COPY tsconfig.json ./
+
+# Install pnpm and TypeScript globally
+RUN npm install -g pnpm typescript
+
+# Copy packages and apps
+COPY packages/ ./packages/
+COPY apps/ ./apps/
+
+# Install dependencies from root (this handles workspace dependencies)
+RUN pnpm install --frozen-lockfile
+
+# Build types package only (API will run with ts-node)
+WORKDIR /app
+RUN pnpm --filter @fintrak/types build
+
+# Install ts-node globally for production
+RUN npm install -g ts-node
+
+# Expose port  
+EXPOSE 3000
+
+# Start the application from API directory with ts-node
+WORKDIR /app/apps/api
+CMD ["ts-node", "src/index.ts"]
