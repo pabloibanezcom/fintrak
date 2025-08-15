@@ -4,6 +4,7 @@ import express from 'express';
 import connectDB from './config/db';
 import { specs, swaggerUi } from './config/swagger';
 import authRoutes from './routes/authRoutes';
+import expenseRoutes from './routes/expenseRoutes';
 import productRoutes from './routes/productRoutes';
 
 dotenv.config();
@@ -20,6 +21,7 @@ connectDB();
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use('/api/auth/', authRoutes);
+app.use('/api', expenseRoutes);
 app.use('/api', productRoutes);
 
 app.use('/', (_req, res) => {

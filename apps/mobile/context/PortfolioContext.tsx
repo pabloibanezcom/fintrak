@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { Investment, Portfolio } from '@fintrak/shared-types';
+import { Investment, Portfolio } from '@fintrak/types';
 
 interface PortfolioState {
   portfolio: Portfolio;

@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { Expense, ExpenseCategory } from '@fintrak/shared-types';
+import { useExpenses } from '../context/ExpenseContext';
+import { Expense, ExpenseCategory } from '@fintrak/types';
+import AddExpenseForm from '../components/AddExpenseForm';
 
 interface ExpenseItemProps {
   expense: Expense;
+  onDelete: (id: string) => void;
 }
 
-function ExpenseItem({ expense }: ExpenseItemProps) {
+function ExpenseItem({ expense, onDelete }: ExpenseItemProps) {
   const { colors } = useTheme();
 
   const getCategoryColor = (category: ExpenseCategory) => {
@@ -30,15 +33,30 @@ function ExpenseItem({ expense }: ExpenseItemProps) {
     }).format(amount);
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
     });
   };
 
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Expense',
+      'Are you sure you want to delete this expense?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => onDelete(expense.id) },
+      ]
+    );
+  };
+
   return (
-    <View style={[styles.expenseItem, { backgroundColor: colors.card }]}>
+    <TouchableOpacity 
+      style={[styles.expenseItem, { backgroundColor: colors.card }]}
+      onLongPress={handleDelete}
+    >
       <View style={styles.expenseHeader}>
         <View style={styles.expenseInfo}>
           <Text style={[styles.expenseTitle, { color: colors.text }]}>{expense.title}</Text>
@@ -60,40 +78,35 @@ function ExpenseItem({ expense }: ExpenseItemProps) {
       <View style={[styles.categoryTag, { backgroundColor: getCategoryColor(expense.category) }]}>
         <Text style={styles.categoryText}>{expense.category.toUpperCase()}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 export default function ExpensesScreen() {
   const { colors } = useTheme();
-  const [expenses] = useState<Expense[]>([
-    {
-      id: '1',
-      title: 'Grocery Shopping',
-      amount: 85.50,
-      category: 'food',
-      date: new Date(2024, 0, 15),
-      description: 'Weekly groceries'
-    },
-    {
-      id: '2',
-      title: 'Gas Station',
-      amount: 45.00,
-      category: 'transport',
-      date: new Date(2024, 0, 14),
-    },
-    {
-      id: '3',
-      title: 'Netflix Subscription',
-      amount: 15.99,
-      category: 'entertainment',
-      date: new Date(2024, 0, 12),
-    },
-  ]);
+  const { state, fetchExpenses, deleteExpense } = useExpenses();
+  const [showAddForm, setShowAddForm] = useState(false);
 
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const monthlyExpenses = expenses
-    .filter(expense => expense.date.getMonth() === new Date().getMonth())
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const handleDeleteExpense = async (id: string) => {
+    try {
+      await deleteExpense(id);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete expense');
+    }
+  };
+
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d;
+  };
+
+  const totalExpenses = state.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const monthlyExpenses = state.expenses
+    .filter(expense => formatDate(expense.date).getMonth() === new Date().getMonth())
     .reduce((sum, expense) => sum + expense.amount, 0);
 
   const formatCurrency = (amount: number) => {
@@ -107,7 +120,10 @@ export default function ExpensesScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Expenses</Text>
-        <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]}>
+        <TouchableOpacity 
+          style={[styles.addButton, { backgroundColor: colors.primary }]}
+          onPress={() => setShowAddForm(true)}
+        >
           <Text style={styles.addButtonText}>+ Add</Text>
         </TouchableOpacity>
       </View>
@@ -127,11 +143,22 @@ export default function ExpensesScreen() {
         </View>
       </View>
 
-      {expenses.length > 0 ? (
+      {state.loading ? (
+        <View style={styles.emptyContainer}>
+          <Text style={[styles.emptyText, { color: colors.text }]}>Loading...</Text>
+        </View>
+      ) : state.error ? (
+        <View style={styles.emptyContainer}>
+          <Text style={[styles.emptyText, { color: colors.danger }]}>Error</Text>
+          <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
+            {state.error}
+          </Text>
+        </View>
+      ) : state.expenses.length > 0 ? (
         <FlatList
-          data={expenses}
+          data={state.expenses}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <ExpenseItem expense={item} />}
+          renderItem={({ item }) => <ExpenseItem expense={item} onDelete={handleDeleteExpense} />}
           style={styles.list}
           showsVerticalScrollIndicator={false}
         />
@@ -143,6 +170,15 @@ export default function ExpensesScreen() {
           </Text>
         </View>
       )}
+
+      <Modal
+        visible={showAddForm}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowAddForm(false)}
+      >
+        <AddExpenseForm onClose={() => setShowAddForm(false)} />
+      </Modal>
     </View>
   );
 }

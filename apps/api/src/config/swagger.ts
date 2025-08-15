@@ -195,6 +195,134 @@ const options = {
             },
           },
         },
+        Expense: {
+          type: 'object',
+          required: ['title', 'amount', 'category', 'date'],
+          properties: {
+            id: {
+              type: 'string',
+              description: 'Expense ID',
+            },
+            title: {
+              type: 'string',
+              description: 'Expense title',
+            },
+            amount: {
+              type: 'number',
+              minimum: 0,
+              description: 'Expense amount',
+            },
+            category: {
+              type: 'string',
+              enum: [
+                'food',
+                'transport',
+                'entertainment',
+                'utilities',
+                'shopping',
+                'healthcare',
+                'other',
+              ],
+              description: 'Expense category',
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Expense date',
+            },
+            description: {
+              type: 'string',
+              description: 'Optional expense description',
+            },
+            userId: {
+              type: 'string',
+              description: 'User ID',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Creation timestamp',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Last update timestamp',
+            },
+          },
+        },
+        CreateExpenseRequest: {
+          type: 'object',
+          required: ['title', 'amount', 'category', 'date'],
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Expense title',
+            },
+            amount: {
+              type: 'number',
+              minimum: 0,
+              description: 'Expense amount',
+            },
+            category: {
+              type: 'string',
+              enum: [
+                'food',
+                'transport',
+                'entertainment',
+                'utilities',
+                'shopping',
+                'healthcare',
+                'other',
+              ],
+              description: 'Expense category',
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Expense date',
+            },
+            description: {
+              type: 'string',
+              description: 'Optional expense description',
+            },
+          },
+        },
+        UpdateExpenseRequest: {
+          type: 'object',
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Expense title',
+            },
+            amount: {
+              type: 'number',
+              minimum: 0,
+              description: 'Expense amount',
+            },
+            category: {
+              type: 'string',
+              enum: [
+                'food',
+                'transport',
+                'entertainment',
+                'utilities',
+                'shopping',
+                'healthcare',
+                'other',
+              ],
+              description: 'Expense category',
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Expense date',
+            },
+            description: {
+              type: 'string',
+              description: 'Optional expense description',
+            },
+          },
+        },
         Error: {
           type: 'object',
           properties: {
