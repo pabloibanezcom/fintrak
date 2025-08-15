@@ -5,6 +5,14 @@ export { Expense, ExpenseCategory, CreateExpenseRequest, UpdateExpenseRequest } 
 export { IndexedFund } from "./IndexedFund";
 export { Investment, Portfolio } from "./Investment";
 export { Product } from "./Product";
+export { 
+  BankTransaction, 
+  GoCardlessAccount, 
+  GoCardlessRequisition, 
+  CreateRequisitionRequest,
+  SyncTransactionsRequest,
+  SyncTransactionsResponse
+} from "./Transaction";
 
 export { UserProducts } from "./UserProducts";
 export {
