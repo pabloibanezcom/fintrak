@@ -4,11 +4,11 @@ import { categorySchemaDefinition } from './schemas/categorySchema';
 import { counterpartySchemaDefinition } from './schemas/counterpartySchema';
 import { tagSchemaDefinition } from './schemas/tagSchema';
 
-export interface IExpense extends Document {
+export interface IIncome extends Document {
   title: string;
   amount: number;
   category: Category;
-  payee?: Counterparty;
+  source?: Counterparty;
   date: Date;
   description?: string;
   tags?: Tag[];
@@ -17,7 +17,7 @@ export interface IExpense extends Document {
   updatedAt: Date;
 }
 
-const ExpenseSchema: Schema = new Schema(
+const IncomeSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     amount: { type: Number, required: true, min: 0 },
@@ -25,7 +25,7 @@ const ExpenseSchema: Schema = new Schema(
       type: categorySchemaDefinition,
       required: true,
     },
-    payee: {
+    source: {
       type: counterpartySchemaDefinition,
     },
     date: { type: Date, required: true },
@@ -40,6 +40,6 @@ const ExpenseSchema: Schema = new Schema(
   }
 );
 
-ExpenseSchema.index({ userId: 1, date: -1 });
+IncomeSchema.index({ userId: 1, date: -1 });
 
-export default mongoose.model<IExpense>('Expense', ExpenseSchema);
+export default mongoose.model<IIncome>('Income', IncomeSchema);
