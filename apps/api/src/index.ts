@@ -2,7 +2,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import connectDB from './config/db';
-import { specs, swaggerUi, swaggerOptions } from './config/swagger';
+import { specs, swaggerOptions, swaggerUi } from './config/swagger';
 import authRoutes from './routes/authRoutes';
 import bankRoutes from './routes/bankRoutes';
 import categoryRoutes from './routes/categoryRoutes';

@@ -10,7 +10,9 @@ export const getCounterparties = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
-    const counterparties = await CounterpartyModel.find({ userId }).sort({ name: 1 });
+    const counterparties = await CounterpartyModel.find({ userId }).sort({
+      name: 1,
+    });
     res.json(counterparties);
   } catch (error) {
     console.error('Error fetching counterparties:', error);
@@ -47,14 +49,14 @@ export const createCounterparty = async (req: Request, res: Response) => {
     const counterpartyData: Counterparty = req.body;
 
     // Check if counterparty with same id already exists for this user
-    const existingCounterparty = await CounterpartyModel.findOne({ 
-      id: counterpartyData.id, 
-      userId 
+    const existingCounterparty = await CounterpartyModel.findOne({
+      id: counterpartyData.id,
+      userId,
     });
-    
+
     if (existingCounterparty) {
-      return res.status(409).json({ 
-        error: 'Counterparty with this ID already exists' 
+      return res.status(409).json({
+        error: 'Counterparty with this ID already exists',
       });
     }
 
@@ -105,7 +107,10 @@ export const deleteCounterparty = async (req: Request, res: Response) => {
     }
     const { id } = req.params;
 
-    const counterparty = await CounterpartyModel.findOneAndDelete({ id, userId });
+    const counterparty = await CounterpartyModel.findOneAndDelete({
+      id,
+      userId,
+    });
     if (!counterparty) {
       return res.status(404).json({ error: 'Counterparty not found' });
     }

@@ -36,19 +36,25 @@ export interface IBankTransaction extends Document {
   updatedAt: Date;
 }
 
-const TransactionAmountSchema = new Schema({
-  amount: { type: String, required: true },
-  currency: { type: String, required: true }
-}, { _id: false });
-
-const BalanceAfterTransactionSchema = new Schema({
-  balanceAmount: {
+const TransactionAmountSchema = new Schema(
+  {
     amount: { type: String, required: true },
-    currency: { type: String, required: true }
+    currency: { type: String, required: true },
   },
-  balanceType: { type: String, required: true },
-  referenceDate: { type: String, required: true }
-}, { _id: false });
+  { _id: false }
+);
+
+const BalanceAfterTransactionSchema = new Schema(
+  {
+    balanceAmount: {
+      amount: { type: String, required: true },
+      currency: { type: String, required: true },
+    },
+    balanceType: { type: String, required: true },
+    referenceDate: { type: String, required: true },
+  },
+  { _id: false }
+);
 
 const BankTransactionSchema: Schema = new Schema(
   {
@@ -72,10 +78,10 @@ const BankTransactionSchema: Schema = new Schema(
     additionalInformationStructured: { type: String },
     balanceAfterTransaction: { type: BalanceAfterTransactionSchema },
     accountId: { type: String, required: true },
-    userId: { type: String, required: true }
+    userId: { type: String, required: true },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
@@ -83,4 +89,7 @@ BankTransactionSchema.index({ userId: 1, bookingDate: -1 });
 BankTransactionSchema.index({ transactionId: 1 }, { unique: true });
 BankTransactionSchema.index({ accountId: 1, bookingDate: -1 });
 
-export default mongoose.model<IBankTransaction>('BankTransaction', BankTransactionSchema);
+export default mongoose.model<IBankTransaction>(
+  'BankTransaction',
+  BankTransactionSchema
+);

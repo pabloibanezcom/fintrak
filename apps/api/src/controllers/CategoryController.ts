@@ -47,14 +47,14 @@ export const createCategory = async (req: Request, res: Response) => {
     const categoryData: Category = req.body;
 
     // Check if category with same id already exists for this user
-    const existingCategory = await CategoryModel.findOne({ 
-      id: categoryData.id, 
-      userId 
+    const existingCategory = await CategoryModel.findOne({
+      id: categoryData.id,
+      userId,
     });
-    
+
     if (existingCategory) {
-      return res.status(409).json({ 
-        error: 'Category with this ID already exists' 
+      return res.status(409).json({
+        error: 'Category with this ID already exists',
       });
     }
 

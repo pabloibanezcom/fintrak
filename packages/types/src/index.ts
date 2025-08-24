@@ -1,8 +1,9 @@
+export { BaseTransaction } from "./BaseTransaction";
 export { CashAccount } from "./CashAccount";
 export { Category } from "./Category";
 export { Counterparty } from "./Counterparty";
+export { Currency } from "./Currency";
 export { Deposit } from "./Deposit";
-export { Tag } from "./Tag";
 export { ETC } from "./ETC";
 export {
   BaseExpense,
@@ -17,19 +18,7 @@ export {
   UpdateIncomeRequest,
 } from "./Income";
 export { IndexedFund } from "./IndexedFund";
-export { BaseTransaction } from "./BaseTransaction";
 export { Investment, Portfolio } from "./Investment";
-export { Product } from "./Product";
-export {
-  BankTransaction,
-  GoCardlessAccount,
-  GoCardlessRequisition,
-  CreateRequisitionRequest,
-  SyncTransactionsRequest,
-  SyncTransactionsResponse,
-} from "./Transaction";
-
-export { UserProducts } from "./UserProducts";
 export {
   MIDeposit,
   MICashAccount,
@@ -39,3 +28,15 @@ export {
   MILoginResponse,
   MIServiceError,
 } from "./MI";
+export { Periodicity } from "./Periodicity";
+export { Product } from "./Product";
+export { Tag } from "./Tag";
+export {
+  BankTransaction,
+  GoCardlessAccount,
+  GoCardlessRequisition,
+  CreateRequisitionRequest,
+  SyncTransactionsRequest,
+  SyncTransactionsResponse,
+} from "./Transaction";
+export { UserProducts } from "./UserProducts";

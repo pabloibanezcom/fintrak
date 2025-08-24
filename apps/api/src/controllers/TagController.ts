@@ -47,14 +47,14 @@ export const createTag = async (req: Request, res: Response) => {
     const tagData: Tag = req.body;
 
     // Check if tag with same id already exists for this user
-    const existingTag = await TagModel.findOne({ 
-      id: tagData.id, 
-      userId 
+    const existingTag = await TagModel.findOne({
+      id: tagData.id,
+      userId,
     });
-    
+
     if (existingTag) {
-      return res.status(409).json({ 
-        error: 'Tag with this ID already exists' 
+      return res.status(409).json({
+        error: 'Tag with this ID already exists',
       });
     }
 
@@ -80,11 +80,10 @@ export const updateTag = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updateData: Partial<Tag> = req.body;
 
-    const tag = await TagModel.findOneAndUpdate(
-      { id, userId },
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const tag = await TagModel.findOneAndUpdate({ id, userId }, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!tag) {
       return res.status(404).json({ error: 'Tag not found' });

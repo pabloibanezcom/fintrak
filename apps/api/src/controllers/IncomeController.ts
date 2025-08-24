@@ -1,9 +1,6 @@
 /// <reference path="../index.d.ts" />
 
-import type {
-  CreateIncomeRequest,
-  UpdateIncomeRequest,
-} from '@fintrak/types';
+import type { CreateIncomeRequest, UpdateIncomeRequest } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import IncomeModel from '../models/IncomeModel';
 

@@ -411,8 +411,8 @@ const swaggerOptions = {
     .swagger-ui .info .description { color: #666; line-height: 1.6; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   `,
-  customSiteTitle: "Fintrak API Documentation",
-  customfavIcon: "/favicon.ico",
+  customSiteTitle: 'Fintrak API Documentation',
+  customfavIcon: '/favicon.ico',
   swaggerOptions: {
     displayRequestDuration: true,
     filter: true,
@@ -421,7 +421,7 @@ const swaggerOptions = {
     docExpansion: 'none',
     defaultModelsExpandDepth: 2,
     defaultModelExpandDepth: 3,
-  }
+  },
 };
 
 export { specs, swaggerUi, swaggerOptions };

@@ -1,10 +1,10 @@
-import axios, { type AxiosInstance } from 'axios';
-import type { 
-  GoCardlessAccount, 
-  GoCardlessRequisition, 
+import type {
+  BankTransaction,
   CreateRequisitionRequest,
-  BankTransaction
+  GoCardlessAccount,
+  GoCardlessRequisition,
 } from '@fintrak/types';
+import axios, { type AxiosInstance } from 'axios';
 
 interface TokenResponse {
   access: string;
@@ -36,8 +36,8 @@ class GoCardlessService {
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     });
 
     this.client.interceptors.request.use(async (config) => {
@@ -78,13 +78,13 @@ class GoCardlessService {
         'https://bankaccountdata.gocardless.com/api/v2/token/new/',
         {
           secret_id: secretId,
-          secret_key: secretKey
+          secret_key: secretKey,
         }
       );
 
       this.accessToken = response.data.access;
       this.refreshToken = response.data.refresh;
-      this.tokenExpiresAt = Date.now() + (response.data.access_expires * 1000);
+      this.tokenExpiresAt = Date.now() + response.data.access_expires * 1000;
     } catch (error) {
       console.error('GoCardless authentication failed:', error);
       throw new Error('Failed to authenticate with GoCardless');
@@ -101,13 +101,13 @@ class GoCardlessService {
       const response = await axios.post<TokenResponse>(
         'https://bankaccountdata.gocardless.com/api/v2/token/refresh/',
         {
-          refresh: this.refreshToken
+          refresh: this.refreshToken,
         }
       );
 
       this.accessToken = response.data.access;
       this.refreshToken = response.data.refresh;
-      this.tokenExpiresAt = Date.now() + (response.data.access_expires * 1000);
+      this.tokenExpiresAt = Date.now() + response.data.access_expires * 1000;
     } catch (error) {
       console.error('Token refresh failed:', error);
       await this.authenticate();
@@ -115,7 +115,11 @@ class GoCardlessService {
   }
 
   private async ensureValidToken(): Promise<void> {
-    if (!this.accessToken || !this.tokenExpiresAt || Date.now() >= this.tokenExpiresAt - 60000) {
+    if (
+      !this.accessToken ||
+      !this.tokenExpiresAt ||
+      Date.now() >= this.tokenExpiresAt - 60000
+    ) {
       if (this.refreshToken) {
         await this.refreshAccessToken();
       } else {
@@ -126,7 +130,9 @@ class GoCardlessService {
 
   async getInstitutions(country: string = 'ES'): Promise<Institution[]> {
     try {
-      const response = await this.client.get<Institution[]>(`/institutions/?country=${country}`);
+      const response = await this.client.get<Institution[]>(
+        `/institutions/?country=${country}`
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to fetch institutions:', error);
@@ -134,9 +140,14 @@ class GoCardlessService {
     }
   }
 
-  async createRequisition(data: CreateRequisitionRequest): Promise<GoCardlessRequisition> {
+  async createRequisition(
+    data: CreateRequisitionRequest
+  ): Promise<GoCardlessRequisition> {
     try {
-      const response = await this.client.post<GoCardlessRequisition>('/requisitions/', data);
+      const response = await this.client.post<GoCardlessRequisition>(
+        '/requisitions/',
+        data
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to create requisition:', error);
@@ -146,7 +157,9 @@ class GoCardlessService {
 
   async getRequisition(requisitionId: string): Promise<GoCardlessRequisition> {
     try {
-      const response = await this.client.get<GoCardlessRequisition>(`/requisitions/${requisitionId}/`);
+      const response = await this.client.get<GoCardlessRequisition>(
+        `/requisitions/${requisitionId}/`
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to fetch requisition:', error);
@@ -156,7 +169,9 @@ class GoCardlessService {
 
   async getAccountDetails(accountId: string): Promise<GoCardlessAccount> {
     try {
-      const response = await this.client.get<GoCardlessAccount>(`/accounts/${accountId}/details/`);
+      const response = await this.client.get<GoCardlessAccount>(
+        `/accounts/${accountId}/details/`
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to fetch account details:', error);
@@ -168,7 +183,9 @@ class GoCardlessService {
     accountId: string,
     dateFrom?: string,
     dateTo?: string
-  ): Promise<{ transactions: { booked: BankTransaction[]; pending: BankTransaction[] } }> {
+  ): Promise<{
+    transactions: { booked: BankTransaction[]; pending: BankTransaction[] };
+  }> {
     try {
       const params = new URLSearchParams();
       if (dateFrom) params.append('date_from', dateFrom);
@@ -176,7 +193,7 @@ class GoCardlessService {
 
       const queryString = params.toString();
       const url = `/accounts/${accountId}/transactions/${queryString ? `?${queryString}` : ''}`;
-      
+
       const response = await this.client.get(url);
       return response.data;
     } catch (error) {
@@ -187,7 +204,9 @@ class GoCardlessService {
 
   async getAccountBalances(accountId: string): Promise<any> {
     try {
-      const response = await this.client.get(`/accounts/${accountId}/balances/`);
+      const response = await this.client.get(
+        `/accounts/${accountId}/balances/`
+      );
       return response.data;
     } catch (error) {
       console.error('Failed to fetch account balances:', error);

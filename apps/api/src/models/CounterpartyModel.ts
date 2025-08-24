@@ -28,4 +28,7 @@ const CounterpartySchema: Schema = new Schema(
 CounterpartySchema.index({ userId: 1, id: 1 }, { unique: true });
 CounterpartySchema.index({ userId: 1, name: 1 });
 
-export default mongoose.model<ICounterparty>('Counterparty', CounterpartySchema);
+export default mongoose.model<ICounterparty>(
+  'Counterparty',
+  CounterpartySchema
+);

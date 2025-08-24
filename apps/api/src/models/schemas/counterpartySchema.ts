@@ -3,8 +3,8 @@ import { Schema } from 'mongoose';
 export const counterpartySchemaDefinition = {
   id: { type: String, required: true },
   name: { type: String, required: true },
-  type: { 
-    type: String, 
+  type: {
+    type: String,
     enum: ['person', 'company', 'government', 'other'],
   },
   logo: { type: String },
