@@ -512,6 +512,214 @@
 			"description": "Complete CRUD operations for expense management"
 		},
 		{
+			"name": "Import",
+			"item": [
+				{
+					"name": "Import Transactions from Excel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Excel file (.xlsx) containing transactions. Supports BBVA 'Últimos movimientos' format or standard format with columns: date, description, amount, currency (optional), type (optional), category (optional), periodicity (optional)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/import/transactions",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"import",
+								"transactions"
+							]
+						},
+						"description": "Import transactions from Excel file. Automatically detects BBVA format or processes standard format. Negative amounts are treated as expenses, positive as income."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/path/to/transactions.xlsx"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/transactions",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"transactions"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total\": 40,\n  \"imported\": 40,\n  \"expenses\": 37,\n  \"income\": 3,\n  \"format\": \"BBVA\",\n  \"errors\": []\n}"
+						},
+						{
+							"name": "Validation Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/path/to/invalid.xlsx"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/transactions",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"transactions"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total\": 10,\n  \"imported\": 7,\n  \"expenses\": 5,\n  \"income\": 2,\n  \"format\": \"Standard\",\n  \"errors\": [\n    \"Row 3: Invalid date format\",\n    \"Row 7: Missing required fields (date, description, amount)\",\n    \"Row 10: Validation failed: amount must be a number\"\n  ]\n}"
+						},
+						{
+							"name": "No File Uploaded",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/transactions",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"transactions"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"No file uploaded\"\n}"
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/path/to/transactions.xlsx"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/transactions",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"transactions"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"User not authenticated\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Import transactions from Excel files. Supports BBVA format and standard formats with automatic categorization and validation."
+		},
+		{
 			"name": "Incomes",
 			"item": [
 				{

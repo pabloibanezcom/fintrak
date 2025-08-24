@@ -58,7 +58,11 @@ export const createExpense = async (req: Request, res: Response) => {
     res.status(201).json(savedExpense);
   } catch (error) {
     console.error('Error creating expense:', error);
-    res.status(500).json({ error: 'Failed to create expense' });
+    if (error instanceof Error && 'name' in error && error.name === 'ValidationError') {
+      res.status(400).json({ error: 'Validation failed', details: error.message });
+    } else {
+      res.status(500).json({ error: 'Failed to create expense' });
+    }
   }
 };
 

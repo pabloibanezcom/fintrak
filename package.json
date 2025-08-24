@@ -17,5 +17,10 @@
   "description": "Financial tracking monorepo",
   "devDependencies": {
     "@biomejs/biome": "^2.1.4"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "form-data": "^4.0.4",
+    "xlsx": "^0.18.5"
   }
 }
