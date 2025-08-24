@@ -6,12 +6,21 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "docs": "typedoc",
+    "docs:watch": "typedoc --watch",
+    "docs:clean": "rm -rf docs"
   },
-  "keywords": ["fintrak", "types", "typescript"],
+  "keywords": [
+    "fintrak",
+    "types",
+    "typescript"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "typedoc": "^0.28.10",
+    "typedoc-github-theme": "^0.3.1",
     "typescript": "~5.8.3"
   },
   "files": [
