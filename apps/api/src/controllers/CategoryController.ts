@@ -26,7 +26,7 @@ export const getCategoryById = async (req: Request, res: Response) => {
     }
     const { id } = req.params;
 
-    const category = await CategoryModel.findOne({ id, userId });
+    const category = await CategoryModel.findOne({ key: id, userId });
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
@@ -48,7 +48,7 @@ export const createCategory = async (req: Request, res: Response) => {
 
     // Check if category with same id already exists for this user
     const existingCategory = await CategoryModel.findOne({
-      id: categoryData.id,
+      key: categoryData.key,
       userId,
     });
 
@@ -81,7 +81,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     const updateData: Partial<Category> = req.body;
 
     const category = await CategoryModel.findOneAndUpdate(
-      { id, userId },
+      { key: id, userId },
       updateData,
       { new: true, runValidators: true }
     );
@@ -105,7 +105,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
     }
     const { id } = req.params;
 
-    const category = await CategoryModel.findOneAndDelete({ id, userId });
+    const category = await CategoryModel.findOneAndDelete({ key: id, userId });
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
