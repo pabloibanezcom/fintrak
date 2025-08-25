@@ -2,11 +2,11 @@ import type { Currency, Periodicity } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import multer from 'multer';
 import * as XLSX from 'xlsx';
+import CategoryModel from '../models/CategoryModel';
+import CounterpartyModel from '../models/CounterpartyModel';
 import ExpenseModel from '../models/ExpenseModel';
 import IncomeModel from '../models/IncomeModel';
-import CategoryModel from '../models/CategoryModel';
 import TagModel from '../models/TagModel';
-import CounterpartyModel from '../models/CounterpartyModel';
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
@@ -29,7 +29,6 @@ export const importTransactions = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
-
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -150,9 +149,9 @@ export const importTransactions = async (req: Request, res: Response) => {
         const searchText = `${description} ${movementType}`.trim();
 
         // Get all user categories with keywords
-        const userCategories = await CategoryModel.find({ 
+        const userCategories = await CategoryModel.find({
           userId,
-          keywords: { $exists: true, $not: { $size: 0 } }
+          keywords: { $exists: true, $not: { $size: 0 } },
         });
 
         // Find best matching category based on keywords
@@ -176,11 +175,11 @@ export const importTransactions = async (req: Request, res: Response) => {
           category = bestMatch.category;
         } else {
           // Fallback: use "otros" category, create if doesn't exist
-          category = await CategoryModel.findOne({ 
-            userId, 
-            key: 'otros'
+          category = await CategoryModel.findOne({
+            userId,
+            key: 'otros',
           });
-          
+
           if (!category) {
             category = await CategoryModel.create({
               key: 'otros',
@@ -242,7 +241,7 @@ export const importTransactions = async (req: Request, res: Response) => {
           await ExpenseModel.create(transactionData);
           results.expenses++;
         } else {
-          // Remove existing duplicate income if exists  
+          // Remove existing duplicate income if exists
           await IncomeModel.deleteMany(duplicateQuery);
           await IncomeModel.create(transactionData);
           results.income++;
@@ -282,19 +281,22 @@ export const importCategories = async (req: Request, res: Response) => {
     try {
       const fileContent = req.file.buffer.toString('utf-8');
       const parsedData = JSON.parse(fileContent);
-      
+
       // Handle both array format and object with categories property
-      categoriesData = Array.isArray(parsedData) ? parsedData : parsedData.categories;
-      
+      categoriesData = Array.isArray(parsedData)
+        ? parsedData
+        : parsedData.categories;
+
       if (!Array.isArray(categoriesData)) {
-        return res.status(400).json({ 
-          error: 'Invalid JSON format. Expected array of categories or object with categories property' 
+        return res.status(400).json({
+          error:
+            'Invalid JSON format. Expected array of categories or object with categories property',
         });
       }
     } catch (error) {
-      return res.status(400).json({ 
-        error: 'Invalid JSON file', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+      return res.status(400).json({
+        error: 'Invalid JSON file',
+        details: error instanceof Error ? error.message : 'Unknown error',
       });
     }
 
@@ -311,14 +313,16 @@ export const importCategories = async (req: Request, res: Response) => {
 
         // Validate required fields
         if (!categoryData.key || !categoryData.name) {
-          results.errors.push(`Row ${i + 1}: Missing required fields (key, name)`);
+          results.errors.push(
+            `Row ${i + 1}: Missing required fields (key, name)`
+          );
           continue;
         }
 
         // Check if category already exists
-        const existingCategory = await CategoryModel.findOne({ 
-          userId, 
-          key: categoryData.key 
+        const existingCategory = await CategoryModel.findOne({
+          userId,
+          key: categoryData.key,
         });
 
         const categoryDoc = {
@@ -373,19 +377,20 @@ export const importTags = async (req: Request, res: Response) => {
     try {
       const fileContent = req.file.buffer.toString('utf-8');
       const parsedData = JSON.parse(fileContent);
-      
+
       // Handle both array format and object with tags property
       tagsData = Array.isArray(parsedData) ? parsedData : parsedData.tags;
-      
+
       if (!Array.isArray(tagsData)) {
-        return res.status(400).json({ 
-          error: 'Invalid JSON format. Expected array of tags or object with tags property' 
+        return res.status(400).json({
+          error:
+            'Invalid JSON format. Expected array of tags or object with tags property',
         });
       }
     } catch (error) {
-      return res.status(400).json({ 
-        error: 'Invalid JSON file', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+      return res.status(400).json({
+        error: 'Invalid JSON file',
+        details: error instanceof Error ? error.message : 'Unknown error',
       });
     }
 
@@ -402,14 +407,16 @@ export const importTags = async (req: Request, res: Response) => {
 
         // Validate required fields
         if (!tagData.key || !tagData.name) {
-          results.errors.push(`Row ${i + 1}: Missing required fields (key, name)`);
+          results.errors.push(
+            `Row ${i + 1}: Missing required fields (key, name)`
+          );
           continue;
         }
 
         // Check if tag already exists
-        const existingTag = await TagModel.findOne({ 
-          userId, 
-          key: tagData.key 
+        const existingTag = await TagModel.findOne({
+          userId,
+          key: tagData.key,
         });
 
         const tagDoc = {
@@ -463,19 +470,22 @@ export const importCounterparties = async (req: Request, res: Response) => {
     try {
       const fileContent = req.file.buffer.toString('utf-8');
       const parsedData = JSON.parse(fileContent);
-      
+
       // Handle both array format and object with counterparties property
-      counterpartiesData = Array.isArray(parsedData) ? parsedData : parsedData.counterparties;
-      
+      counterpartiesData = Array.isArray(parsedData)
+        ? parsedData
+        : parsedData.counterparties;
+
       if (!Array.isArray(counterpartiesData)) {
-        return res.status(400).json({ 
-          error: 'Invalid JSON format. Expected array of counterparties or object with counterparties property' 
+        return res.status(400).json({
+          error:
+            'Invalid JSON format. Expected array of counterparties or object with counterparties property',
         });
       }
     } catch (error) {
-      return res.status(400).json({ 
-        error: 'Invalid JSON file', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+      return res.status(400).json({
+        error: 'Invalid JSON file',
+        details: error instanceof Error ? error.message : 'Unknown error',
       });
     }
 
@@ -492,20 +502,29 @@ export const importCounterparties = async (req: Request, res: Response) => {
 
         // Validate required fields
         if (!counterpartyData.key || !counterpartyData.name) {
-          results.errors.push(`Row ${i + 1}: Missing required fields (key, name)`);
+          results.errors.push(
+            `Row ${i + 1}: Missing required fields (key, name)`
+          );
           continue;
         }
 
         // Validate type value if provided
-        if (counterpartyData.type && !['company', 'person', 'institution', 'other'].includes(counterpartyData.type)) {
-          results.errors.push(`Row ${i + 1}: Invalid type value. Expected: company, person, institution, or other`);
+        if (
+          counterpartyData.type &&
+          !['company', 'person', 'institution', 'other'].includes(
+            counterpartyData.type
+          )
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: Invalid type value. Expected: company, person, institution, or other`
+          );
           continue;
         }
 
         // Check if counterparty already exists
-        const existingCounterparty = await CounterpartyModel.findOne({ 
-          userId, 
-          key: counterpartyData.key 
+        const existingCounterparty = await CounterpartyModel.findOne({
+          userId,
+          key: counterpartyData.key,
         });
 
         const counterpartyDoc = {
@@ -522,7 +541,10 @@ export const importCounterparties = async (req: Request, res: Response) => {
 
         if (existingCounterparty) {
           // Replace existing counterparty (delete and recreate to ensure complete replacement)
-          await CounterpartyModel.deleteOne({ userId, key: counterpartyData.key });
+          await CounterpartyModel.deleteOne({
+            userId,
+            key: counterpartyData.key,
+          });
           await CounterpartyModel.create(counterpartyDoc);
           results.updated++;
         } else {
