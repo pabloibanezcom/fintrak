@@ -192,11 +192,7 @@ router.post(
  *       500:
  *         description: Internal server error
  */
-router.post(
-  '/tags',
-  controller.upload.single('file'),
-  controller.importTags
-);
+router.post('/tags', controller.upload.single('file'), controller.importTags);
 
 /**
  * @swagger
