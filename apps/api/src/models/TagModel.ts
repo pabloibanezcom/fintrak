@@ -2,7 +2,7 @@ import mongoose, { type Document, Schema } from 'mongoose';
 import { tagSchemaDefinition } from './schemas/tagSchema';
 
 export interface ITag extends Document {
-  id: string;
+  key: string;
   name: string;
   color: string;
   icon: string;
@@ -21,6 +21,6 @@ const TagSchema: Schema = new Schema(
   }
 );
 
-TagSchema.index({ userId: 1, id: 1 }, { unique: true });
+TagSchema.index({ userId: 1, key: 1 }, { unique: true });
 
 export default mongoose.model<ITag>('Tag', TagSchema);

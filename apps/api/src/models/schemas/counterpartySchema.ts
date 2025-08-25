@@ -1,11 +1,12 @@
 import { Schema } from 'mongoose';
 
 export const counterpartySchemaDefinition = {
-  id: { type: String, required: true },
+  key: { type: String, required: true },
   name: { type: String, required: true },
   type: {
     type: String,
-    enum: ['person', 'company', 'government', 'other'],
+    enum: ['company', 'person', 'institution', 'other'],
+    default: 'other',
   },
   logo: { type: String },
   email: { type: String },

@@ -5,8 +5,8 @@
  * @group Core Types
  */
 export interface Tag {
-  /** Unique identifier for the tag */
-  id: string;
+  /** Unique business key for the tag */
+  key: string;
   
   /** Display name of the tag */
   name: string;

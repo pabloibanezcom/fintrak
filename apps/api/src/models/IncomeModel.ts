@@ -6,8 +6,6 @@ import type {
   Tag,
 } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
-import { categorySchemaDefinition } from './schemas/categorySchema';
-import { counterpartySchemaDefinition } from './schemas/counterpartySchema';
 import { tagSchemaDefinition } from './schemas/tagSchema';
 
 export interface IIncome extends Document {
@@ -31,11 +29,13 @@ const IncomeSchema: Schema = new Schema(
     amount: { type: Number, required: true, min: 0 },
     currency: { type: String, required: true, enum: ['EUR', 'GBP', 'USD'] },
     category: {
-      type: categorySchemaDefinition,
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
       required: true,
     },
     source: {
-      type: counterpartySchemaDefinition,
+      type: Schema.Types.ObjectId,
+      ref: 'Counterparty',
     },
     date: { type: Date, required: true },
     periodicity: {

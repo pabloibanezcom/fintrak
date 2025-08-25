@@ -4,8 +4,8 @@
  * @group Core Types
  */
 export interface Category {
-  /** Unique identifier for the category */
-  id: string;
+  /** Unique business key for the category */
+  key: string;
   
   /** Display name of the category */
   name: string;
@@ -15,4 +15,7 @@ export interface Category {
   
   /** Icon identifier or emoji for visual representation */
   icon: string;
+  
+  /** Keywords for automatic transaction categorization based on description matching */
+  keywords?: string[];
 }

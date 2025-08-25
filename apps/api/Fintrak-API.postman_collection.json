@@ -715,9 +715,252 @@
 							"body": "{\n  \"error\": \"User not authenticated\"\n}"
 						}
 					]
+				},
+				{
+					"name": "Import Categories from JSON",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "JSON file containing categories. Expected format: [{\"key\": \"food_dining\", \"name\": \"Food & Dining\", \"color\": \"#FF6B35\", \"icon\": \"restaurant\", \"keywords\": [\"restaurant\", \"food\", \"dining\"]}]"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/import/categories",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"import",
+								"categories"
+							]
+						},
+						"description": "Import categories from JSON file. Categories with existing keys will be replaced. Supports keywords for automatic transaction categorization."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/path/to/categories.json"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/categories",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"categories"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total\": 18,\n  \"imported\": 15,\n  \"updated\": 3,\n  \"errors\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "Import Tags from JSON",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "JSON file containing tags. Expected format: [{\"key\": \"urgent\", \"name\": \"Urgent\", \"color\": \"#FF0000\", \"icon\": \"alert\"}]"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/import/tags",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"import",
+								"tags"
+							]
+						},
+						"description": "Import tags from JSON file. Tags with existing keys will be replaced. Useful for organizing and filtering transactions."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/path/to/tags.json"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/tags",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"tags"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total\": 18,\n  \"imported\": 16,\n  \"updated\": 2,\n  \"errors\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "Import Counterparties from JSON",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "JSON file containing counterparties. Expected format: [{\"key\": \"amazon_es\", \"name\": \"Amazon España\", \"type\": {\"key\": \"company\", \"name\": \"Empresa\"}, \"email\": \"customerservice@amazon.es\", \"notes\": \"Tienda online\"}]"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/import/counterparties",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"import",
+								"counterparties"
+							]
+						},
+						"description": "Import counterparties from JSON file. Counterparties with existing keys will be replaced. Useful for managing payees and income sources."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/path/to/counterparties.json"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/counterparties",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"counterparties"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total\": 32,\n  \"imported\": 30,\n  \"updated\": 2,\n  \"errors\": []\n}"
+						}
+					]
 				}
 			],
-			"description": "Import transactions from Excel files. Supports BBVA format and standard formats with automatic categorization and validation."
+			"description": "Import data from external files. Supports Excel transactions (BBVA format), JSON categories with smart keywords, JSON tags, and JSON counterparties. All imports prevent duplicates by replacing existing items with same keys."
 		},
 		{
 			"name": "Incomes",

@@ -5,14 +5,14 @@
  * @group Core Types
  */
 export interface Counterparty {
-  /** Unique identifier for the counterparty */
-  id: string;
+  /** Unique business key for the counterparty */
+  key: string;
   
   /** Display name of the counterparty */
   name: string;
   
   /** Type of counterparty entity */
-  type?: 'person' | 'company' | 'government' | 'other';
+  type?: 'company' | 'person' | 'institution' | 'other';
   
   /** URL to logo or avatar image */
   logo?: string;

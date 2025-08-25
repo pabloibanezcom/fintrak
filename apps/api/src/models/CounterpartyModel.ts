@@ -2,9 +2,9 @@ import mongoose, { type Document, Schema } from 'mongoose';
 import { counterpartySchemaDefinition } from './schemas/counterpartySchema';
 
 export interface ICounterparty extends Document {
-  id: string;
+  key: string;
   name: string;
-  type?: 'person' | 'company' | 'government' | 'other';
+  type?: 'company' | 'person' | 'institution' | 'other';
   logo?: string;
   email?: string;
   phone?: string;
@@ -25,7 +25,7 @@ const CounterpartySchema: Schema = new Schema(
   }
 );
 
-CounterpartySchema.index({ userId: 1, id: 1 }, { unique: true });
+CounterpartySchema.index({ userId: 1, key: 1 }, { unique: true });
 CounterpartySchema.index({ userId: 1, name: 1 });
 
 export default mongoose.model<ICounterparty>(
