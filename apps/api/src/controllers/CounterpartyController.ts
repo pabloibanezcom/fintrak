@@ -28,7 +28,7 @@ export const getCounterpartyById = async (req: Request, res: Response) => {
     }
     const { id } = req.params;
 
-    const counterparty = await CounterpartyModel.findOne({ id, userId });
+    const counterparty = await CounterpartyModel.findOne({ key: id, userId });
     if (!counterparty) {
       return res.status(404).json({ error: 'Counterparty not found' });
     }
@@ -48,15 +48,15 @@ export const createCounterparty = async (req: Request, res: Response) => {
     }
     const counterpartyData: Counterparty = req.body;
 
-    // Check if counterparty with same id already exists for this user
+    // Check if counterparty with same key already exists for this user
     const existingCounterparty = await CounterpartyModel.findOne({
-      id: counterpartyData.id,
+      key: counterpartyData.key,
       userId,
     });
 
     if (existingCounterparty) {
       return res.status(409).json({
-        error: 'Counterparty with this ID already exists',
+        error: 'Counterparty with this key already exists',
       });
     }
 
@@ -83,7 +83,7 @@ export const updateCounterparty = async (req: Request, res: Response) => {
     const updateData: Partial<Counterparty> = req.body;
 
     const counterparty = await CounterpartyModel.findOneAndUpdate(
-      { id, userId },
+      { key: id, userId },
       updateData,
       { new: true, runValidators: true }
     );
@@ -108,7 +108,7 @@ export const deleteCounterparty = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const counterparty = await CounterpartyModel.findOneAndDelete({
-      id,
+      key: id,
       userId,
     });
     if (!counterparty) {

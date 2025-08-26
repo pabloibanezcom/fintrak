@@ -26,7 +26,7 @@ export const getTagById = async (req: Request, res: Response) => {
     }
     const { id } = req.params;
 
-    const tag = await TagModel.findOne({ id, userId });
+    const tag = await TagModel.findOne({ key: id, userId });
     if (!tag) {
       return res.status(404).json({ error: 'Tag not found' });
     }
@@ -46,15 +46,15 @@ export const createTag = async (req: Request, res: Response) => {
     }
     const tagData: Tag = req.body;
 
-    // Check if tag with same id already exists for this user
+    // Check if tag with same key already exists for this user
     const existingTag = await TagModel.findOne({
-      id: tagData.id,
+      key: tagData.key,
       userId,
     });
 
     if (existingTag) {
       return res.status(409).json({
-        error: 'Tag with this ID already exists',
+        error: 'Tag with this key already exists',
       });
     }
 
@@ -80,10 +80,14 @@ export const updateTag = async (req: Request, res: Response) => {
     const { id } = req.params;
     const updateData: Partial<Tag> = req.body;
 
-    const tag = await TagModel.findOneAndUpdate({ id, userId }, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    const tag = await TagModel.findOneAndUpdate(
+      { key: id, userId },
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!tag) {
       return res.status(404).json({ error: 'Tag not found' });
@@ -104,7 +108,7 @@ export const deleteTag = async (req: Request, res: Response) => {
     }
     const { id } = req.params;
 
-    const tag = await TagModel.findOneAndDelete({ id, userId });
+    const tag = await TagModel.findOneAndDelete({ key: id, userId });
     if (!tag) {
       return res.status(404).json({ error: 'Tag not found' });
     }

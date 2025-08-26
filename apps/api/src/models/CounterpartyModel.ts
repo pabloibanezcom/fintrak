@@ -10,6 +10,7 @@ export interface ICounterparty extends Document {
   phone?: string;
   address?: string;
   notes?: string;
+  titleTemplate?: string;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
