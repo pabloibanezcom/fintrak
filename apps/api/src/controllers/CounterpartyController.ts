@@ -4,19 +4,97 @@ import type { Counterparty } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import CounterpartyModel from '../models/CounterpartyModel';
 
-export const getCounterparties = async (req: Request, res: Response) => {
+export const searchCounterparties = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
-    const counterparties = await CounterpartyModel.find({ userId }).sort({
-      name: 1,
+
+    const {
+      name,
+      type,
+      email,
+      phone,
+      address,
+      notes,
+      titleTemplate,
+      limit = 50,
+      offset = 0,
+      sortBy = 'name',
+      sortOrder = 'asc',
+    } = req.query;
+
+    // Build query object
+    const query: any = { userId };
+
+    // Text search filters
+    if (name) {
+      query.name = { $regex: name, $options: 'i' };
+    }
+    if (email) {
+      query.email = { $regex: email, $options: 'i' };
+    }
+    if (phone) {
+      query.phone = { $regex: phone, $options: 'i' };
+    }
+    if (address) {
+      query.address = { $regex: address, $options: 'i' };
+    }
+    if (notes) {
+      query.notes = { $regex: notes, $options: 'i' };
+    }
+    if (titleTemplate) {
+      query.titleTemplate = { $regex: titleTemplate, $options: 'i' };
+    }
+
+    // Type filter
+    if (type) {
+      query.type = type;
+    }
+
+    // Build sort object
+    const sort: any = {};
+    const validSortFields = ['name', 'type', 'key', 'createdAt', 'updatedAt'];
+    const sortField = validSortFields.includes(sortBy as string)
+      ? (sortBy as string)
+      : 'name';
+    sort[sortField] = sortOrder === 'desc' ? -1 : 1;
+
+    // Execute query with pagination
+    const counterparties = await CounterpartyModel.find(query)
+      .sort(sort)
+      .limit(Number(limit))
+      .skip(Number(offset));
+
+    // Get total count for pagination
+    const totalCount = await CounterpartyModel.countDocuments(query);
+
+    res.json({
+      counterparties,
+      pagination: {
+        total: totalCount,
+        limit: Number(limit),
+        offset: Number(offset),
+        hasMore: Number(offset) + Number(limit) < totalCount,
+      },
+      filters: {
+        name,
+        type,
+        email,
+        phone,
+        address,
+        notes,
+        titleTemplate,
+      },
+      sort: {
+        sortBy: sortField,
+        sortOrder,
+      },
     });
-    res.json(counterparties);
   } catch (error) {
-    console.error('Error fetching counterparties:', error);
-    res.status(500).json({ error: 'Failed to fetch counterparties' });
+    console.error('Error searching counterparties:', error);
+    res.status(500).json({ error: 'Failed to search counterparties' });
   }
 };
 

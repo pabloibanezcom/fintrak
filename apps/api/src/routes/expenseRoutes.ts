@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import * as controller from '../controllers/ExpenseController';
+import {
+  createExpense,
+  deleteExpense,
+  getExpenseById,
+  searchExpenses,
+  updateExpense,
+} from '../controllers/ExpenseController';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
@@ -8,36 +14,137 @@ router.use(authenticate); // all routes require auth
 
 /**
  * @swagger
- * /api/expenses:
+ * /api/expenses/search:
  *   get:
- *     summary: Get user's expenses
- *     description: Retrieves all expenses for the authenticated user
+ *     summary: Search expenses with filters
+ *     description: Search and filter expenses for the authenticated user
  *     tags: [Expenses]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Search in expense title (case-insensitive)
+ *       - in: query
+ *         name: description
+ *         schema:
+ *           type: string
+ *         description: Search in expense description (case-insensitive)
+ *       - in: query
+ *         name: dateFrom
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter expenses from this date
+ *       - in: query
+ *         name: dateTo
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter expenses until this date
+ *       - in: query
+ *         name: amountMin
+ *         schema:
+ *           type: number
+ *         description: Minimum amount filter
+ *       - in: query
+ *         name: amountMax
+ *         schema:
+ *           type: number
+ *         description: Maximum amount filter
+ *       - in: query
+ *         name: currency
+ *         schema:
+ *           type: string
+ *           enum: [EUR, GBP, USD]
+ *         description: Currency filter
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Category ID filter
+ *       - in: query
+ *         name: payee
+ *         schema:
+ *           type: string
+ *         description: Payee/Counterparty ID filter
+ *       - in: query
+ *         name: periodicity
+ *         schema:
+ *           type: string
+ *           enum: [NOT_RECURRING, RECURRING_VARIABLE_AMOUNT, RECURRING_FIXED_AMOUNT]
+ *         description: Periodicity filter
+ *       - in: query
+ *         name: tags
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Tag keys filter (matches any)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 50
+ *         description: Number of results to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         description: Number of results to skip
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [date, amount, title, createdAt]
+ *           default: date
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order
  *     responses:
  *       200:
  *         description: Expenses retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Expense'
+ *               type: object
+ *               properties:
+ *                 expenses:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Expense'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     offset:
+ *                       type: integer
+ *                     hasMore:
+ *                       type: boolean
+ *                 filters:
+ *                   type: object
+ *                 sort:
+ *                   type: object
  *       401:
  *         description: Unauthorized - Invalid or missing token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
-router.get('/expenses', controller.getExpenses);
+router.get('/expenses/search', searchExpenses);
 
 /**
  * @swagger
@@ -81,7 +188,7 @@ router.get('/expenses', controller.getExpenses);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/expenses/:id', controller.getExpenseById);
+router.get('/expenses/:id', getExpenseById);
 
 /**
  * @swagger
@@ -130,7 +237,7 @@ router.get('/expenses/:id', controller.getExpenseById);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/expenses', controller.createExpense);
+router.post('/expenses', createExpense);
 
 /**
  * @swagger
@@ -190,7 +297,7 @@ router.post('/expenses', controller.createExpense);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/expenses/:id', controller.updateExpense);
+router.put('/expenses/:id', updateExpense);
 
 /**
  * @swagger
@@ -238,6 +345,6 @@ router.put('/expenses/:id', controller.updateExpense);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/expenses/:id', controller.deleteExpense);
+router.delete('/expenses/:id', deleteExpense);
 
 export default router;
