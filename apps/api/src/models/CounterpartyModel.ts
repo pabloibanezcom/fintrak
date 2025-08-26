@@ -23,6 +23,12 @@ const CounterpartySchema: Schema = new Schema(
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: (_doc, ret) => {
+        const { _id, __v, userId, ...rest } = ret;
+        return rest;
+      },
+    },
   }
 );
 
