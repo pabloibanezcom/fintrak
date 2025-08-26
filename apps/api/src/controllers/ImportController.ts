@@ -155,7 +155,7 @@ export const importTransactions = async (req: Request, res: Response) => {
         });
 
         // Find best matching category based on keywords
-        let bestMatch: { category: any; matches: number } | null = null;
+        let bestCategoryMatch: { category: any; matches: number } | null = null;
 
         for (const cat of userCategories) {
           if (cat.keywords && cat.keywords.length > 0) {
@@ -165,14 +165,17 @@ export const importTransactions = async (req: Request, res: Response) => {
                 matches++;
               }
             }
-            if (matches > 0 && (!bestMatch || matches > bestMatch.matches)) {
-              bestMatch = { category: cat, matches };
+            if (
+              matches > 0 &&
+              (!bestCategoryMatch || matches > bestCategoryMatch.matches)
+            ) {
+              bestCategoryMatch = { category: cat, matches };
             }
           }
         }
 
-        if (bestMatch) {
-          category = bestMatch.category;
+        if (bestCategoryMatch) {
+          category = bestCategoryMatch.category;
         } else {
           // Fallback: use "otros" category, create if doesn't exist
           category = await CategoryModel.findOne({
@@ -192,33 +195,91 @@ export const importTransactions = async (req: Request, res: Response) => {
           }
         }
 
+        // Generate title based on counterparty (will be set after counterparty detection)
+        let transactionTitle = cleanDescription; // Default fallback
+
         const transactionData: any = {
-          title: cleanDescription,
+          title: transactionTitle, // Will be updated after counterparty detection
           amount: absAmount,
           currency: (row.currency || 'EUR') as Currency,
           category: category._id,
           date: transactionDate,
           periodicity: row.periodicity || ('NOT_RECURRING' as Periodicity),
-          description: isBBVAFormat
-            ? `${row.movement_type} - ${cleanDescription}${row.observations ? ` (${row.observations})` : ''}`
-            : `Imported from Excel - ${cleanDescription}`,
+          // Remove description for now - let user add manually if needed
           userId,
         };
 
-        // Use "unknown" counterparty for all imported transactions
-        let counterparty = await CounterpartyModel.findOne({
-          userId,
-          key: 'unknown',
-        });
+        // Smart counterparty detection based on transaction description
+        let counterparty: any = null;
 
-        if (!counterparty) {
-          counterparty = await CounterpartyModel.create({
-            key: 'unknown',
-            name: 'Desconocido',
-            type: 'other',
-            userId,
-          });
+        // Get all user counterparties
+        const userCounterparties = await CounterpartyModel.find({ userId });
+
+        // Find best matching counterparty based on name similarity
+        let bestCounterpartyMatch: {
+          counterparty: any;
+          similarity: number;
+        } | null = null;
+
+        for (const cp of userCounterparties) {
+          const counterpartyName = cp.name.toLowerCase();
+          const descriptionLower = cleanDescription.toLowerCase();
+          const movementTypeLower = (row.movement_type || '').toLowerCase();
+          const searchText = `${descriptionLower} ${movementTypeLower}`.trim();
+
+          // Check if counterparty name appears in description or movement type
+          if (searchText.includes(counterpartyName)) {
+            const similarity = counterpartyName.length; // Longer names get priority
+            if (
+              !bestCounterpartyMatch ||
+              similarity > bestCounterpartyMatch.similarity
+            ) {
+              bestCounterpartyMatch = { counterparty: cp, similarity };
+            }
+          }
         }
+
+        if (bestCounterpartyMatch) {
+          counterparty = bestCounterpartyMatch.counterparty;
+        } else {
+          // Fallback: use "unknown" counterparty, create if doesn't exist
+          counterparty = await CounterpartyModel.findOne({
+            userId,
+            key: 'unknown',
+          });
+
+          if (!counterparty) {
+            counterparty = await CounterpartyModel.create({
+              key: 'unknown',
+              name: 'Desconocido',
+              type: 'other',
+              titleTemplate: 'Transacción {name}',
+              userId,
+            });
+          }
+        }
+
+        // Generate transaction title based on counterparty
+        if (counterparty.key !== 'unknown') {
+          if (counterparty.titleTemplate) {
+            // Use custom title template, replace {name} placeholder
+            transactionTitle = counterparty.titleTemplate.replace(
+              '{name}',
+              counterparty.name
+            );
+          } else {
+            // Fallback to generic title based on counterparty name and transaction type
+            transactionTitle = isExpense
+              ? `Compra ${counterparty.name}`
+              : `Ingreso ${counterparty.name}`;
+          }
+        } else {
+          // Keep original description for unknown counterparties
+          transactionTitle = cleanDescription;
+        }
+
+        // Update transaction data with generated title
+        transactionData.title = transactionTitle;
 
         // Add counterparty reference to transaction
         if (isExpense) {
@@ -227,11 +288,12 @@ export const importTransactions = async (req: Request, res: Response) => {
           transactionData.source = counterparty._id;
         }
 
-        // Check for duplicate transactions (same user, date, amount, description)
+        // Check for duplicate transactions (same user, date, amount, and original description)
         const duplicateQuery = {
           userId,
           date: transactionDate,
           amount: absAmount,
+          // Use original description for duplicate detection, not generated title
           title: cleanDescription,
         };
 
@@ -536,6 +598,7 @@ export const importCounterparties = async (req: Request, res: Response) => {
           phone: counterpartyData.phone,
           address: counterpartyData.address,
           notes: counterpartyData.notes,
+          titleTemplate: counterpartyData.titleTemplate,
           userId,
         };
 

@@ -13,6 +13,7 @@ export const counterpartySchemaDefinition = {
   phone: { type: String },
   address: { type: String },
   notes: { type: String },
+  titleTemplate: { type: String },
 };
 
 export const counterpartySchema = new Schema(counterpartySchemaDefinition);

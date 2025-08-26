@@ -28,4 +28,7 @@ export interface Counterparty {
   
   /** Additional notes or information */
   notes?: string;
+  
+  /** Template for transaction titles (e.g., "Compra en {name}", "Pago a {name}") */
+  titleTemplate?: string;
 }
