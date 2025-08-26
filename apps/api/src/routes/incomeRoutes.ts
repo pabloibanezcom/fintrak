@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import * as controller from '../controllers/IncomeController';
+import {
+  createIncome,
+  deleteIncome,
+  getIncomeById,
+  searchIncomes,
+  updateIncome,
+} from '../controllers/IncomeController';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
@@ -8,36 +14,137 @@ router.use(authenticate); // all routes require auth
 
 /**
  * @swagger
- * /api/incomes:
+ * /api/incomes/search:
  *   get:
- *     summary: Get user's incomes
- *     description: Retrieves all incomes for the authenticated user
+ *     summary: Search incomes with filters
+ *     description: Search and filter incomes for the authenticated user
  *     tags: [Incomes]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Search in income title (case-insensitive)
+ *       - in: query
+ *         name: description
+ *         schema:
+ *           type: string
+ *         description: Search in income description (case-insensitive)
+ *       - in: query
+ *         name: dateFrom
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter incomes from this date
+ *       - in: query
+ *         name: dateTo
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter incomes until this date
+ *       - in: query
+ *         name: amountMin
+ *         schema:
+ *           type: number
+ *         description: Minimum amount filter
+ *       - in: query
+ *         name: amountMax
+ *         schema:
+ *           type: number
+ *         description: Maximum amount filter
+ *       - in: query
+ *         name: currency
+ *         schema:
+ *           type: string
+ *           enum: [EUR, GBP, USD]
+ *         description: Currency filter
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Category ID filter
+ *       - in: query
+ *         name: source
+ *         schema:
+ *           type: string
+ *         description: Source/Counterparty ID filter
+ *       - in: query
+ *         name: periodicity
+ *         schema:
+ *           type: string
+ *           enum: [NOT_RECURRING, RECURRING_VARIABLE_AMOUNT, RECURRING_FIXED_AMOUNT]
+ *         description: Periodicity filter
+ *       - in: query
+ *         name: tags
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description: Tag keys filter (matches any)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 50
+ *         description: Number of results to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           minimum: 0
+ *           default: 0
+ *         description: Number of results to skip
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [date, amount, title, createdAt]
+ *           default: date
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order
  *     responses:
  *       200:
  *         description: Incomes retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Income'
+ *               type: object
+ *               properties:
+ *                 incomes:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Income'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     offset:
+ *                       type: integer
+ *                     hasMore:
+ *                       type: boolean
+ *                 filters:
+ *                   type: object
+ *                 sort:
+ *                   type: object
  *       401:
  *         description: Unauthorized - Invalid or missing token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
-router.get('/incomes', controller.getIncomes);
+router.get('/incomes/search', searchIncomes);
 
 /**
  * @swagger
@@ -81,7 +188,7 @@ router.get('/incomes', controller.getIncomes);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/incomes/:id', controller.getIncomeById);
+router.get('/incomes/:id', getIncomeById);
 
 /**
  * @swagger
@@ -134,7 +241,7 @@ router.get('/incomes/:id', controller.getIncomeById);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/incomes', controller.createIncome);
+router.post('/incomes', createIncome);
 
 /**
  * @swagger
@@ -194,7 +301,7 @@ router.post('/incomes', controller.createIncome);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/incomes/:id', controller.updateIncome);
+router.put('/incomes/:id', updateIncome);
 
 /**
  * @swagger
@@ -242,6 +349,6 @@ router.put('/incomes/:id', controller.updateIncome);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/incomes/:id', controller.deleteIncome);
+router.delete('/incomes/:id', deleteIncome);
 
 export default router;
