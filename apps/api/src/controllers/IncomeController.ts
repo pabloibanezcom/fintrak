@@ -114,6 +114,7 @@ export const searchIncomes = async (req: Request, res: Response) => {
       offset = 0,
       sortBy = 'date',
       sortOrder = 'desc',
+      includeTotal = 'false',
     } = req.query;
 
     // Build query object
@@ -194,7 +195,40 @@ export const searchIncomes = async (req: Request, res: Response) => {
     // Get total count for pagination
     const totalCount = await IncomeModel.countDocuments(query);
 
-    res.json({
+    // Calculate total amount if requested
+    let totalAmount = null;
+    if (includeTotal === 'true') {
+      // Create a clean query object for aggregation (convert ObjectIds properly)
+      const aggregationQuery = { ...query };
+      
+      // Convert category and source to ObjectId if they're strings
+      if (aggregationQuery.category && typeof aggregationQuery.category === 'string') {
+        const mongoose = require('mongoose');
+        if (mongoose.Types.ObjectId.isValid(aggregationQuery.category)) {
+          aggregationQuery.category = new mongoose.Types.ObjectId(aggregationQuery.category);
+        }
+      }
+      
+      if (aggregationQuery.source && typeof aggregationQuery.source === 'string') {
+        const mongoose = require('mongoose');
+        if (mongoose.Types.ObjectId.isValid(aggregationQuery.source)) {
+          aggregationQuery.source = new mongoose.Types.ObjectId(aggregationQuery.source);
+        }
+      }
+      
+      const aggregation = await IncomeModel.aggregate([
+        { $match: aggregationQuery },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' },
+          },
+        },
+      ]);
+      totalAmount = aggregation.length > 0 ? aggregation[0].total : 0;
+    }
+
+    const response: any = {
       incomes,
       pagination: {
         total: totalCount,
@@ -219,7 +253,13 @@ export const searchIncomes = async (req: Request, res: Response) => {
         sortBy: sortField,
         sortOrder,
       },
-    });
+    };
+
+    if (totalAmount !== null) {
+      response.totalAmount = totalAmount;
+    }
+
+    res.json(response);
   } catch (error) {
     console.error('Error searching incomes:', error);
     res.status(500).json({ error: 'Failed to search incomes' });

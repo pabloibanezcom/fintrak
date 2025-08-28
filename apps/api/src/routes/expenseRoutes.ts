@@ -112,6 +112,13 @@ router.use(authenticate); // all routes require auth
  *           enum: [asc, desc]
  *           default: desc
  *         description: Sort order
+ *       - in: query
+ *         name: includeTotal
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *           default: false
+ *         description: Whether to include total amount in response
  *     responses:
  *       200:
  *         description: Expenses retrieved successfully
@@ -139,6 +146,9 @@ router.use(authenticate); // all routes require auth
  *                   type: object
  *                 sort:
  *                   type: object
+ *                 totalAmount:
+ *                   type: number
+ *                   description: Total amount of all matching expenses (only included when includeTotal=true)
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *       500:
