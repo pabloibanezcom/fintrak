@@ -6,67 +6,63 @@ import type {
 } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import ExpenseModel from '../models/ExpenseModel';
+import { requireAuth } from '../utils/authUtils';
+import {
+  handleGenericError,
+  handleNotFoundError,
+  handleValidationError,
+} from '../utils/errorUtils';
+import { prepareAggregationQuery } from '../utils/mongoUtils';
+import {
+  buildAmountRangeQuery,
+  buildDateRangeQuery,
+  buildSortObject,
+  buildTagsQuery,
+  buildTextSearchQuery,
+  createPaginationResponse,
+  parsePaginationParams,
+  parseSortParams,
+} from '../utils/queryUtils';
 
 export const getExpenseById = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-    const { id } = req.params;
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
+    const { id } = req.params;
     const expense = await ExpenseModel.findOne({ _id: id, userId });
     if (!expense) {
-      return res.status(404).json({ error: 'Expense not found' });
+      return handleNotFoundError(res, 'Expense');
     }
 
     res.json(expense);
   } catch (error) {
-    console.error('Error fetching expense:', error);
-    res.status(500).json({ error: 'Failed to fetch expense' });
+    return handleGenericError(res, 'fetch expense', error);
   }
 };
 
 export const createExpense = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const expenseData: CreateExpenseRequest = req.body;
-
-    const expense = new ExpenseModel({
-      ...expenseData,
-      userId,
-    });
-
+    const expense = new ExpenseModel({ ...expenseData, userId });
     const savedExpense = await expense.save();
+
     res.status(201).json(savedExpense);
   } catch (error) {
-    console.error('Error creating expense:', error);
-    if (
-      error instanceof Error &&
-      'name' in error &&
-      error.name === 'ValidationError'
-    ) {
-      res
-        .status(400)
-        .json({ error: 'Validation failed', details: error.message });
-    } else {
-      res.status(500).json({ error: 'Failed to create expense' });
-    }
+    return handleValidationError(res, error, 'expense');
   }
 };
 
 export const updateExpense = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
     const updateData: UpdateExpenseRequest = req.body;
-
     const expense = await ExpenseModel.findOneAndUpdate(
       { _id: id, userId },
       updateData,
@@ -74,42 +70,36 @@ export const updateExpense = async (req: Request, res: Response) => {
     );
 
     if (!expense) {
-      return res.status(404).json({ error: 'Expense not found' });
+      return handleNotFoundError(res, 'Expense');
     }
 
     res.json(expense);
   } catch (error) {
-    console.error('Error updating expense:', error);
-    res.status(500).json({ error: 'Failed to update expense' });
+    return handleGenericError(res, 'update expense', error);
   }
 };
 
 export const deleteExpense = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-    const { id } = req.params;
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
+    const { id } = req.params;
     const expense = await ExpenseModel.findOneAndDelete({ _id: id, userId });
     if (!expense) {
-      return res.status(404).json({ error: 'Expense not found' });
+      return handleNotFoundError(res, 'Expense');
     }
 
     res.json({ message: 'Expense deleted successfully' });
   } catch (error) {
-    console.error('Error deleting expense:', error);
-    res.status(500).json({ error: 'Failed to delete expense' });
+    return handleGenericError(res, 'delete expense', error);
   }
 };
 
 export const searchExpenses = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     const {
       title,
@@ -123,87 +113,56 @@ export const searchExpenses = async (req: Request, res: Response) => {
       periodicity,
       tags,
       description,
-      limit = 50,
-      offset = 0,
-      sortBy = 'date',
-      sortOrder = 'desc',
       includeTotal = 'false',
     } = req.query;
 
     // Build query object
     const query: any = { userId };
 
-    // Text search on title and description
-    if (title) {
-      query.title = { $regex: title, $options: 'i' };
-    }
-    if (description) {
-      query.description = { $regex: description, $options: 'i' };
-    }
+    // Text search filters
+    const titleQuery = buildTextSearchQuery(title as string);
+    if (titleQuery) query.title = titleQuery;
 
-    // Date range filter
-    if (dateFrom || dateTo) {
-      query.date = {};
-      if (dateFrom) {
-        query.date.$gte = new Date(dateFrom as string);
-      }
-      if (dateTo) {
-        query.date.$lte = new Date(dateTo as string);
-      }
-    }
+    const descQuery = buildTextSearchQuery(description as string);
+    if (descQuery) query.description = descQuery;
 
-    // Amount range filter
-    if (amountMin !== undefined || amountMax !== undefined) {
-      query.amount = {};
-      if (amountMin !== undefined) {
-        query.amount.$gte = Number(amountMin);
-      }
-      if (amountMax !== undefined) {
-        query.amount.$lte = Number(amountMax);
-      }
-    }
+    // Date and amount range filters
+    const dateQuery = buildDateRangeQuery(dateFrom as string, dateTo as string);
+    if (dateQuery) query.date = dateQuery;
 
-    // Currency filter
-    if (currency) {
-      query.currency = currency;
-    }
+    const amountQuery = buildAmountRangeQuery(
+      amountMin as string,
+      amountMax as string
+    );
+    if (amountQuery) query.amount = amountQuery;
 
-    // Category filter
-    if (category) {
-      query.category = category;
-    }
+    // Direct field filters
+    if (currency) query.currency = currency;
+    if (category) query.category = category;
+    if (payee) query.payee = payee;
+    if (periodicity) query.periodicity = periodicity;
 
-    // Payee filter
-    if (payee) {
-      query.payee = payee;
-    }
+    // Tags filter
+    const tagsQuery = buildTagsQuery(tags as string | string[]);
+    if (tagsQuery) query['tags.key'] = tagsQuery;
 
-    // Periodicity filter
-    if (periodicity) {
-      query.periodicity = periodicity;
-    }
-
-    // Tags filter (match any of the provided tags)
-    if (tags) {
-      const tagArray = Array.isArray(tags) ? tags : [tags];
-      query['tags.key'] = { $in: tagArray };
-    }
-
-    // Build sort object
-    const sort: any = {};
-    const validSortFields = ['date', 'amount', 'title', 'createdAt'];
-    const sortField = validSortFields.includes(sortBy as string)
-      ? (sortBy as string)
-      : 'date';
-    sort[sortField] = sortOrder === 'asc' ? 1 : -1;
+    // Parse pagination and sorting
+    const pagination = parsePaginationParams(req);
+    const sortParams = parseSortParams(req, [
+      'date',
+      'amount',
+      'title',
+      'createdAt',
+    ]);
+    const sort = buildSortObject(sortParams);
 
     // Execute query with pagination
     const expenses = await ExpenseModel.find(query)
       .populate('category', 'key name color icon')
       .populate('payee', 'key name type')
       .sort(sort)
-      .limit(Number(limit))
-      .skip(Number(offset));
+      .limit(pagination.limit)
+      .skip(pagination.offset);
 
     // Get total count for pagination
     const totalCount = await ExpenseModel.countDocuments(query);
@@ -211,44 +170,24 @@ export const searchExpenses = async (req: Request, res: Response) => {
     // Calculate total amount if requested
     let totalAmount = null;
     if (includeTotal === 'true') {
-      // Create a clean query object for aggregation (convert ObjectIds properly)
-      const aggregationQuery = { ...query };
-      
-      // Convert category and payee to ObjectId if they're strings
-      if (aggregationQuery.category && typeof aggregationQuery.category === 'string') {
-        const mongoose = require('mongoose');
-        if (mongoose.Types.ObjectId.isValid(aggregationQuery.category)) {
-          aggregationQuery.category = new mongoose.Types.ObjectId(aggregationQuery.category);
-        }
-      }
-      
-      if (aggregationQuery.payee && typeof aggregationQuery.payee === 'string') {
-        const mongoose = require('mongoose');
-        if (mongoose.Types.ObjectId.isValid(aggregationQuery.payee)) {
-          aggregationQuery.payee = new mongoose.Types.ObjectId(aggregationQuery.payee);
-        }
-      }
-      
+      const aggregationQuery = prepareAggregationQuery(query, [
+        'category',
+        'payee',
+      ]);
       const aggregation = await ExpenseModel.aggregate([
         { $match: aggregationQuery },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: '$amount' },
-          },
-        },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
       ]);
       totalAmount = aggregation.length > 0 ? aggregation[0].total : 0;
     }
 
     const response: any = {
       expenses,
-      pagination: {
-        total: totalCount,
-        limit: Number(limit),
-        offset: Number(offset),
-        hasMore: Number(offset) + Number(limit) < totalCount,
-      },
+      pagination: createPaginationResponse(
+        totalCount,
+        pagination.limit,
+        pagination.offset
+      ),
       filters: {
         title,
         dateFrom,
@@ -263,8 +202,8 @@ export const searchExpenses = async (req: Request, res: Response) => {
         description,
       },
       sort: {
-        sortBy: sortField,
-        sortOrder,
+        sortBy: sortParams.sortBy,
+        sortOrder: sortParams.sortOrder,
       },
     };
 
@@ -274,7 +213,6 @@ export const searchExpenses = async (req: Request, res: Response) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Error searching expenses:', error);
-    res.status(500).json({ error: 'Failed to search expenses' });
+    return handleGenericError(res, 'search expenses', error);
   }
 };

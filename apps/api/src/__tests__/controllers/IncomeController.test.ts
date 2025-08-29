@@ -41,14 +41,14 @@ describe('IncomeController', () => {
       {
         _id: 'income1',
         title: 'Freelance Project',
-        amount: 1500.00,
+        amount: 1500.0,
         currency: 'EUR',
         userId: 'userId123',
       },
       {
         _id: 'income2',
         title: 'Salary',
-        amount: 2500.00,
+        amount: 2500.0,
         currency: 'EUR',
         userId: 'userId123',
       },
@@ -113,7 +113,7 @@ describe('IncomeController', () => {
     it('should return incomes with total amount when includeTotal is true', async () => {
       req.query = { includeTotal: 'true' };
 
-      const mockAggregationResult = [{ _id: null, total: 4000.00 }];
+      const mockAggregationResult = [{ _id: null, total: 4000.0 }];
       mockIncomeModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchIncomes(req as Request, res as Response);
@@ -130,7 +130,7 @@ describe('IncomeController', () => {
 
       expect(jsonMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          totalAmount: 4000.00,
+          totalAmount: 4000.0,
           incomes: mockIncomes,
           pagination: expect.any(Object),
           filters: expect.any(Object),
@@ -155,26 +155,26 @@ describe('IncomeController', () => {
     });
 
     it('should apply filters and calculate total correctly', async () => {
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
         title: 'freelance',
         amountMin: '1000',
-        currency: 'EUR'
+        currency: 'EUR',
       };
 
-      const mockAggregationResult = [{ _id: null, total: 1500.00 }];
+      const mockAggregationResult = [{ _id: null, total: 1500.0 }];
       mockIncomeModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchIncomes(req as Request, res as Response);
 
       expect(mockIncomeModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
             title: { $regex: 'freelance', $options: 'i' },
             amount: { $gte: 1000 },
-            currency: 'EUR'
-          } 
+            currency: 'EUR',
+          },
         },
         {
           $group: {
@@ -186,7 +186,7 @@ describe('IncomeController', () => {
 
       expect(jsonMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          totalAmount: 1500.00,
+          totalAmount: 1500.0,
           filters: expect.objectContaining({
             title: 'freelance',
             amountMin: '1000',
@@ -198,22 +198,22 @@ describe('IncomeController', () => {
 
     it('should handle ObjectId conversion for category filter with includeTotal', async () => {
       const mongoose = require('mongoose');
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
-        category: '507f1f77bcf86cd799439011' // Valid ObjectId string
+        category: '507f1f77bcf86cd799439011', // Valid ObjectId string
       };
 
-      const mockAggregationResult = [{ _id: null, total: 3000.00 }];
+      const mockAggregationResult = [{ _id: null, total: 3000.0 }];
       mockIncomeModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchIncomes(req as Request, res as Response);
 
       expect(mockIncomeModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
-            category: expect.any(mongoose.Types.ObjectId)
-          } 
+            category: expect.any(mongoose.Types.ObjectId),
+          },
         },
         {
           $group: {
@@ -226,22 +226,22 @@ describe('IncomeController', () => {
 
     it('should handle ObjectId conversion for source filter with includeTotal', async () => {
       const mongoose = require('mongoose');
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
-        source: '507f1f77bcf86cd799439012' // Valid ObjectId string
+        source: '507f1f77bcf86cd799439012', // Valid ObjectId string
       };
 
-      const mockAggregationResult = [{ _id: null, total: 2500.00 }];
+      const mockAggregationResult = [{ _id: null, total: 2500.0 }];
       mockIncomeModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchIncomes(req as Request, res as Response);
 
       expect(mockIncomeModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
-            source: expect.any(mongoose.Types.ObjectId)
-          } 
+            source: expect.any(mongoose.Types.ObjectId),
+          },
         },
         {
           $group: {
@@ -253,22 +253,22 @@ describe('IncomeController', () => {
     });
 
     it('should handle string source filter with includeTotal', async () => {
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
-        source: 'freelance_client' // String source (not ObjectId)
+        source: 'freelance_client', // String source (not ObjectId)
       };
 
-      const mockAggregationResult = [{ _id: null, total: 1800.00 }];
+      const mockAggregationResult = [{ _id: null, total: 1800.0 }];
       mockIncomeModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchIncomes(req as Request, res as Response);
 
       expect(mockIncomeModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
-            source: 'freelance_client' // Should remain as string
-          } 
+            source: 'freelance_client', // Should remain as string
+          },
         },
         {
           $group: {
@@ -280,26 +280,26 @@ describe('IncomeController', () => {
     });
 
     it('should handle date range filters with includeTotal', async () => {
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
         dateFrom: '2024-01-01',
-        dateTo: '2024-12-31'
+        dateTo: '2024-12-31',
       };
 
-      const mockAggregationResult = [{ _id: null, total: 5000.00 }];
+      const mockAggregationResult = [{ _id: null, total: 5000.0 }];
       mockIncomeModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchIncomes(req as Request, res as Response);
 
       expect(mockIncomeModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
             date: {
               $gte: new Date('2024-01-01'),
-              $lte: new Date('2024-12-31')
-            }
-          } 
+              $lte: new Date('2024-12-31'),
+            },
+          },
         },
         {
           $group: {
@@ -312,14 +312,14 @@ describe('IncomeController', () => {
 
     it('should handle errors gracefully', async () => {
       req.query = { includeTotal: 'true' };
-      
+
       mockIncomeModel.aggregate.mockRejectedValue(new Error('Database error'));
 
       await searchIncomes(req as Request, res as Response);
 
       expect(statusMock).toHaveBeenCalledWith(500);
-      expect(jsonMock).toHaveBeenCalledWith({ 
-        error: 'Failed to search incomes' 
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: 'Failed to search incomes',
       });
     });
   });

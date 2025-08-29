@@ -42,14 +42,14 @@ describe('ExpenseController', () => {
       {
         _id: 'expense1',
         title: 'Grocery Shopping',
-        amount: 85.50,
+        amount: 85.5,
         currency: 'EUR',
         userId: 'userId123',
       },
       {
         _id: 'expense2',
         title: 'Gas Station',
-        amount: 45.20,
+        amount: 45.2,
         currency: 'EUR',
         userId: 'userId123',
       },
@@ -114,7 +114,7 @@ describe('ExpenseController', () => {
     it('should return expenses with total amount when includeTotal is true', async () => {
       req.query = { includeTotal: 'true' };
 
-      const mockAggregationResult = [{ _id: null, total: 130.70 }];
+      const mockAggregationResult = [{ _id: null, total: 130.7 }];
       mockExpenseModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchExpenses(req as Request, res as Response);
@@ -131,7 +131,7 @@ describe('ExpenseController', () => {
 
       expect(jsonMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          totalAmount: 130.70,
+          totalAmount: 130.7,
           expenses: mockExpenses,
           pagination: expect.any(Object),
           filters: expect.any(Object),
@@ -156,26 +156,26 @@ describe('ExpenseController', () => {
     });
 
     it('should apply filters and calculate total correctly', async () => {
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
         title: 'grocery',
         amountMin: '50',
-        currency: 'EUR'
+        currency: 'EUR',
       };
 
-      const mockAggregationResult = [{ _id: null, total: 85.50 }];
+      const mockAggregationResult = [{ _id: null, total: 85.5 }];
       mockExpenseModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchExpenses(req as Request, res as Response);
 
       expect(mockExpenseModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
             title: { $regex: 'grocery', $options: 'i' },
             amount: { $gte: 50 },
-            currency: 'EUR'
-          } 
+            currency: 'EUR',
+          },
         },
         {
           $group: {
@@ -187,7 +187,7 @@ describe('ExpenseController', () => {
 
       expect(jsonMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          totalAmount: 85.50,
+          totalAmount: 85.5,
           filters: expect.objectContaining({
             title: 'grocery',
             amountMin: '50',
@@ -199,22 +199,22 @@ describe('ExpenseController', () => {
 
     it('should handle ObjectId conversion for category filter with includeTotal', async () => {
       const mongoose = require('mongoose');
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
-        category: '507f1f77bcf86cd799439011' // Valid ObjectId string
+        category: '507f1f77bcf86cd799439011', // Valid ObjectId string
       };
 
-      const mockAggregationResult = [{ _id: null, total: 200.00 }];
+      const mockAggregationResult = [{ _id: null, total: 200.0 }];
       mockExpenseModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchExpenses(req as Request, res as Response);
 
       expect(mockExpenseModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
-            category: expect.any(mongoose.Types.ObjectId)
-          } 
+            category: expect.any(mongoose.Types.ObjectId),
+          },
         },
         {
           $group: {
@@ -226,22 +226,22 @@ describe('ExpenseController', () => {
     });
 
     it('should handle string category filter with includeTotal', async () => {
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
-        category: 'food' // String category (not ObjectId)
+        category: 'food', // String category (not ObjectId)
       };
 
-      const mockAggregationResult = [{ _id: null, total: 150.00 }];
+      const mockAggregationResult = [{ _id: null, total: 150.0 }];
       mockExpenseModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchExpenses(req as Request, res as Response);
 
       expect(mockExpenseModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
-            category: 'food' // Should remain as string
-          } 
+            category: 'food', // Should remain as string
+          },
         },
         {
           $group: {
@@ -253,26 +253,26 @@ describe('ExpenseController', () => {
     });
 
     it('should handle date range filters with includeTotal', async () => {
-      req.query = { 
+      req.query = {
         includeTotal: 'true',
         dateFrom: '2024-01-01',
-        dateTo: '2024-12-31'
+        dateTo: '2024-12-31',
       };
 
-      const mockAggregationResult = [{ _id: null, total: 500.00 }];
+      const mockAggregationResult = [{ _id: null, total: 500.0 }];
       mockExpenseModel.aggregate.mockResolvedValue(mockAggregationResult);
 
       await searchExpenses(req as Request, res as Response);
 
       expect(mockExpenseModel.aggregate).toHaveBeenCalledWith([
-        { 
-          $match: { 
+        {
+          $match: {
             userId: 'userId123',
             date: {
               $gte: new Date('2024-01-01'),
-              $lte: new Date('2024-12-31')
-            }
-          } 
+              $lte: new Date('2024-12-31'),
+            },
+          },
         },
         {
           $group: {
@@ -285,14 +285,14 @@ describe('ExpenseController', () => {
 
     it('should handle errors gracefully', async () => {
       req.query = { includeTotal: 'true' };
-      
+
       mockExpenseModel.aggregate.mockRejectedValue(new Error('Database error'));
 
       await searchExpenses(req as Request, res as Response);
 
       expect(statusMock).toHaveBeenCalledWith(500);
-      expect(jsonMock).toHaveBeenCalledWith({ 
-        error: 'Failed to search expenses' 
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: 'Failed to search expenses',
       });
     });
   });

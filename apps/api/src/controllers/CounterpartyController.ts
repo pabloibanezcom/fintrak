@@ -3,13 +3,13 @@
 import type { Counterparty } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import CounterpartyModel from '../models/CounterpartyModel';
+import { requireAuth } from '../utils/authUtils';
+import { handleGenericError, handleNotFoundError } from '../utils/errorUtils';
 
 export const searchCounterparties = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     const {
       name,
@@ -93,37 +93,31 @@ export const searchCounterparties = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Error searching counterparties:', error);
-    res.status(500).json({ error: 'Failed to search counterparties' });
+    return handleGenericError(res, 'search counterparties', error);
   }
 };
 
 export const getCounterpartyById = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const { id } = req.params;
 
     const counterparty = await CounterpartyModel.findOne({ key: id, userId });
     if (!counterparty) {
-      return res.status(404).json({ error: 'Counterparty not found' });
+      return handleNotFoundError(res, 'Counterparty');
     }
 
     res.json(counterparty);
   } catch (error) {
-    console.error('Error fetching counterparty:', error);
-    res.status(500).json({ error: 'Failed to fetch counterparty' });
+    return handleGenericError(res, 'fetch counterparty', error);
   }
 };
 
 export const createCounterparty = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const counterpartyData: Counterparty = req.body;
 
     // Check if counterparty with same key already exists for this user
@@ -146,17 +140,14 @@ export const createCounterparty = async (req: Request, res: Response) => {
     const savedCounterparty = await counterparty.save();
     res.status(201).json(savedCounterparty);
   } catch (error) {
-    console.error('Error creating counterparty:', error);
-    res.status(500).json({ error: 'Failed to create counterparty' });
+    return handleGenericError(res, 'create counterparty', error);
   }
 };
 
 export const updateCounterparty = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const { id } = req.params;
     const updateData: Partial<Counterparty> = req.body;
 
@@ -167,22 +158,19 @@ export const updateCounterparty = async (req: Request, res: Response) => {
     );
 
     if (!counterparty) {
-      return res.status(404).json({ error: 'Counterparty not found' });
+      return handleNotFoundError(res, 'Counterparty');
     }
 
     res.json(counterparty);
   } catch (error) {
-    console.error('Error updating counterparty:', error);
-    res.status(500).json({ error: 'Failed to update counterparty' });
+    return handleGenericError(res, 'update counterparty', error);
   }
 };
 
 export const deleteCounterparty = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const { id } = req.params;
 
     const counterparty = await CounterpartyModel.findOneAndDelete({
@@ -190,12 +178,11 @@ export const deleteCounterparty = async (req: Request, res: Response) => {
       userId,
     });
     if (!counterparty) {
-      return res.status(404).json({ error: 'Counterparty not found' });
+      return handleNotFoundError(res, 'Counterparty');
     }
 
     res.json({ message: 'Counterparty deleted successfully' });
   } catch (error) {
-    console.error('Error deleting counterparty:', error);
-    res.status(500).json({ error: 'Failed to delete counterparty' });
+    return handleGenericError(res, 'delete counterparty', error);
   }
 };
