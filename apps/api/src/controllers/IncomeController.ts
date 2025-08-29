@@ -3,57 +3,59 @@
 import type { CreateIncomeRequest, UpdateIncomeRequest } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import IncomeModel from '../models/IncomeModel';
+import { requireAuth } from '../utils/authUtils';
+import { handleGenericError, handleNotFoundError } from '../utils/errorUtils';
+import { prepareAggregationQuery } from '../utils/mongoUtils';
+import {
+  buildAmountRangeQuery,
+  buildDateRangeQuery,
+  buildSortObject,
+  buildTagsQuery,
+  buildTextSearchQuery,
+  createPaginationResponse,
+  parsePaginationParams,
+  parseSortParams,
+} from '../utils/queryUtils';
 
 export const getIncomeById = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-    const { id } = req.params;
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
+    const { id } = req.params;
     const income = await IncomeModel.findOne({ _id: id, userId });
     if (!income) {
-      return res.status(404).json({ error: 'Income not found' });
+      return handleNotFoundError(res, 'Income');
     }
 
     res.json(income);
   } catch (error) {
-    console.error('Error fetching income:', error);
-    res.status(500).json({ error: 'Failed to fetch income' });
+    return handleGenericError(res, 'fetch income', error);
   }
 };
 
 export const createIncome = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const incomeData: CreateIncomeRequest = req.body;
-
-    const income = new IncomeModel({
-      ...incomeData,
-      userId,
-    });
-
+    const income = new IncomeModel({ ...incomeData, userId });
     const savedIncome = await income.save();
+
     res.status(201).json(savedIncome);
   } catch (error) {
-    console.error('Error creating income:', error);
-    res.status(500).json({ error: 'Failed to create income' });
+    return handleGenericError(res, 'create income', error);
   }
 };
 
 export const updateIncome = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
     const updateData: UpdateIncomeRequest = req.body;
-
     const income = await IncomeModel.findOneAndUpdate(
       { _id: id, userId },
       updateData,
@@ -61,42 +63,36 @@ export const updateIncome = async (req: Request, res: Response) => {
     );
 
     if (!income) {
-      return res.status(404).json({ error: 'Income not found' });
+      return handleNotFoundError(res, 'Income');
     }
 
     res.json(income);
   } catch (error) {
-    console.error('Error updating income:', error);
-    res.status(500).json({ error: 'Failed to update income' });
+    return handleGenericError(res, 'update income', error);
   }
 };
 
 export const deleteIncome = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-    const { id } = req.params;
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
+    const { id } = req.params;
     const income = await IncomeModel.findOneAndDelete({ _id: id, userId });
     if (!income) {
-      return res.status(404).json({ error: 'Income not found' });
+      return handleNotFoundError(res, 'Income');
     }
 
     res.json({ message: 'Income deleted successfully' });
   } catch (error) {
-    console.error('Error deleting income:', error);
-    res.status(500).json({ error: 'Failed to delete income' });
+    return handleGenericError(res, 'delete income', error);
   }
 };
 
 export const searchIncomes = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     const {
       title,
@@ -110,87 +106,56 @@ export const searchIncomes = async (req: Request, res: Response) => {
       periodicity,
       tags,
       description,
-      limit = 50,
-      offset = 0,
-      sortBy = 'date',
-      sortOrder = 'desc',
       includeTotal = 'false',
     } = req.query;
 
     // Build query object
     const query: any = { userId };
 
-    // Text search on title and description
-    if (title) {
-      query.title = { $regex: title, $options: 'i' };
-    }
-    if (description) {
-      query.description = { $regex: description, $options: 'i' };
-    }
+    // Text search filters
+    const titleQuery = buildTextSearchQuery(title as string);
+    if (titleQuery) query.title = titleQuery;
 
-    // Date range filter
-    if (dateFrom || dateTo) {
-      query.date = {};
-      if (dateFrom) {
-        query.date.$gte = new Date(dateFrom as string);
-      }
-      if (dateTo) {
-        query.date.$lte = new Date(dateTo as string);
-      }
-    }
+    const descQuery = buildTextSearchQuery(description as string);
+    if (descQuery) query.description = descQuery;
 
-    // Amount range filter
-    if (amountMin !== undefined || amountMax !== undefined) {
-      query.amount = {};
-      if (amountMin !== undefined) {
-        query.amount.$gte = Number(amountMin);
-      }
-      if (amountMax !== undefined) {
-        query.amount.$lte = Number(amountMax);
-      }
-    }
+    // Date and amount range filters
+    const dateQuery = buildDateRangeQuery(dateFrom as string, dateTo as string);
+    if (dateQuery) query.date = dateQuery;
 
-    // Currency filter
-    if (currency) {
-      query.currency = currency;
-    }
+    const amountQuery = buildAmountRangeQuery(
+      amountMin as string,
+      amountMax as string
+    );
+    if (amountQuery) query.amount = amountQuery;
 
-    // Category filter
-    if (category) {
-      query.category = category;
-    }
+    // Direct field filters
+    if (currency) query.currency = currency;
+    if (category) query.category = category;
+    if (source) query.source = source;
+    if (periodicity) query.periodicity = periodicity;
 
-    // Source filter
-    if (source) {
-      query.source = source;
-    }
+    // Tags filter
+    const tagsQuery = buildTagsQuery(tags as string | string[]);
+    if (tagsQuery) query['tags.key'] = tagsQuery;
 
-    // Periodicity filter
-    if (periodicity) {
-      query.periodicity = periodicity;
-    }
-
-    // Tags filter (match any of the provided tags)
-    if (tags) {
-      const tagArray = Array.isArray(tags) ? tags : [tags];
-      query['tags.key'] = { $in: tagArray };
-    }
-
-    // Build sort object
-    const sort: any = {};
-    const validSortFields = ['date', 'amount', 'title', 'createdAt'];
-    const sortField = validSortFields.includes(sortBy as string)
-      ? (sortBy as string)
-      : 'date';
-    sort[sortField] = sortOrder === 'asc' ? 1 : -1;
+    // Parse pagination and sorting
+    const pagination = parsePaginationParams(req);
+    const sortParams = parseSortParams(req, [
+      'date',
+      'amount',
+      'title',
+      'createdAt',
+    ]);
+    const sort = buildSortObject(sortParams);
 
     // Execute query with pagination
     const incomes = await IncomeModel.find(query)
       .populate('category', 'key name color icon')
       .populate('source', 'key name type')
       .sort(sort)
-      .limit(Number(limit))
-      .skip(Number(offset));
+      .limit(pagination.limit)
+      .skip(pagination.offset);
 
     // Get total count for pagination
     const totalCount = await IncomeModel.countDocuments(query);
@@ -198,44 +163,24 @@ export const searchIncomes = async (req: Request, res: Response) => {
     // Calculate total amount if requested
     let totalAmount = null;
     if (includeTotal === 'true') {
-      // Create a clean query object for aggregation (convert ObjectIds properly)
-      const aggregationQuery = { ...query };
-      
-      // Convert category and source to ObjectId if they're strings
-      if (aggregationQuery.category && typeof aggregationQuery.category === 'string') {
-        const mongoose = require('mongoose');
-        if (mongoose.Types.ObjectId.isValid(aggregationQuery.category)) {
-          aggregationQuery.category = new mongoose.Types.ObjectId(aggregationQuery.category);
-        }
-      }
-      
-      if (aggregationQuery.source && typeof aggregationQuery.source === 'string') {
-        const mongoose = require('mongoose');
-        if (mongoose.Types.ObjectId.isValid(aggregationQuery.source)) {
-          aggregationQuery.source = new mongoose.Types.ObjectId(aggregationQuery.source);
-        }
-      }
-      
+      const aggregationQuery = prepareAggregationQuery(query, [
+        'category',
+        'source',
+      ]);
       const aggregation = await IncomeModel.aggregate([
         { $match: aggregationQuery },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: '$amount' },
-          },
-        },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
       ]);
       totalAmount = aggregation.length > 0 ? aggregation[0].total : 0;
     }
 
     const response: any = {
       incomes,
-      pagination: {
-        total: totalCount,
-        limit: Number(limit),
-        offset: Number(offset),
-        hasMore: Number(offset) + Number(limit) < totalCount,
-      },
+      pagination: createPaginationResponse(
+        totalCount,
+        pagination.limit,
+        pagination.offset
+      ),
       filters: {
         title,
         dateFrom,
@@ -250,8 +195,8 @@ export const searchIncomes = async (req: Request, res: Response) => {
         description,
       },
       sort: {
-        sortBy: sortField,
-        sortOrder,
+        sortBy: sortParams.sortBy,
+        sortOrder: sortParams.sortOrder,
       },
     };
 
@@ -261,7 +206,6 @@ export const searchIncomes = async (req: Request, res: Response) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Error searching incomes:', error);
-    res.status(500).json({ error: 'Failed to search incomes' });
+    return handleGenericError(res, 'search incomes', error);
   }
 };

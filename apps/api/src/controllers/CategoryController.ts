@@ -3,47 +3,41 @@
 import type { Category } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import CategoryModel from '../models/CategoryModel';
+import { requireAuth } from '../utils/authUtils';
+import { handleGenericError, handleNotFoundError } from '../utils/errorUtils';
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const categories = await CategoryModel.find({ userId }).sort({ name: 1 });
     res.json(categories);
   } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).json({ error: 'Failed to fetch categories' });
+    return handleGenericError(res, 'fetch categories', error);
   }
 };
 
 export const getCategoryById = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const { id } = req.params;
 
     const category = await CategoryModel.findOne({ key: id, userId });
     if (!category) {
-      return res.status(404).json({ error: 'Category not found' });
+      return handleNotFoundError(res, 'Category');
     }
 
     res.json(category);
   } catch (error) {
-    console.error('Error fetching category:', error);
-    res.status(500).json({ error: 'Failed to fetch category' });
+    return handleGenericError(res, 'fetch category', error);
   }
 };
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const categoryData: Category = req.body;
 
     // Check if category with same id already exists for this user
@@ -66,17 +60,14 @@ export const createCategory = async (req: Request, res: Response) => {
     const savedCategory = await category.save();
     res.status(201).json(savedCategory);
   } catch (error) {
-    console.error('Error creating category:', error);
-    res.status(500).json({ error: 'Failed to create category' });
+    return handleGenericError(res, 'create category', error);
   }
 };
 
 export const updateCategory = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const { id } = req.params;
     const updateData: Partial<Category> = req.body;
 
@@ -87,32 +78,28 @@ export const updateCategory = async (req: Request, res: Response) => {
     );
 
     if (!category) {
-      return res.status(404).json({ error: 'Category not found' });
+      return handleNotFoundError(res, 'Category');
     }
 
     res.json(category);
   } catch (error) {
-    console.error('Error updating category:', error);
-    res.status(500).json({ error: 'Failed to update category' });
+    return handleGenericError(res, 'update category', error);
   }
 };
 
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
     const { id } = req.params;
 
     const category = await CategoryModel.findOneAndDelete({ key: id, userId });
     if (!category) {
-      return res.status(404).json({ error: 'Category not found' });
+      return handleNotFoundError(res, 'Category');
     }
 
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
-    console.error('Error deleting category:', error);
-    res.status(500).json({ error: 'Failed to delete category' });
+    return handleGenericError(res, 'delete category', error);
   }
 };
