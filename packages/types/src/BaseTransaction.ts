@@ -1,6 +1,7 @@
 import type { Category } from './Category';
 import type { Currency } from './Currency';
 import type { Periodicity } from './Periodicity';
+import type { RecurringTransaction } from './RecurringTransaction';
 import type { Tag } from './Tag';
 
 /**
@@ -33,4 +34,7 @@ export interface BaseTransaction {
   
   /** Optional tags for additional categorization */
   tags?: Tag[];
+  
+  /** Optional reference to a recurring transaction template that generated this transaction */
+  recurringTransaction?: RecurringTransaction;
 }

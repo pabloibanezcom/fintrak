@@ -3,6 +3,7 @@ import type {
   Counterparty,
   Currency,
   Periodicity,
+  RecurringTransaction,
   Tag,
 } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
@@ -18,6 +19,7 @@ export interface IExpense extends Document {
   periodicity: Periodicity;
   description?: string;
   tags?: Tag[];
+  recurringTransaction?: RecurringTransaction;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -53,6 +55,10 @@ const ExpenseSchema: Schema = new Schema(
         type: tagSchemaDefinition,
       },
     ],
+    recurringTransaction: {
+      type: Schema.Types.ObjectId,
+      ref: 'RecurringTransaction',
+    },
     userId: { type: String, required: true },
   },
   {

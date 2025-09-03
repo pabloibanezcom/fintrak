@@ -249,4 +249,59 @@ router.post(
   controller.importCounterparties
 );
 
+/**
+ * @swagger
+ * /api/import/recurring-transactions:
+ *   post:
+ *     summary: Import recurring transactions from JSON file
+ *     tags:
+ *       - Import
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: JSON file containing recurring transactions
+ *     responses:
+ *       200:
+ *         description: Import results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                   description: Total number of recurring transactions processed
+ *                 imported:
+ *                   type: number
+ *                   description: Number of recurring transactions successfully imported
+ *                 updated:
+ *                   type: number
+ *                   description: Number of recurring transactions updated
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of errors encountered during import
+ *       400:
+ *         description: Bad request - no file uploaded or invalid JSON
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+  '/recurring-transactions',
+  controller.upload.single('file'),
+  controller.importRecurringTransactions
+);
+
 export default router;

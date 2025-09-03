@@ -1114,9 +1114,89 @@
 							"body": "{\n  \"total\": 32,\n  \"imported\": 30,\n  \"updated\": 2,\n  \"errors\": []\n}"
 						}
 					]
+				},
+				{
+					"name": "Import Recurring Transactions from JSON",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/data/recurringTransactions.json"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/import/recurring-transactions",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"import",
+								"recurring-transactions"
+							]
+						},
+						"description": "Import recurring transactions from JSON file. The file should contain an array of recurring transaction objects with title, currency, category, transactionType, periodicity, and optional minAproxAmount/maxAproxAmount."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/data/recurringTransactions.json"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/import/recurring-transactions",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"import",
+										"recurring-transactions"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"total\": 15,\n  \"imported\": 13,\n  \"updated\": 2,\n  \"errors\": []\n}"
+						}
+					]
 				}
 			],
-			"description": "Import data from external files. Supports Excel transactions (BBVA format), JSON categories with smart keywords, JSON tags, and JSON counterparties. All imports prevent duplicates by replacing existing items with same keys."
+			"description": "Import data from external files. Supports Excel transactions (BBVA format), JSON categories with smart keywords, JSON tags, JSON counterparties, and JSON recurring transactions. All imports prevent duplicates by replacing existing items with same keys."
 		},
 		{
 			"name": "Incomes",
@@ -1438,6 +1518,410 @@
 				}
 			],
 			"description": "Complete CRUD operations for income tracking with advanced search and filtering capabilities"
+		},
+		{
+			"name": "Recurring Transactions",
+			"item": [
+				{
+					"name": "Search Recurring Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{rootUrl}}/api/recurring-transactions/search?limit=20&offset=0&sortBy=createdAt&sortOrder=desc&transactionType=EXPENSE&periodicity=MONTHLY",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"recurring-transactions",
+								"search"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Alquiler",
+									"disabled": true,
+									"description": "Search by title (case-insensitive)"
+								},
+								{
+									"key": "currency",
+									"value": "EUR",
+									"disabled": true,
+									"description": "Filter by currency"
+								},
+								{
+									"key": "category",
+									"value": "{{category_id}}",
+									"disabled": true,
+									"description": "Filter by category ID"
+								},
+								{
+									"key": "transactionType",
+									"value": "EXPENSE",
+									"description": "Filter by transaction type"
+								},
+								{
+									"key": "periodicity",
+									"value": "MONTHLY",
+									"description": "Filter by periodicity"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of results"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Results offset"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt",
+									"description": "Sort field"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc",
+									"description": "Sort order"
+								}
+							]
+						},
+						"description": "Search and filter recurring transactions with pagination"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{rootUrl}}/api/recurring-transactions/search?limit=20&offset=0&sortBy=createdAt&sortOrder=desc",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"recurring-transactions",
+										"search"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "sortBy",
+											"value": "createdAt"
+										},
+										{
+											"key": "sortOrder",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"recurringTransactions\": [\n    {\n      \"id\": \"674a1b2c3d4e5f6789abcdef\",\n      \"title\": \"Alquiler\",\n      \"currency\": \"EUR\",\n      \"category\": {\n        \"id\": \"674a1b2c3d4e5f6789abcd01\",\n        \"key\": \"vivienda\",\n        \"name\": \"Vivienda\",\n        \"color\": \"#8B5CF6\",\n        \"icon\": \"home\"\n      },\n      \"transactionType\": \"EXPENSE\",\n      \"minAproxAmount\": 800,\n      \"maxAproxAmount\": 1200,\n      \"periodicity\": \"MONTHLY\",\n      \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n      \"updatedAt\": \"2024-01-15T10:00:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 15,\n    \"limit\": 20,\n    \"offset\": 0,\n    \"hasMore\": false\n  },\n  \"filters\": {\n    \"transactionType\": \"EXPENSE\",\n    \"periodicity\": \"MONTHLY\"\n  },\n  \"sort\": {\n    \"sortBy\": \"createdAt\",\n    \"sortOrder\": \"desc\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Recurring Transaction by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{rootUrl}}/api/recurring-transactions/{{recurring_transaction_id}}",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"recurring-transactions",
+								"{{recurring_transaction_id}}"
+							]
+						},
+						"description": "Get a specific recurring transaction by ID"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{rootUrl}}/api/recurring-transactions/674a1b2c3d4e5f6789abcdef",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"recurring-transactions",
+										"674a1b2c3d4e5f6789abcdef"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"674a1b2c3d4e5f6789abcdef\",\n  \"title\": \"Alquiler\",\n  \"currency\": \"EUR\",\n  \"category\": {\n    \"id\": \"674a1b2c3d4e5f6789abcd01\",\n    \"key\": \"vivienda\",\n    \"name\": \"Vivienda\",\n    \"color\": \"#8B5CF6\",\n    \"icon\": \"home\"\n  },\n  \"transactionType\": \"EXPENSE\",\n  \"minAproxAmount\": 800,\n  \"maxAproxAmount\": 1200,\n  \"periodicity\": \"MONTHLY\",\n  \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-15T10:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Recurring Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Seguro del coche\",\n  \"currency\": \"EUR\",\n  \"category\": \"{{category_id}}\",\n  \"transactionType\": \"EXPENSE\",\n  \"minAproxAmount\": 150,\n  \"maxAproxAmount\": 300,\n  \"periodicity\": \"QUARTERLY\"\n}"
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/recurring-transactions",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"recurring-transactions"
+							]
+						},
+						"description": "Create a new recurring transaction"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Seguro del coche\",\n  \"currency\": \"EUR\",\n  \"category\": \"674a1b2c3d4e5f6789abcd01\",\n  \"transactionType\": \"EXPENSE\",\n  \"minAproxAmount\": 150,\n  \"maxAproxAmount\": 300,\n  \"periodicity\": \"QUARTERLY\"\n}"
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/recurring-transactions",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"recurring-transactions"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"674a1b2c3d4e5f6789abcde0\",\n  \"title\": \"Seguro del coche\",\n  \"currency\": \"EUR\",\n  \"category\": {\n    \"id\": \"674a1b2c3d4e5f6789abcd01\",\n    \"key\": \"transporte\",\n    \"name\": \"Transporte\",\n    \"color\": \"#4ECDC4\",\n    \"icon\": \"car\"\n  },\n  \"transactionType\": \"EXPENSE\",\n  \"minAproxAmount\": 150,\n  \"maxAproxAmount\": 300,\n  \"periodicity\": \"QUARTERLY\",\n  \"createdAt\": \"2024-01-15T10:30:00.000Z\",\n  \"updatedAt\": \"2024-01-15T10:30:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Recurring Transaction",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Seguro del coche actualizado\",\n  \"minAproxAmount\": 160,\n  \"maxAproxAmount\": 320\n}"
+						},
+						"url": {
+							"raw": "{{rootUrl}}/api/recurring-transactions/{{recurring_transaction_id}}",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"recurring-transactions",
+								"{{recurring_transaction_id}}"
+							]
+						},
+						"description": "Update an existing recurring transaction"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Seguro del coche actualizado\",\n  \"minAproxAmount\": 160,\n  \"maxAproxAmount\": 320\n}"
+								},
+								"url": {
+									"raw": "{{rootUrl}}/api/recurring-transactions/674a1b2c3d4e5f6789abcde0",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"recurring-transactions",
+										"674a1b2c3d4e5f6789abcde0"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"674a1b2c3d4e5f6789abcde0\",\n  \"title\": \"Seguro del coche actualizado\",\n  \"currency\": \"EUR\",\n  \"category\": {\n    \"id\": \"674a1b2c3d4e5f6789abcd01\",\n    \"key\": \"transporte\",\n    \"name\": \"Transporte\",\n    \"color\": \"#4ECDC4\",\n    \"icon\": \"car\"\n  },\n  \"transactionType\": \"EXPENSE\",\n  \"minAproxAmount\": 160,\n  \"maxAproxAmount\": 320,\n  \"periodicity\": \"QUARTERLY\",\n  \"createdAt\": \"2024-01-15T10:30:00.000Z\",\n  \"updatedAt\": \"2024-01-15T11:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Recurring Transaction",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{rootUrl}}/api/recurring-transactions/{{recurring_transaction_id}}",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"recurring-transactions",
+								"{{recurring_transaction_id}}"
+							]
+						},
+						"description": "Delete an existing recurring transaction"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{rootUrl}}/api/recurring-transactions/674a1b2c3d4e5f6789abcde0",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"recurring-transactions",
+										"674a1b2c3d4e5f6789abcde0"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"message\": \"Recurring transaction deleted successfully\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Complete CRUD operations for recurring transactions with search and filtering capabilities. Manage templates for recurring expenses and income."
 		},
 		{
 			"name": "Categories",

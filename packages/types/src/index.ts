@@ -30,6 +30,13 @@ export {
 } from "./MI";
 export { Periodicity } from "./Periodicity";
 export { Product } from "./Product";
+export {
+  RecurringTransactionPeriodicity,
+  BaseRecurringTransaction,
+  RecurringTransaction,
+  CreateRecurringTransactionRequest,
+  UpdateRecurringTransactionRequest,
+} from "./RecurringTransaction";
 export { Tag } from "./Tag";
 export {
   BankTransaction,
