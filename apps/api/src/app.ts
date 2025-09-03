@@ -9,6 +9,7 @@ import expenseRoutes from './routes/expenseRoutes';
 import importRoutes from './routes/importRoutes';
 import incomeRoutes from './routes/incomeRoutes';
 import productRoutes from './routes/productRoutes';
+import recurringTransactionRoutes from './routes/recurringTransactionRoutes';
 import tagRoutes from './routes/tagRoutes';
 
 const app = express();
@@ -27,6 +28,7 @@ app.use('/api', expenseRoutes);
 app.use('/api/import', importRoutes);
 app.use('/api', incomeRoutes);
 app.use('/api', productRoutes);
+app.use('/api', recurringTransactionRoutes);
 app.use('/api', tagRoutes);
 
 app.use('/', (_req, res) => {

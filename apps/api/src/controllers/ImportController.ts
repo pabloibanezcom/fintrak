@@ -1,4 +1,8 @@
-import type { Currency, Periodicity } from '@fintrak/types';
+import type {
+  Currency,
+  Periodicity,
+  RecurringTransactionPeriodicity,
+} from '@fintrak/types';
 import type { Request, Response } from 'express';
 import multer from 'multer';
 import * as XLSX from 'xlsx';
@@ -6,6 +10,7 @@ import CategoryModel from '../models/CategoryModel';
 import CounterpartyModel from '../models/CounterpartyModel';
 import ExpenseModel from '../models/ExpenseModel';
 import IncomeModel from '../models/IncomeModel';
+import RecurringTransactionModel from '../models/RecurringTransactionModel';
 import TagModel from '../models/TagModel';
 
 const storage = multer.memoryStorage();
@@ -627,6 +632,210 @@ export const importCounterparties = async (req: Request, res: Response) => {
     console.error('Counterparty import error:', error);
     res.status(500).json({
       error: 'Failed to import counterparties',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const importRecurringTransactions = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Parse JSON file
+    let recurringTransactionsData: any[];
+    try {
+      const fileContent = req.file.buffer.toString('utf-8');
+      const parsedData = JSON.parse(fileContent);
+
+      // Handle both array format and object with recurringTransactions property
+      recurringTransactionsData = Array.isArray(parsedData)
+        ? parsedData
+        : parsedData.recurringTransactions;
+
+      if (!Array.isArray(recurringTransactionsData)) {
+        return res.status(400).json({
+          error:
+            'Invalid JSON format. Expected array of recurring transactions or object with recurringTransactions property',
+        });
+      }
+    } catch (error) {
+      return res.status(400).json({
+        error: 'Invalid JSON file',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+
+    const results = {
+      total: recurringTransactionsData.length,
+      imported: 0,
+      updated: 0,
+      errors: [] as string[],
+    };
+
+    for (let i = 0; i < recurringTransactionsData.length; i++) {
+      try {
+        const recurringTransactionData = recurringTransactionsData[i];
+
+        // Validate required fields
+        if (
+          !recurringTransactionData.title ||
+          !recurringTransactionData.currency ||
+          !recurringTransactionData.category ||
+          !recurringTransactionData.transactionType ||
+          !recurringTransactionData.periodicity
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: Missing required fields (title, currency, category, transactionType, periodicity)`
+          );
+          continue;
+        }
+
+        // Validate currency
+        if (
+          !['EUR', 'GBP', 'USD'].includes(recurringTransactionData.currency)
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: Invalid currency. Expected: EUR, GBP, or USD`
+          );
+          continue;
+        }
+
+        // Validate transaction type
+        if (
+          !['EXPENSE', 'INCOME'].includes(
+            recurringTransactionData.transactionType
+          )
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: Invalid transaction type. Expected: EXPENSE or INCOME`
+          );
+          continue;
+        }
+
+        // Validate periodicity
+        if (
+          !['MONTHLY', 'QUARTERLY', 'YEARLY'].includes(
+            recurringTransactionData.periodicity
+          )
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: Invalid periodicity. Expected: MONTHLY, QUARTERLY, or YEARLY`
+          );
+          continue;
+        }
+
+        // Validate amount ranges if provided
+        if (
+          recurringTransactionData.minAproxAmount !== undefined &&
+          recurringTransactionData.minAproxAmount < 0
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: minAproxAmount must be non-negative`
+          );
+          continue;
+        }
+
+        if (
+          recurringTransactionData.maxAproxAmount !== undefined &&
+          recurringTransactionData.maxAproxAmount < 0
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: maxAproxAmount must be non-negative`
+          );
+          continue;
+        }
+
+        if (
+          recurringTransactionData.minAproxAmount !== undefined &&
+          recurringTransactionData.maxAproxAmount !== undefined &&
+          recurringTransactionData.minAproxAmount >
+            recurringTransactionData.maxAproxAmount
+        ) {
+          results.errors.push(
+            `Row ${i + 1}: minAproxAmount cannot be greater than maxAproxAmount`
+          );
+          continue;
+        }
+
+        // Find or create category
+        let category = await CategoryModel.findOne({
+          userId,
+          key: recurringTransactionData.category,
+        });
+
+        if (!category) {
+          // Category doesn't exist, create a basic one
+          category = await CategoryModel.create({
+            key: recurringTransactionData.category,
+            name:
+              recurringTransactionData.category.charAt(0).toUpperCase() +
+              recurringTransactionData.category.slice(1),
+            color: '#6B7280',
+            icon: 'folder',
+            keywords: [],
+            userId,
+          });
+        }
+
+        // Check if recurring transaction already exists (same user, title, and periodicity)
+        const existingRecurringTransaction =
+          await RecurringTransactionModel.findOne({
+            userId,
+            title: recurringTransactionData.title,
+            periodicity: recurringTransactionData.periodicity,
+          });
+
+        const recurringTransactionDoc = {
+          title: recurringTransactionData.title,
+          currency: recurringTransactionData.currency as Currency,
+          category: category._id,
+          transactionType: recurringTransactionData.transactionType,
+          minAproxAmount: recurringTransactionData.minAproxAmount,
+          maxAproxAmount: recurringTransactionData.maxAproxAmount,
+          periodicity:
+            recurringTransactionData.periodicity as RecurringTransactionPeriodicity,
+          userId,
+        };
+
+        if (existingRecurringTransaction) {
+          // Update existing recurring transaction
+          await RecurringTransactionModel.findOneAndUpdate(
+            {
+              userId,
+              title: recurringTransactionData.title,
+              periodicity: recurringTransactionData.periodicity,
+            },
+            recurringTransactionDoc,
+            { new: true }
+          );
+          results.updated++;
+        } else {
+          // Create new recurring transaction
+          await RecurringTransactionModel.create(recurringTransactionDoc);
+          results.imported++;
+        }
+      } catch (error) {
+        results.errors.push(
+          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
+    }
+
+    res.json(results);
+  } catch (error) {
+    console.error('Recurring transaction import error:', error);
+    res.status(500).json({
+      error: 'Failed to import recurring transactions',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
