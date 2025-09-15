@@ -6,10 +6,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import type { Expense } from '@fintrak/types';
 import { apiService } from '../services/api';
+import { useTheme } from '../context/ThemeContext';
+import Button from '../components/Button';
+import Card from '../components/Card';
 
 interface ExpensesScreenProps {
   onLogout?: () => void;
@@ -18,15 +21,21 @@ interface ExpensesScreenProps {
 export default function ExpensesScreen({ onLogout }: ExpensesScreenProps) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme, isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     loadExpenses();
   }, []);
 
-  const loadExpenses = async () => {
+  const loadExpenses = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
       const response = await apiService.getExpenses({
         limit: 50,
@@ -37,10 +46,17 @@ export default function ExpensesScreen({ onLogout }: ExpensesScreenProps) {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load expenses';
       setError(errorMessage);
-      Alert.alert('Error', errorMessage);
+      if (!isRefresh) {
+        Alert.alert('Error', errorMessage);
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleRefresh = () => {
+    loadExpenses(true);
   };
 
   const formatDate = (date: Date | string) => {
@@ -51,42 +67,65 @@ export default function ExpensesScreen({ onLogout }: ExpensesScreenProps) {
     return `${amount.toFixed(2)} ${currency}`;
   };
 
+  const styles = createStyles(theme);
+
   const renderExpenseItem = ({ item }: { item: Expense }) => (
-    <View style={styles.expenseItem}>
+    <Card style={styles.expenseCard} padding="base">
       <View style={styles.expenseHeader}>
-        <Text style={styles.expenseTitle}>{item.title}</Text>
+        <View style={styles.expenseTitleContainer}>
+          <Text style={styles.expenseTitle}>{item.title}</Text>
+          {item.category && (
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>{item.category.name}</Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.expenseAmount}>
-          {formatAmount(item.amount, item.currency)}
+          -{formatAmount(item.amount, item.currency)}
         </Text>
       </View>
       <View style={styles.expenseDetails}>
         <Text style={styles.expenseDate}>{formatDate(item.date)}</Text>
-        {item.category && (
-          <Text style={styles.expenseCategory}>• {item.category.name}</Text>
-        )}
       </View>
       {item.description && (
         <Text style={styles.expenseDescription}>{item.description}</Text>
       )}
-    </View>
+    </Card>
   );
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" testID="activity-indicator" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary[500]} testID="activity-indicator" />
         <Text style={styles.loadingText}>Loading expenses...</Text>
       </View>
     );
   }
 
-  if (error) {
+  if (error && !refreshing) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-        <Text style={styles.errorHint}>
-          Make sure the API server is running on localhost:3000
-        </Text>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>Expenses</Text>
+          {onLogout && (
+            <Button
+              title="Logout"
+              onPress={onLogout}
+              variant="outline"
+              size="sm"
+            />
+          )}
+        </View>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Unable to load expenses</Text>
+          <Text style={styles.errorHint}>{error}</Text>
+          <Button
+            title="Try Again"
+            onPress={() => loadExpenses()}
+            style={styles.retryButton}
+            size="md"
+          />
+        </View>
       </View>
     );
   }
@@ -94,16 +133,35 @@ export default function ExpensesScreen({ onLogout }: ExpensesScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Expenses</Text>
-        {onLogout && (
-          <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
-        )}
+        <View>
+          <Text style={styles.header}>Expenses</Text>
+          <Text style={styles.subheader}>
+            {expenses.length} {expenses.length === 1 ? 'expense' : 'expenses'}
+          </Text>
+        </View>
+        <View style={styles.headerActions}>
+          <Button
+            title={isDark ? '☀️' : '🌙'}
+            onPress={toggleTheme}
+            variant="ghost"
+            size="sm"
+            style={styles.themeToggle}
+          />
+          {onLogout && (
+            <Button
+              title="Logout"
+              onPress={onLogout}
+              variant="outline"
+              size="sm"
+            />
+          )}
+        </View>
       </View>
+
       {expenses.length === 0 ? (
-        <View style={styles.centerContainer}>
+        <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No expenses found</Text>
+          <Text style={styles.emptyHint}>Your expenses will appear here once you add them</Text>
         </View>
       ) : (
         <FlatList
@@ -111,117 +169,162 @@ export default function ExpensesScreen({ onLogout }: ExpensesScreenProps) {
           renderItem={renderExpenseItem}
           keyExtractor={(item: Expense) => item.id}
           style={styles.list}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[theme.colors.primary[500]]}
+              tintColor={theme.colors.primary[500]}
+            />
+          }
         />
       )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 16,
+    backgroundColor: theme.colors.background.secondary,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background.secondary,
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: theme.spacing.base,
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.base,
+    backgroundColor: theme.colors.background.primary,
+    ...theme.shadows.sm,
+  },
+  headerActions: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    gap: theme.spacing.sm,
+  },
+  themeToggle: {
+    minWidth: 40,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: theme.typography.fontSize['3xl'],
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.text.primary,
   },
-  logoutButton: {
-    backgroundColor: '#ff4444',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+  subheader: {
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
+    marginTop: theme.spacing.xs,
   },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
+  loadingText: {
+    marginTop: theme.spacing.md,
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.base,
   },
-  centerContainer: {
+  errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: '#666',
+    paddingHorizontal: theme.spacing.xl,
   },
   errorText: {
-    color: '#d32f2f',
-    fontSize: 16,
+    color: theme.colors.error[500],
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.medium,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: theme.spacing.sm,
   },
   errorHint: {
-    color: '#666',
-    fontSize: 14,
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.sm,
     textAlign: 'center',
+    marginBottom: theme.spacing.xl,
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
+  },
+  retryButton: {
+    marginTop: theme.spacing.base,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.xl,
   },
   emptyText: {
-    color: '#666',
-    fontSize: 16,
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.medium,
+    textAlign: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  emptyHint: {
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.base,
+    textAlign: 'center',
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
   list: {
     flex: 1,
   },
-  expenseItem: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  listContent: {
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.base,
+  },
+  expenseCard: {
+    marginBottom: theme.spacing.md,
   },
   expenseHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.sm,
+  },
+  expenseTitleContainer: {
+    flex: 1,
+    marginRight: theme.spacing.md,
   },
   expenseTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    flex: 1,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: theme.typography.fontWeight.semiBold,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
+  },
+  categoryBadge: {
+    backgroundColor: theme.colors.primary[50],
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+    alignSelf: 'flex-start',
+  },
+  categoryText: {
+    fontSize: theme.typography.fontSize.xs,
+    fontWeight: theme.typography.fontWeight.medium,
+    color: theme.colors.primary[600],
   },
   expenseAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#d32f2f',
+    fontSize: theme.typography.fontSize.lg,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.error[500],
   },
   expenseDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   expenseDate: {
-    fontSize: 14,
-    color: '#666',
-  },
-  expenseCategory: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 8,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
   },
   expenseDescription: {
-    fontSize: 14,
-    color: '#777',
-    marginTop: 4,
+    fontSize: theme.typography.fontSize.sm,
+    color: theme.colors.text.secondary,
     fontStyle: 'italic',
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
   },
 });

@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
-  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import type { LoginRequest } from '@fintrak/types';
 import { apiService } from '../services/api';
+import { useTheme } from '../context/ThemeContext';
+import Button from '../components/Button';
+import Input from '../components/Input';
+import Card from '../components/Card';
 
 interface LoginScreenProps {
   onLoginSuccess: (token: string) => void;
@@ -19,6 +21,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { theme, isDark, toggleTheme } = useTheme();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -44,123 +47,114 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     }
   };
 
+  const styles = createStyles(theme);
+
   return (
-    <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Login to Fintrak</Text>
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          />
-        </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.themeToggleContainer}>
+        <Button
+          title={isDark ? '☀️' : '🌙'}
+          onPress={toggleTheme}
+          variant="ghost"
+          size="sm"
+        />
+      </View>
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Welcome to</Text>
+        <Text style={styles.brandTitle}>Fintrak</Text>
+        <Text style={styles.subtitle}>Track your financial journey</Text>
+      </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          />
-        </View>
+      <Card style={styles.formCard} padding="xl">
+        <Input
+          label="Email Address"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Enter your email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          editable={!loading}
+        />
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+        <Input
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter your password"
+          secureTextEntry
+          autoCapitalize="none"
+          autoCorrect={false}
+          editable={!loading}
+        />
+
+        <Button
+          title="Sign In"
           onPress={handleLogin}
           disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color="#fff" testID="login-loading" />
-          ) : (
-            <Text style={styles.buttonText}>Login</Text>
-          )}
-        </TouchableOpacity>
+          loading={loading}
+          size="lg"
+          style={styles.loginButton}
+        />
 
         <Text style={styles.hint}>
           Use any email/password combination for testing
         </Text>
-      </View>
-    </View>
+      </Card>
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
-    padding: 20,
+    backgroundColor: theme.colors.primary[50],
   },
-  form: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+  contentContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: theme.spacing.lg,
+    minHeight: '100%',
+  },
+  themeToggleContainer: {
+    alignItems: 'flex-end',
+    marginBottom: theme.spacing.lg,
+  },
+  headerContainer: {
+    alignItems: 'center',
+    marginBottom: theme.spacing['4xl'],
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: theme.typography.fontSize['2xl'],
+    fontWeight: theme.typography.fontWeight.normal,
+    color: theme.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 30,
-    color: '#333',
+    marginBottom: theme.spacing.xs,
   },
-  inputContainer: {
-    marginBottom: 20,
+  brandTitle: {
+    fontSize: theme.typography.fontSize['4xl'],
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.primary[600],
+    textAlign: 'center',
+    marginBottom: theme.spacing.sm,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
+  subtitle: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
+  formCard: {
+    marginTop: theme.spacing.lg,
   },
-  button: {
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  loginButton: {
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
   hint: {
-    marginTop: 20,
     textAlign: 'center',
-    color: '#666',
-    fontSize: 14,
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.sm,
     fontStyle: 'italic',
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
   },
 });
