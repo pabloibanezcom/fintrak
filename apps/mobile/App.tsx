@@ -1,58 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
-import { PortfolioProvider } from './context/PortfolioContext';
-import { ThemeProvider, useTheme } from './context/ThemeContext';
-import { NavigationProvider, useNavigation } from './context/NavigationContext';
-import InvestmentsScreen from './screens/InvestmentsScreen';
 import ExpensesScreen from './screens/ExpensesScreen';
-import IncomesScreen from './screens/IncomesScreen';
-import MarketScreen from './screens/MarketScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import BottomNavigation from './components/BottomNavigation';
+import LoginScreen from './screens/LoginScreen';
 
-function AppContent() {
-  const { colors } = useTheme();
-  const { activeTab } = useNavigation();
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
-  const renderScreen = () => {
-    switch (activeTab) {
-      case 'investments':
-        return <InvestmentsScreen />;
-      case 'expenses':
-        return <ExpensesScreen />;
-      case 'incomes':
-        return <IncomesScreen />;
-      case 'market':
-        return <MarketScreen />;
-      case 'profile':
-        return <ProfileScreen />;
-      default:
-        return <InvestmentsScreen />;
-    }
+  const handleLoginSuccess = (authToken: string) => {
+    setToken(authToken);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setIsAuthenticated(false);
   };
 
   return (
-    <PortfolioProvider>
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        {renderScreen()}
-        <BottomNavigation />
-      </SafeAreaView>
-    </PortfolioProvider>
-  );
-}
-
-export default function App() {
-  return (
-    <ThemeProvider>
-      <NavigationProvider>
-        <AppContent />
-      </NavigationProvider>
-    </ThemeProvider>
+    <SafeAreaView style={styles.container}>
+      {isAuthenticated ? (
+        <ExpensesScreen onLogout={handleLogout} />
+      ) : (
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
 });
