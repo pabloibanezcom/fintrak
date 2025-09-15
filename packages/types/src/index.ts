@@ -47,3 +47,11 @@ export {
   SyncTransactionsResponse,
 } from "./Transaction";
 export { UserProducts } from "./UserProducts";
+export {
+  LoginRequest,
+  AuthResponse,
+  RegisterRequest,
+  RegisterResponse,
+  PaginationInfo,
+  ExpensesResponse,
+} from "./Auth";
