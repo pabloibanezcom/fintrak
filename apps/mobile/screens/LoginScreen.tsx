@@ -5,23 +5,26 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import type { LoginRequest } from '@fintrak/types';
 import { apiService } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
-import Button from '../components/Button';
 import Input from '../components/Input';
-import Card from '../components/Card';
+import { Ionicons } from '@expo/vector-icons';
 
 interface LoginScreenProps {
   onLoginSuccess: (token: string) => void;
+  onBackPress?: () => void;
 }
 
-export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
+export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { theme, isDark, toggleTheme } = useTheme();
+  const [showPassword, setShowPassword] = useState(false);
+  const { theme } = useTheme();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -50,115 +53,155 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const styles = createStyles(theme);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <View style={styles.themeToggleContainer}>
-        <Button
-          title={isDark ? '☀️' : '🌙'}
-          onPress={toggleTheme}
-          variant="ghost"
-          size="sm"
-        />
-      </View>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>Welcome to</Text>
-        <Text style={styles.brandTitle}>Fintrak</Text>
-        <Text style={styles.subtitle}>Track your financial journey</Text>
-      </View>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background.primary} translucent={false} />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {/* Back Button */}
+        {onBackPress && (
+          <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
+            <View style={styles.backButtonCircle}>
+              <Ionicons name="chevron-back" size={20} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
+        )}
 
-      <Card style={styles.formCard} padding="xl">
-        <Input
-          label="Email Address"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!loading}
-        />
+        {/* Title */}
+        <Text style={styles.title}>Sign In</Text>
 
-        <Input
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Enter your password"
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!loading}
-        />
+        {/* Email Field */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Email Address</Text>
+          <Input
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
+            leftIcon={<Ionicons name="mail-outline" size={22} color={theme.colors.text.secondary} />}
+            containerStyle={styles.inputContainerOverride}
+            inputStyle={styles.customInput}
+          />
+        </View>
 
-        <Button
-          title="Sign In"
+        {/* Password Field */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Password</Text>
+          <Input
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Enter your password"
+            secureTextEntry={!showPassword}
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!loading}
+            leftIcon={<Ionicons name="lock-closed-outline" size={22} color={theme.colors.text.secondary} />}
+            rightIcon={
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={22}
+                  color={theme.colors.text.secondary}
+                />
+              </TouchableOpacity>
+            }
+            containerStyle={styles.inputContainerOverride}
+            inputStyle={styles.customInput}
+          />
+        </View>
+
+        {/* Sign In Button */}
+        <TouchableOpacity
+          style={[styles.signInButton, (loading || !email.trim() || !password.trim()) && styles.signInButtonDisabled]}
           onPress={handleLogin}
-          disabled={loading}
-          loading={loading}
-          size="lg"
-          style={styles.loginButton}
-        />
-
-        <Text style={styles.hint}>
-          Use any email/password combination for testing
-        </Text>
-      </Card>
-    </ScrollView>
+          disabled={loading || !email.trim() || !password.trim()}
+        >
+          <Text style={styles.signInButtonText}>Sign In</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.primary[50],
+    backgroundColor: theme.colors.background.primary,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: theme.colors.background.primary,
   },
   contentContainer: {
     flexGrow: 1,
+    padding: 20,
     justifyContent: 'center',
-    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.primary,
     minHeight: '100%',
   },
-  themeToggleContainer: {
-    alignItems: 'flex-end',
-    marginBottom: theme.spacing.lg,
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    zIndex: 1,
   },
-  headerContainer: {
+  backButtonCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: theme.colors.background.secondary,
     alignItems: 'center',
-    marginBottom: theme.spacing['4xl'],
+    justifyContent: 'center',
   },
   title: {
-    fontSize: theme.typography.fontSize['2xl'],
-    fontFamily: theme.typography.fontFamily.regular,
-    fontWeight: theme.typography.fontWeight.normal,
-    color: theme.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.xs,
+    fontSize: 32,
+    fontFamily: theme.typography.fontFamily.medium,
+    fontWeight: '500',
+    color: theme.colors.text.primary,
+    marginBottom: 50,
+    textAlign: 'left',
   },
-  brandTitle: {
-    fontSize: theme.typography.fontSize['4xl'],
-    fontFamily: theme.typography.fontFamily.bold,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.primary[600],
-    textAlign: 'center',
-    marginBottom: theme.spacing.sm,
+  inputContainer: {
+    marginBottom: 30,
   },
-  subtitle: {
-    fontSize: theme.typography.fontSize.base,
+  inputLabel: {
+    fontSize: 14,
     fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
-    textAlign: 'center',
+    marginBottom: 12,
   },
-  formCard: {
-    marginTop: theme.spacing.lg,
+  inputContainerOverride: {
+    marginBottom: 0,
   },
-  loginButton: {
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
-  },
-  hint: {
-    textAlign: 'center',
-    color: theme.colors.text.secondary,
-    fontSize: theme.typography.fontSize.sm,
+  customInput: {
+    fontSize: 14,
     fontFamily: theme.typography.fontFamily.regular,
-    fontStyle: 'italic',
-    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
+    color: theme.colors.text.primary,
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
+  },
+  signInButton: {
+    backgroundColor: theme.colors.primary[500],
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+    width: '100%',
+  },
+  signInButtonDisabled: {
+    opacity: 0.5,
+  },
+  signInButtonText: {
+    fontSize: 16,
+    fontFamily: theme.typography.fontFamily.semiBold,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
   },
 });
