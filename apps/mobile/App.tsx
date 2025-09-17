@@ -80,7 +80,7 @@ function AppContent() {
         barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor={theme.colors.background.primary}
       />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, !isAuthenticated && styles.loginContainer]}>
         {isAuthenticated ? (
           <ExpensesScreen onLogout={handleLogout} />
         ) : (
@@ -102,6 +102,9 @@ export default function App() {
 const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background.primary,
+  },
+  loginContainer: {
     backgroundColor: theme.colors.background.primary,
   },
   loadingContainer: {

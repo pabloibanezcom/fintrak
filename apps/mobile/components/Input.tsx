@@ -17,6 +17,8 @@ interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   inputStyle?: TextStyle;
   labelStyle?: TextStyle;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
 export default function Input({
@@ -26,6 +28,8 @@ export default function Input({
   containerStyle,
   inputStyle,
   labelStyle,
+  leftIcon,
+  rightIcon,
   ...textInputProps
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -38,7 +42,15 @@ export default function Input({
     isFocused && styles.inputFocused,
     error && styles.inputError,
     textInputProps.editable === false && styles.inputDisabled,
+    leftIcon && styles.inputWithLeftIcon,
+    rightIcon && styles.inputWithRightIcon,
     inputStyle,
+  ];
+
+  const wrapperStyles = [
+    styles.inputWrapper,
+    isFocused && styles.inputWrapperFocused,
+    error && styles.inputWrapperError,
   ];
 
   return (
@@ -48,19 +60,23 @@ export default function Input({
           {label}
         </Text>
       )}
-      <TextInput
-        style={inputStyles}
-        onFocus={(e) => {
-          setIsFocused(true);
-          textInputProps.onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setIsFocused(false);
-          textInputProps.onBlur?.(e);
-        }}
-        placeholderTextColor={theme.colors.text.disabled}
-        {...textInputProps}
-      />
+      <View style={wrapperStyles}>
+        {leftIcon && <View style={styles.leftIconContainer}>{leftIcon}</View>}
+        <TextInput
+          style={inputStyles}
+          onFocus={(e) => {
+            setIsFocused(true);
+            textInputProps.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            textInputProps.onBlur?.(e);
+          }}
+          placeholderTextColor={theme.colors.text.disabled}
+          {...textInputProps}
+        />
+        {rightIcon && <View style={styles.rightIconContainer}>{rightIcon}</View>}
+      </View>
       {error && <Text style={styles.errorText}>{error}</Text>}
       {hint && !error && <Text style={styles.hintText}>{hint}</Text>}
     </View>
@@ -70,6 +86,23 @@ export default function Input({
 const createStyles = (theme: any) => StyleSheet.create({
   container: {
     marginBottom: theme.spacing.base,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    borderBottomWidth: 1.5,
+    borderBottomColor: theme.colors.border.light,
+    borderRadius: 0,
+    minHeight: 48,
+    paddingBottom: 8,
+  },
+  inputWrapperFocused: {
+    borderBottomColor: theme.colors.primary[500],
+  },
+  inputWrapperError: {
+    borderBottomColor: theme.colors.error[500],
   },
   label: {
     fontSize: theme.typography.fontSize.sm,
@@ -82,25 +115,33 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.error[500],
   },
   input: {
+    flex: 1,
     fontSize: theme.typography.fontSize.base,
     fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.primary,
-    backgroundColor: theme.colors.background.primary,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border.light,
-    borderRadius: theme.borderRadius.base,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    minHeight: 48,
+    backgroundColor: 'transparent',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
     textAlignVertical: 'center',
   },
-  inputFocused: {
-    borderColor: theme.colors.primary[500],
-    ...theme.shadows.sm,
+  inputWithLeftIcon: {
+    paddingLeft: theme.spacing.sm,
   },
-  inputError: {
-    borderColor: theme.colors.error[500],
+  inputWithRightIcon: {
+    paddingRight: theme.spacing.sm,
   },
+  leftIconContainer: {
+    paddingRight: theme.spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rightIconContainer: {
+    paddingLeft: theme.spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputFocused: {},
+  inputError: {},
   inputDisabled: {
     backgroundColor: theme.colors.background.tertiary,
     color: theme.colors.text.disabled,

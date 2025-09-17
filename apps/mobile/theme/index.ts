@@ -62,7 +62,7 @@ const darkColors = {
   primary: {
     50: "#0D47A1",
     100: "#1565C0",
-    500: "#42A5F5",
+    500: "#0066FF",
     600: "#2196F3",
     700: "#1976D2",
     900: "#E3F2FD",
@@ -102,17 +102,17 @@ const darkColors = {
   },
   text: {
     primary: "#FFFFFF",
-    secondary: "#BFBFBF",
-    disabled: "#737373",
+    secondary: "#A2A2A7",
+    disabled: "#6B7280",
     inverse: "#000000",
   },
   background: {
-    primary: "#0c3638",
-    secondary: "#1E1E1E",
+    primary: "#161622",
+    secondary: "#1E1E2D",
     tertiary: "#2D2D2D",
   },
   border: {
-    light: "#404040",
+    light: "#232533",
     medium: "#595959",
     dark: "#737373",
   },
