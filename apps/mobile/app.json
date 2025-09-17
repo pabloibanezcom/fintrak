@@ -25,6 +25,19 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/PlusJakartaSans_400Regular.ttf",
+            "./assets/fonts/PlusJakartaSans_500Medium.ttf",
+            "./assets/fonts/PlusJakartaSans_600SemiBold.ttf",
+            "./assets/fonts/PlusJakartaSans_700Bold.ttf"
+          ]
+        }
+      ]
+    ],
     "extra": {
       "apiBaseUrl": "http://192.168.1.113:3000/api"
     }

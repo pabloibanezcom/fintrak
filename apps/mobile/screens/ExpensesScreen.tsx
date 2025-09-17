@@ -188,13 +188,13 @@ export default function ExpensesScreen({ onLogout }: ExpensesScreenProps) {
 const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background.secondary,
+    backgroundColor: theme.colors.background.primary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.colors.background.secondary,
+    backgroundColor: theme.colors.background.primary,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -216,11 +216,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   header: {
     fontSize: theme.typography.fontSize['3xl'],
+    fontFamily: theme.typography.fontFamily.bold,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text.primary,
   },
   subheader: {
     fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
     marginTop: theme.spacing.xs,
   },
@@ -228,6 +230,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginTop: theme.spacing.md,
     color: theme.colors.text.secondary,
     fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.regular,
   },
   errorContainer: {
     flex: 1,
@@ -238,6 +241,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   errorText: {
     color: theme.colors.error[500],
     fontSize: theme.typography.fontSize.lg,
+    fontFamily: theme.typography.fontFamily.medium,
     fontWeight: theme.typography.fontWeight.medium,
     textAlign: 'center',
     marginBottom: theme.spacing.sm,
@@ -245,6 +249,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   errorHint: {
     color: theme.colors.text.secondary,
     fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     textAlign: 'center',
     marginBottom: theme.spacing.xl,
     lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
@@ -261,6 +266,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   emptyText: {
     color: theme.colors.text.primary,
     fontSize: theme.typography.fontSize.lg,
+    fontFamily: theme.typography.fontFamily.medium,
     fontWeight: theme.typography.fontWeight.medium,
     textAlign: 'center',
     marginBottom: theme.spacing.sm,
@@ -268,6 +274,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   emptyHint: {
     color: theme.colors.text.secondary,
     fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.regular,
     textAlign: 'center',
     lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
   },
@@ -293,6 +300,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   expenseTitle: {
     fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.semiBold,
     fontWeight: theme.typography.fontWeight.semiBold,
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
@@ -306,11 +314,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   categoryText: {
     fontSize: theme.typography.fontSize.xs,
+    fontFamily: theme.typography.fontFamily.medium,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.primary[600],
   },
   expenseAmount: {
     fontSize: theme.typography.fontSize.lg,
+    fontFamily: theme.typography.fontFamily.bold,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.error[500],
   },
@@ -319,10 +329,12 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   expenseDate: {
     fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
   },
   expenseDescription: {
     fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
     fontStyle: 'italic',
     lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
