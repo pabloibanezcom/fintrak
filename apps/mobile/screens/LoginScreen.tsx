@@ -126,6 +126,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   title: {
     fontSize: theme.typography.fontSize['2xl'],
+    fontFamily: theme.typography.fontFamily.regular,
     fontWeight: theme.typography.fontWeight.normal,
     color: theme.colors.text.secondary,
     textAlign: 'center',
@@ -133,6 +134,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   brandTitle: {
     fontSize: theme.typography.fontSize['4xl'],
+    fontFamily: theme.typography.fontFamily.bold,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.primary[600],
     textAlign: 'center',
@@ -140,6 +142,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   subtitle: {
     fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
     textAlign: 'center',
   },
@@ -154,6 +157,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     textAlign: 'center',
     color: theme.colors.text.secondary,
     fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     fontStyle: 'italic',
     lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm,
   },

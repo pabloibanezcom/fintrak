@@ -73,6 +73,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   label: {
     fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.medium,
     fontWeight: theme.typography.fontWeight.medium,
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.sm,
@@ -107,12 +108,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   errorText: {
     fontSize: theme.typography.fontSize.xs,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.error[500],
     marginTop: theme.spacing.xs,
     marginLeft: theme.spacing.xs,
   },
   hintText: {
     fontSize: theme.typography.fontSize.xs,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
     marginTop: theme.spacing.xs,
     marginLeft: theme.spacing.xs,
