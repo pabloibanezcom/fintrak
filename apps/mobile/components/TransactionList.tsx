@@ -32,10 +32,15 @@ export default function TransactionList({
   const { theme } = useTheme();
 
   const getWeekRange = (date: Date) => {
-    const startOfWeek = new Date(date);
-    const day = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - day; // Sunday = 0, Monday = 1, etc.
-    startOfWeek.setDate(diff);
+    // Create a new date and ensure we're working with local time
+    const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    const startOfWeek = new Date(localDate);
+    const day = startOfWeek.getDay(); // Sunday = 0, Monday = 1, etc.
+
+    // Calculate days to subtract to get to Sunday (start of week)
+    const daysToSubtract = day;
+    startOfWeek.setDate(startOfWeek.getDate() - daysToSubtract);
 
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
@@ -53,14 +58,17 @@ export default function TransactionList({
     const currentWeekRange = getWeekRange(now);
     const weekRange = getWeekRange(weekStart);
 
-    const weeksDiff = Math.round((currentWeekRange.start.getTime() - weekRange.start.getTime()) / (7 * 24 * 60 * 60 * 1000));
+    const weeksDiff = Math.floor((currentWeekRange.start.getTime() - weekRange.start.getTime()) / (7 * 24 * 60 * 60 * 1000));
 
     if (weeksDiff === 0) {
       return `This Week (${formatDateRange(weekRange.start, weekRange.end)})`;
     } else if (weeksDiff === 1) {
       return `Last Week (${formatDateRange(weekRange.start, weekRange.end)})`;
-    } else {
+    } else if (weeksDiff > 1) {
       return `${weeksDiff} weeks ago (${formatDateRange(weekRange.start, weekRange.end)})`;
+    } else {
+      // Future weeks
+      return `${formatDateRange(weekRange.start, weekRange.end)}`;
     }
   };
 
@@ -70,7 +78,7 @@ export default function TransactionList({
     transactions.forEach(transaction => {
       const transactionDate = new Date(transaction.date);
       const weekRange = getWeekRange(transactionDate);
-      const weekKey = weekRange.start.toISOString().split('T')[0]; // Use start of week as key
+      const weekKey = `${weekRange.start.getFullYear()}-${String(weekRange.start.getMonth() + 1).padStart(2, '0')}-${String(weekRange.start.getDate()).padStart(2, '0')}`;
 
       if (!groups[weekKey]) {
         groups[weekKey] = [];
