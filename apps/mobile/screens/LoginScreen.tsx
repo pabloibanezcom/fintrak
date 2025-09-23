@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Alert,
   ScrollView,
   TouchableOpacity,
@@ -13,6 +12,7 @@ import { apiService } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import Input from '../components/Input';
 import { Ionicons } from '@expo/vector-icons';
+import { componentStyles } from '../styles';
 
 interface LoginScreenProps {
   onLoginSuccess: (token: string) => void;
@@ -50,32 +50,30 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
     }
   };
 
-  const styles = createStyles(theme);
-
   return (
-    <View style={styles.container}>
+    <View style={componentStyles.loginContainer}>
       <StatusBar barStyle="light-content" backgroundColor={theme.colors.background.primary} translucent={false} />
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
+        style={componentStyles.loginScrollView}
+        contentContainerStyle={componentStyles.loginContentContainer}
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
         {/* Back Button */}
         {onBackPress && (
-          <TouchableOpacity style={styles.backButton} onPress={onBackPress}>
-            <View style={styles.backButtonCircle}>
+          <TouchableOpacity style={componentStyles.loginBackButton} onPress={onBackPress}>
+            <View style={componentStyles.loginBackButtonCircle}>
               <Ionicons name="chevron-back" size={20} color="#FFFFFF" />
             </View>
           </TouchableOpacity>
         )}
 
         {/* Title */}
-        <Text style={styles.title}>Sign In</Text>
+        <Text style={componentStyles.loginTitle}>Sign In</Text>
 
         {/* Email Field */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Email Address</Text>
+        <View style={componentStyles.loginInputContainer}>
+          <Text style={componentStyles.loginInputLabel}>Email Address</Text>
           <Input
             value={email}
             onChangeText={setEmail}
@@ -85,14 +83,14 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
             autoCorrect={false}
             editable={!loading}
             leftIcon={<Ionicons name="mail-outline" size={22} color={theme.colors.text.secondary} />}
-            containerStyle={styles.inputContainerOverride}
-            inputStyle={styles.customInput}
+            containerStyle={componentStyles.loginInputContainerOverride}
+            inputStyle={componentStyles.loginCustomInput}
           />
         </View>
 
         {/* Password Field */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Password</Text>
+        <View style={componentStyles.loginInputContainer}>
+          <Text style={componentStyles.loginInputLabel}>Password</Text>
           <Input
             value={password}
             onChangeText={setPassword}
@@ -111,97 +109,21 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
                 />
               </TouchableOpacity>
             }
-            containerStyle={styles.inputContainerOverride}
-            inputStyle={styles.customInput}
+            containerStyle={componentStyles.loginInputContainerOverride}
+            inputStyle={componentStyles.loginCustomInput}
           />
         </View>
 
         {/* Sign In Button */}
         <TouchableOpacity
-          style={[styles.signInButton, (loading || !email.trim() || !password.trim()) && styles.signInButtonDisabled]}
+          style={[componentStyles.loginSignInButton, (loading || !email.trim() || !password.trim()) && componentStyles.loginSignInButtonDisabled]}
           onPress={handleLogin}
           disabled={loading || !email.trim() || !password.trim()}
         >
-          <Text style={styles.signInButtonText}>Sign In</Text>
+          <Text style={componentStyles.loginSignInButtonText}>Sign In</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
   );
 }
 
-const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background.primary,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: theme.colors.background.primary,
-  },
-  contentContainer: {
-    flexGrow: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: theme.colors.background.primary,
-    minHeight: '100%',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    zIndex: 1,
-  },
-  backButtonCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: theme.colors.background.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: theme.typography.fontFamily.medium,
-    fontWeight: '500',
-    color: theme.colors.text.primary,
-    marginBottom: 50,
-    textAlign: 'left',
-  },
-  inputContainer: {
-    marginBottom: 30,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontFamily: theme.typography.fontFamily.regular,
-    color: theme.colors.text.secondary,
-    marginBottom: 12,
-  },
-  inputContainerOverride: {
-    marginBottom: 0,
-  },
-  customInput: {
-    fontSize: 14,
-    fontFamily: theme.typography.fontFamily.regular,
-    color: theme.colors.text.primary,
-    backgroundColor: 'transparent',
-    paddingVertical: 8,
-  },
-  signInButton: {
-    backgroundColor: theme.colors.primary[500],
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 50,
-    width: '100%',
-  },
-  signInButtonDisabled: {
-    opacity: 0.5,
-  },
-  signInButtonText: {
-    fontSize: 16,
-    fontFamily: theme.typography.fontFamily.semiBold,
-    fontWeight: '600',
-    color: theme.colors.text.primary,
-  },
-});
