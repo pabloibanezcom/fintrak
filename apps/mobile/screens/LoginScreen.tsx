@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import Input from '../components/Input';
 import { Ionicons } from '@expo/vector-icons';
 import { componentStyles } from '../styles';
+import { useGoogleSignIn } from '../src/hooks/useGoogleSignIn';
 
 interface LoginScreenProps {
   onLoginSuccess: (token: string) => void;
@@ -25,6 +26,8 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { theme } = useTheme();
+  const { signInWithGoogle, isLoading: googleLoading } = useGoogleSignIn();
+
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -36,10 +39,10 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
       setLoading(true);
       const credentials: LoginRequest = { email: email.trim(), password };
       const response = await apiService.login(credentials);
-      
+
       // Set the token in the API service
       apiService.setToken(response.token);
-      
+
       // Notify parent component of successful login
       onLoginSuccess(response.token);
     } catch (error) {
@@ -47,6 +50,21 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
       Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithGoogle();
+      if (result) {
+        // Set the token in the API service
+        apiService.setToken(result.token);
+
+        // Notify parent component of successful login
+        onLoginSuccess(result.token);
+      }
+    } catch (error) {
+      console.error('Google Sign-In failed:', error);
     }
   };
 
@@ -121,6 +139,25 @@ export default function LoginScreen({ onLoginSuccess, onBackPress }: LoginScreen
           disabled={loading || !email.trim() || !password.trim()}
         >
           <Text style={componentStyles.loginSignInButtonText}>Sign In</Text>
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View style={componentStyles.loginDividerContainer}>
+          <View style={componentStyles.loginDividerLine} />
+          <Text style={componentStyles.loginDividerText}>OR</Text>
+          <View style={componentStyles.loginDividerLine} />
+        </View>
+
+        {/* Google Sign In Button */}
+        <TouchableOpacity
+          style={[componentStyles.loginGoogleButton, googleLoading && componentStyles.loginSignInButtonDisabled]}
+          onPress={handleGoogleSignIn}
+          disabled={googleLoading || loading}
+        >
+          <Ionicons name="logo-google" size={20} color="#4285F4" style={componentStyles.loginGoogleIcon} />
+          <Text style={componentStyles.loginGoogleButtonText}>
+            {googleLoading ? 'Signing in...' : 'Continue with Google'}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
