@@ -1,6 +1,8 @@
 import cors from 'cors';
 import express from 'express';
+import passport from 'passport';
 import { specs, swaggerOptions, swaggerUi } from './config/swagger';
+import './config/passport'; // Initialize passport configuration
 import authRoutes from './routes/authRoutes';
 import bankRoutes from './routes/bankRoutes';
 import categoryRoutes from './routes/categoryRoutes';
@@ -16,6 +18,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Initialize passport
+app.use(passport.initialize());
 
 // Swagger documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerOptions));

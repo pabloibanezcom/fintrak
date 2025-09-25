@@ -210,6 +210,40 @@ export const componentStyles = StyleSheet.create({
     fontWeight: typography.weights.semiBold,
     color: colors.text.primary,
   },
+  loginDividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+  },
+  loginDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border.light,
+  },
+  loginDividerText: {
+    fontSize: typography.sizes.sm,
+    color: colors.text.secondary,
+    marginHorizontal: 16,
+  },
+  loginGoogleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.background.secondary,
+    borderRadius: 16,
+    paddingVertical: spacing.base,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  loginGoogleIcon: {
+    marginRight: 12,
+  },
+  loginGoogleButtonText: {
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.medium,
+    color: colors.text.primary,
+  },
 
   // Bottom navigation styles
   bottomNavContainer: {
