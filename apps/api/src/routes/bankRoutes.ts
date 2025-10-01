@@ -8,52 +8,35 @@ router.use(authenticate);
 
 /**
  * @swagger
- * /api/bank/institutions:
+ * /api/bank/providers:
  *   get:
- *     summary: Get available banks
- *     description: Retrieves list of available banks for connection (filtered by country)
- *     tags: [Bank Integration]
+ *     summary: Get available bank providers
+ *     description: Retrieves list of available banks/providers via Tink (filtered by market). Requires user authentication token from Tink OAuth flow.
+ *     tags: [Bank Integration (Tink)]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: country
+ *         name: market
  *         schema:
  *           type: string
  *           default: ES
- *         description: Country code (defaults to ES for Spain)
+ *         description: Market code (defaults to ES for Spain)
  *     responses:
  *       200:
- *         description: Banks retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   name:
- *                     type: string
- *                   bic:
- *                     type: string
- *                   logo:
- *                     type: string
- *                   countries:
- *                     type: array
- *                     items:
- *                       type: string
+ *         description: Providers retrieved successfully
+ *       401:
+ *         description: User token required (get token from /authorize flow)
  */
-router.get('/institutions', controller.getInstitutions);
+router.get('/providers', controller.getProviders);
 
 /**
  * @swagger
- * /api/bank/connect:
+ * /api/bank/authorize:
  *   post:
- *     summary: Initiate bank connection
- *     description: Creates a requisition to connect user's bank account
- *     tags: [Bank Integration]
+ *     summary: Get authorization URL
+ *     description: Generate Tink authorization URL for user to connect their bank
+ *     tags: [Bank Integration (Tink)]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -63,110 +46,97 @@ router.get('/institutions', controller.getInstitutions);
  *           schema:
  *             type: object
  *             required:
- *               - institutionId
- *               - redirect
+ *               - redirectUri
  *             properties:
- *               institutionId:
- *                 type: string
- *                 description: Bank institution ID
- *               redirect:
+ *               redirectUri:
  *                 type: string
  *                 description: URL to redirect after bank authentication
- *               reference:
+ *               state:
  *                 type: string
- *                 description: Custom reference for the requisition
+ *                 description: Optional state parameter for security
  *     responses:
- *       201:
- *         description: Requisition created successfully
+ *       200:
+ *         description: Authorization URL generated
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: string
- *                 link:
- *                   type: string
- *                   description: URL to redirect user to complete bank authentication
- *                 status:
+ *                 authorizationUrl:
  *                   type: string
  */
-router.post('/connect', controller.createRequisition);
+router.post('/authorize', controller.getAuthorizationUrl);
 
 /**
  * @swagger
- * /api/bank/requisitions/{id}:
+ * /api/bank/callback:
  *   get:
- *     summary: Get requisition status
- *     description: Check the status of a bank connection requisition
- *     tags: [Bank Integration]
- *     security:
- *       - bearerAuth: []
+ *     summary: Handle OAuth callback
+ *     description: Exchange authorization code for access token
+ *     tags: [Bank Integration (Tink)]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - in: query
+ *         name: code
  *         required: true
  *         schema:
  *           type: string
- *         description: Requisition ID
+ *         description: Authorization code from Tink
  *     responses:
  *       200:
- *         description: Requisition status retrieved
+ *         description: Authorization successful
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+ *                 message:
  *                   type: string
- *                 status:
+ *                 accessToken:
  *                   type: string
- *                 accounts:
- *                   type: array
- *                   items:
- *                     type: string
+ *                 expiresIn:
+ *                   type: number
+ *                 refreshToken:
+ *                   type: string
  */
-router.get('/requisitions/:id', controller.getRequisition);
+router.get('/callback', controller.handleCallback);
 
 /**
  * @swagger
  * /api/bank/accounts:
  *   get:
  *     summary: Get connected bank accounts
- *     description: Retrieves user's connected bank accounts
- *     tags: [Bank Integration]
+ *     description: Retrieves user's connected bank accounts from Tink
+ *     tags: [Bank Integration (Tink)]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Connected accounts retrieved
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   iban:
- *                     type: string
- *                   name:
- *                     type: string
- *                   currency:
- *                     type: string
- *                   status:
- *                     type: string
  */
 router.get('/accounts', controller.getAccounts);
+
+/**
+ * @swagger
+ * /api/bank/transactions:
+ *   get:
+ *     summary: Get all transactions
+ *     description: Retrieves all transactions from all connected accounts
+ *     tags: [Bank Integration (Tink)]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Transactions retrieved successfully
+ */
+router.get('/transactions', controller.getTransactions);
 
 /**
  * @swagger
  * /api/bank/accounts/{accountId}/transactions:
  *   get:
  *     summary: Get account transactions
- *     description: Retrieves transactions for a specific bank account
- *     tags: [Bank Integration]
+ *     description: Retrieves transactions for a specific bank account from Tink
+ *     tags: [Bank Integration (Tink)]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -176,134 +146,10 @@ router.get('/accounts', controller.getAccounts);
  *         schema:
  *           type: string
  *         description: Bank account ID
- *       - in: query
- *         name: dateFrom
- *         schema:
- *           type: string
- *           format: date
- *         description: Start date (YYYY-MM-DD)
- *       - in: query
- *         name: dateTo
- *         schema:
- *           type: string
- *           format: date
- *         description: End date (YYYY-MM-DD)
- *       - in: query
- *         name: sync
- *         schema:
- *           type: boolean
- *           default: false
- *         description: Sync fresh data from bank
  *     responses:
  *       200:
  *         description: Transactions retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   transactionId:
- *                     type: string
- *                   bookingDate:
- *                     type: string
- *                   transactionAmount:
- *                     type: object
- *                     properties:
- *                       amount:
- *                         type: string
- *                       currency:
- *                         type: string
- *                   creditorName:
- *                     type: string
- *                   debtorName:
- *                     type: string
- *                   remittanceInformationUnstructured:
- *                     type: string
  */
 router.get('/accounts/:accountId/transactions', controller.getTransactions);
-
-/**
- * @swagger
- * /api/bank/accounts/{accountId}/sync:
- *   post:
- *     summary: Sync account transactions
- *     description: Fetches latest transactions from bank and stores in database
- *     tags: [Bank Integration]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: accountId
- *         required: true
- *         schema:
- *           type: string
- *         description: Bank account ID
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               dateFrom:
- *                 type: string
- *                 format: date
- *                 description: Start date for sync (YYYY-MM-DD)
- *               dateTo:
- *                 type: string
- *                 format: date
- *                 description: End date for sync (YYYY-MM-DD)
- *     responses:
- *       200:
- *         description: Sync completed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 synced:
- *                   type: number
- *                 newTransactions:
- *                   type: number
- *                 errors:
- *                   type: array
- *                   items:
- *                     type: string
- */
-router.post('/accounts/:accountId/sync', controller.syncTransactions);
-
-/**
- * @swagger
- * /api/bank/accounts/{accountId}/balances:
- *   get:
- *     summary: Get account balances
- *     description: Retrieves current balances for a bank account
- *     tags: [Bank Integration]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: accountId
- *         required: true
- *         schema:
- *           type: string
- *         description: Bank account ID
- *     responses:
- *       200:
- *         description: Balances retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 balances:
- *                   type: array
- *                   items:
- *                     type: object
- */
-router.get('/accounts/:accountId/balances', controller.getBalances);
 
 export default router;
