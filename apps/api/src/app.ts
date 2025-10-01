@@ -3,6 +3,7 @@ import express from 'express';
 import passport from 'passport';
 import { specs, swaggerOptions, swaggerUi } from './config/swagger';
 import './config/passport'; // Initialize passport configuration
+import analyticsRoutes from './routes/analyticsRoutes';
 import authRoutes from './routes/authRoutes';
 import bankRoutes from './routes/bankRoutes';
 import categoryRoutes from './routes/categoryRoutes';
@@ -25,6 +26,7 @@ app.use(passport.initialize());
 // Swagger documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerOptions));
 
+app.use('/api', analyticsRoutes);
 app.use('/api/auth/', authRoutes);
 app.use('/api/bank', bankRoutes);
 app.use('/api', categoryRoutes);
