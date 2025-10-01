@@ -118,9 +118,22 @@ fintrak/
 
 ## 📚 API Documentation
 
+### 🌐 Online Documentation
+- **Swagger UI**: <a href="https://pabloibanezcom.github.io/fintrak/" target="_blank">https://pabloibanezcom.github.io/fintrak/</a>
+- View the complete API documentation without running the server locally
+
+### 🏠 Local Development
 Once the API server is running, visit:
 - **Swagger UI**: http://localhost:3000/api/docs
 - **OpenAPI Spec**: http://localhost:3000/api/docs.json
+
+### 🔄 Updating Documentation
+To regenerate the OpenAPI specification after making changes to API routes:
+```bash
+cd apps/api
+pnpm run generate-openapi
+```
+This will update the `docs/openapi.json` file used by GitHub Pages.
 
 ## 🤝 Contributing
 
