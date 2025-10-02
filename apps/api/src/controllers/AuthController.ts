@@ -1,13 +1,15 @@
 import bcrypt from 'bcryptjs';
 import type { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import jwt from 'jsonwebtoken';
 import User, { type IUser } from '../models/UserModel';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'defaultsecret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
+const googleClient = GOOGLE_CLIENT_ID
+  ? new OAuth2Client(GOOGLE_CLIENT_ID)
+  : null;
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -19,7 +21,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await User.create({
       email,
       password: hashedPassword,
-      authProvider: 'email'
+      authProvider: 'email',
     });
 
     res.status(201).json({ id: user._id, email: user.email });
@@ -36,7 +38,9 @@ export const login = async (req: Request, res: Response) => {
 
     // Check if user is trying to login with password for Google account
     if (user.authProvider === 'google') {
-      return res.status(401).json({ error: 'Please use Google Sign-In for this account' });
+      return res
+        .status(401)
+        .json({ error: 'Please use Google Sign-In for this account' });
     }
 
     if (!user.password) {
@@ -69,7 +73,9 @@ export const googleCallback = async (req: Request, res: Response) => {
 
     // For mobile app, we'll redirect with token as query parameter
     // In production, you might want to use a more secure method
-    res.redirect(`${process.env.MOBILE_APP_URL || 'exp://localhost:8081'}?token=${token}`);
+    res.redirect(
+      `${process.env.MOBILE_APP_URL || 'exp://localhost:8081'}?token=${token}`
+    );
   } catch (_err) {
     res.status(500).json({ error: 'Authentication failed' });
   }
@@ -80,7 +86,9 @@ export const googleTokenAuth = async (req: Request, res: Response) => {
   const { idToken } = req.body;
 
   if (!googleClient) {
-    return res.status(500).json({ error: 'Google authentication not configured' });
+    return res
+      .status(500)
+      .json({ error: 'Google authentication not configured' });
   }
 
   try {
@@ -95,7 +103,14 @@ export const googleTokenAuth = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid Google token' });
     }
 
-    const { sub: googleId, email, name, given_name, family_name, picture } = payload;
+    const {
+      sub: googleId,
+      email,
+      name,
+      given_name,
+      family_name,
+      picture,
+    } = payload;
 
     // Check if user already exists
     let user = await User.findOne({ googleId });
