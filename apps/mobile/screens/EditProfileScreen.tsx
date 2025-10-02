@@ -8,9 +8,14 @@ import {
   StyleSheet,
   SafeAreaView,
   TextInput,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as FileSystem from 'expo-file-system';
 import { useUser } from '../context/UserContext';
+import { apiService } from '../services/api';
 import { colors, spacing, typography } from '../styles';
 import { componentStyles } from '../styles';
 
@@ -33,6 +38,7 @@ export default function EditProfileScreen({ onBack, onSave }: EditProfileScreenP
     lastName: user?.lastName || '',
     email: user?.email || '',
   });
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const getInitials = () => {
     if (user?.name && user?.lastName) {
@@ -57,6 +63,98 @@ export default function EditProfileScreen({ onBack, onSave }: EditProfileScreenP
     return 'User';
   };
 
+  const uploadImage = async (imageUri: string) => {
+    try {
+      // Resize image to smaller size (max 400x400 for profile pictures)
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        imageUri,
+        [{ resize: { width: 400, height: 400 } }],
+        { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      imageUri = manipulatedImage.uri;
+      setSelectedImage(imageUri);
+
+      // Convert image to base64 using new File API
+      const file = new FileSystem.File(imageUri);
+      const base64 = await file.base64();
+
+      // Double check file size (base64 is roughly 1.33x the original size)
+      const sizeInMB = (base64.length * 0.75) / (1024 * 1024);
+      if (sizeInMB > 5) {
+        Alert.alert('Image too large', 'Image is still too large after compression. Please try a different image.');
+        setSelectedImage(null);
+        return;
+      }
+
+      const base64Image = `data:image/jpeg;base64,${base64}`;
+
+      // Upload to server
+      await apiService.updateProfilePicture(base64Image);
+      Alert.alert('Success', 'Profile picture updated successfully');
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      Alert.alert('Error', 'Failed to upload profile picture. Please try again.');
+      setSelectedImage(null);
+    }
+  };
+
+  const pickImage = async () => {
+    Alert.alert(
+      'Change Profile Picture',
+      'Choose an option',
+      [
+        {
+          text: 'Take Photo',
+          onPress: async () => {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+            if (status !== 'granted') {
+              Alert.alert('Permission needed', 'Sorry, we need camera permissions to take a photo.');
+              return;
+            }
+
+            const result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 0.5,
+            });
+
+            if (!result.canceled && result.assets[0]) {
+              await uploadImage(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: 'Choose from Library',
+          onPress: async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+            if (status !== 'granted') {
+              Alert.alert('Permission needed', 'Sorry, we need camera roll permissions to choose a photo.');
+              return;
+            }
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ['images'],
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 0.5,
+            });
+
+            if (!result.canceled && result.assets[0]) {
+              await uploadImage(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
   const handleSave = () => {
     onSave(formData);
   };
@@ -78,16 +176,21 @@ export default function EditProfileScreen({ onBack, onSave }: EditProfileScreenP
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
-          {user?.profilePicture ? (
-            <Image
-              source={{ uri: user.profilePicture }}
-              style={styles.profileImage}
-            />
-          ) : (
-            <View style={styles.profileImagePlaceholder}>
-              <Text style={styles.profileInitials}>{getInitials()}</Text>
+          <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+            {selectedImage || user?.profilePicture ? (
+              <Image
+                source={{ uri: selectedImage || user.profilePicture }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <View style={styles.profileImagePlaceholder}>
+                <Text style={styles.profileInitials}>{getInitials()}</Text>
+              </View>
+            )}
+            <View style={styles.cameraIconContainer}>
+              <Ionicons name="camera" size={20} color={colors.text.inverse} />
             </View>
-          )}
+          </TouchableOpacity>
           <Text style={styles.profileName}>{getFullName()}</Text>
         </View>
 
@@ -171,11 +274,14 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.base,
   },
+  imageContainer: {
+    position: 'relative',
+    marginBottom: spacing.base,
+  },
   profileImage: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    marginBottom: spacing.base,
   },
   profileImagePlaceholder: {
     width: 90,
@@ -184,7 +290,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary[500],
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.base,
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.primary[500],
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.background.primary,
   },
   profileInitials: {
     fontSize: 32,

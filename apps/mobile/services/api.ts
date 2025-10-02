@@ -145,6 +145,22 @@ class ApiService {
       body: JSON.stringify(data),
     });
   }
+
+  async updateProfilePicture(profilePicture: string): Promise<{
+    id: string;
+    email: string;
+    name?: string;
+    lastName?: string;
+    profilePicture?: string;
+    authProvider: 'email' | 'google';
+    createdAt: string;
+    updatedAt: string;
+  }> {
+    return this.request('/auth/me/picture', {
+      method: 'PUT',
+      body: JSON.stringify({ profilePicture }),
+    });
+  }
 }
 
 export const apiService = new ApiService();

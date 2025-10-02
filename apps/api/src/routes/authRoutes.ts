@@ -6,6 +6,7 @@ import {
   googleTokenAuth,
   login,
   register,
+  updateProfilePicture,
   updateUserProfile,
 } from '../controllers/AuthController';
 import { authenticate } from '../middleware/auth';
@@ -324,5 +325,66 @@ router.get('/me', authenticate, getCurrentUser);
  *               $ref: '#/components/schemas/Error'
  */
 router.put('/me', authenticate, updateUserProfile);
+
+/**
+ * @swagger
+ * /api/auth/me/picture:
+ *   put:
+ *     summary: Update user profile picture
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profilePicture:
+ *                 type: string
+ *                 description: Base64 encoded image data
+ *             example:
+ *               profilePicture: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+ *     responses:
+ *       200:
+ *         description: Profile picture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 profilePicture:
+ *                   type: string
+ *                 authProvider:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Bad request - missing or invalid image
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.put('/me/picture', authenticate, updateProfilePicture);
 
 export default router;
