@@ -6,7 +6,9 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-  console.warn('Google OAuth credentials not configured. Google authentication will not be available.');
+  console.warn(
+    'Google OAuth credentials not configured. Google authentication will not be available.'
+  );
 }
 
 // Serialize user for session
@@ -36,7 +38,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
       async (accessToken, refreshToken, profile, done) => {
         try {
           // Check if user already exists with this Google ID
-          let user = await User.findOne({ googleId: profile.id });
+          const user = await User.findOne({ googleId: profile.id });
 
           if (user) {
             // User exists, return user
@@ -44,7 +46,9 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
           }
 
           // Check if user exists with same email but different auth provider
-          const existingUser = await User.findOne({ email: profile.emails?.[0]?.value });
+          const existingUser = await User.findOne({
+            email: profile.emails?.[0]?.value,
+          });
 
           if (existingUser) {
             // Link Google account to existing email account

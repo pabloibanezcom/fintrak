@@ -299,7 +299,11 @@ class TinkService {
   /**
    * Set user access token (after user authorization)
    */
-  setUserToken(accessToken: string, refreshToken?: string, expiresIn?: number): void {
+  setUserToken(
+    accessToken: string,
+    refreshToken?: string,
+    expiresIn?: number
+  ): void {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken || null;
     this.tokenExpiresAt = expiresIn ? Date.now() + expiresIn * 1000 : null;
@@ -318,7 +322,8 @@ class TinkService {
       client_id: clientId,
       redirect_uri: redirectUri,
       response_type: 'code',
-      scope: 'authorization:grant,credentials:read,credentials:write,providers:read,user:read,accounts:read,transactions:read,balances:read',
+      scope:
+        'authorization:grant,credentials:read,credentials:write,providers:read,user:read,accounts:read,transactions:read,balances:read',
       market: 'ES',
       locale: 'es_ES',
       ...(state && { state }),
@@ -365,7 +370,9 @@ class TinkService {
       } else {
         console.error('Failed to fetch providers:', error);
       }
-      throw new Error('Failed to fetch providers. This endpoint may require user authentication.');
+      throw new Error(
+        'Failed to fetch providers. This endpoint may require user authentication.'
+      );
     }
   }
 
@@ -375,7 +382,9 @@ class TinkService {
   async getAccounts(): Promise<TinkAccount[]> {
     try {
       if (!this.accessToken) {
-        throw new Error('User not authenticated. Please provide user access token.');
+        throw new Error(
+          'User not authenticated. Please provide user access token.'
+        );
       }
 
       const response = await this.client.get<{ accounts: TinkAccount[] }>(
@@ -395,12 +404,14 @@ class TinkService {
   async getTransactions(accountId: string): Promise<TinkTransaction[]> {
     try {
       if (!this.accessToken) {
-        throw new Error('User not authenticated. Please provide user access token.');
+        throw new Error(
+          'User not authenticated. Please provide user access token.'
+        );
       }
 
-      const response = await this.client.get<{ transactions: TinkTransaction[] }>(
-        `/data/v2/accounts/${accountId}/transactions`
-      );
+      const response = await this.client.get<{
+        transactions: TinkTransaction[];
+      }>(`/data/v2/accounts/${accountId}/transactions`);
 
       return response.data.transactions;
     } catch (error) {
@@ -415,12 +426,14 @@ class TinkService {
   async getAllTransactions(): Promise<TinkTransaction[]> {
     try {
       if (!this.accessToken) {
-        throw new Error('User not authenticated. Please provide user access token.');
+        throw new Error(
+          'User not authenticated. Please provide user access token.'
+        );
       }
 
-      const response = await this.client.get<{ transactions: TinkTransaction[] }>(
-        '/data/v2/transactions'
-      );
+      const response = await this.client.get<{
+        transactions: TinkTransaction[];
+      }>('/data/v2/transactions');
 
       return response.data.transactions;
     } catch (error) {

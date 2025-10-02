@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { login, register, googleCallback, googleTokenAuth } from '../controllers/AuthController';
+import {
+  googleCallback,
+  googleTokenAuth,
+  login,
+  register,
+} from '../controllers/AuthController';
 import '../config/passport'; // Initialize passport configuration
 
 const router = Router();
@@ -93,9 +98,12 @@ router.post('/login', login);
  *       302:
  *         description: Redirect to Google OAuth
  */
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
+router.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+  })
+);
 
 /**
  * @swagger
@@ -107,7 +115,8 @@ router.get('/google', passport.authenticate('google', {
  *       302:
  *         description: Redirect with authentication result
  */
-router.get('/google/callback',
+router.get(
+  '/google/callback',
   passport.authenticate('google', { session: false }),
   googleCallback
 );

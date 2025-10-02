@@ -12,30 +12,33 @@ export interface IUser extends Document {
   updatedAt: Date;
 }
 
-const UserSchema: Schema = new Schema({
-  email: { type: String, required: true, unique: true },
-  password: {
-    type: String,
-    required: function(this: IUser) {
-      return this.authProvider === 'email';
-    }
+const UserSchema: Schema = new Schema(
+  {
+    email: { type: String, required: true, unique: true },
+    password: {
+      type: String,
+      required: function (this: IUser) {
+        return this.authProvider === 'email';
+      },
+    },
+    name: { type: String },
+    lastName: { type: String },
+    googleId: { type: String, unique: true, sparse: true }, // sparse allows null values
+    profilePicture: { type: String },
+    authProvider: {
+      type: String,
+      enum: ['email', 'google'],
+      required: true,
+      default: 'email',
+    },
   },
-  name: { type: String },
-  lastName: { type: String },
-  googleId: { type: String, unique: true, sparse: true }, // sparse allows null values
-  profilePicture: { type: String },
-  authProvider: {
-    type: String,
-    enum: ['email', 'google'],
-    required: true,
-    default: 'email'
-  },
-}, {
-  timestamps: true // Automatically adds createdAt and updatedAt
-});
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt
+  }
+);
 
 // Ensure either email/password or Google ID is provided
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
   if (this.authProvider === 'email' && !this.password) {
     return next(new Error('Password is required for email authentication'));
   }
