@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import passport from 'passport';
 import {
+  getCurrentUser,
   googleCallback,
   googleTokenAuth,
   login,
   register,
 } from '../controllers/AuthController';
+import { authenticate } from '../middleware/auth';
 import '../config/passport'; // Initialize passport configuration
 
 const router = Router();
@@ -182,5 +184,63 @@ router.get(
  *               $ref: '#/components/schemas/Error'
  */
 router.post('/google/token', googleTokenAuth);
+
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Get current user data
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 profilePicture:
+ *                   type: string
+ *                 authProvider:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *             example:
+ *               id: "60d0fe4f5311236168a109ca"
+ *               email: "user@example.com"
+ *               name: "John"
+ *               lastName: "Doe"
+ *               profilePicture: "https://lh3.googleusercontent.com/..."
+ *               authProvider: "email"
+ *               createdAt: "2021-06-21T12:00:00.000Z"
+ *               updatedAt: "2021-06-21T12:00:00.000Z"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.get('/me', authenticate, getCurrentUser);
 
 export default router;

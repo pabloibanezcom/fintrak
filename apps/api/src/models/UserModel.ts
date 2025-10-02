@@ -1,7 +1,10 @@
 import type { User } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IUser extends Document, User {}
+export interface IUser extends Document, User {
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const UserSchema: Schema = new Schema(
   {

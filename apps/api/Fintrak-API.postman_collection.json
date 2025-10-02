@@ -159,6 +159,66 @@
 							"body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"id\": \"60d0fe4f5311236168a109ca\",\n  \"email\": \"{{user}}\"\n}"
 						}
 					]
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{rootUrl}}/api/auth/me",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current authenticated user's data"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{rootUrl}}/api/auth/me",
+									"host": [
+										"{{rootUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"me"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"60d0fe4f5311236168a109ca\",\n  \"email\": \"user@example.com\",\n  \"name\": \"John\",\n  \"lastName\": \"Doe\",\n  \"profilePicture\": \"https://lh3.googleusercontent.com/...\",\n  \"authProvider\": \"email\",\n  \"createdAt\": \"2021-06-21T12:00:00.000Z\",\n  \"updatedAt\": \"2021-06-21T12:00:00.000Z\"\n}"
+						}
+					]
 				}
 			],
 			"description": "User authentication endpoints for registration and login"
