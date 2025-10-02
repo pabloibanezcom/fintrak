@@ -161,3 +161,31 @@ export const googleTokenAuth = async (req: Request, res: Response) => {
     res.status(401).json({ error: 'Invalid Google token' });
   }
 };
+
+// Get current user data
+export const getCurrentUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      lastName: user.lastName,
+      profilePicture: user.profilePicture,
+      authProvider: user.authProvider,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  } catch (_err) {
+    res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+};
