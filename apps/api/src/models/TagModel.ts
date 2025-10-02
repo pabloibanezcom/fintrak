@@ -1,11 +1,8 @@
+import type { Tag } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 import { tagSchemaDefinition } from './schemas/tagSchema';
 
-export interface ITag extends Document {
-  key: string;
-  name: string;
-  color: string;
-  icon: string;
+export interface ITag extends Tag, Document {
   userId: string;
   createdAt: Date;
   updatedAt: Date;

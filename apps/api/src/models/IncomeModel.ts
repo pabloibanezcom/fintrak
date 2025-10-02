@@ -1,25 +1,8 @@
-import type {
-  Category,
-  Counterparty,
-  Currency,
-  Periodicity,
-  RecurringTransaction,
-  Tag,
-} from '@fintrak/types';
+import type { BaseIncome } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 import { tagSchemaDefinition } from './schemas/tagSchema';
 
-export interface IIncome extends Document {
-  title: string;
-  amount: number;
-  currency: Currency;
-  category: Category;
-  source?: Counterparty;
-  date: Date;
-  periodicity: Periodicity;
-  description?: string;
-  tags?: Tag[];
-  recurringTransaction?: RecurringTransaction;
+export interface IIncome extends BaseIncome, Document {
   userId: string;
   createdAt: Date;
   updatedAt: Date;

@@ -1,12 +1,8 @@
+import type { Category } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 import { categorySchemaDefinition } from './schemas/categorySchema';
 
-export interface ICategory extends Document {
-  key: string;
-  name: string;
-  color: string;
-  icon: string;
-  keywords?: string[];
+export interface ICategory extends Category, Document {
   userId: string;
   createdAt: Date;
   updatedAt: Date;
