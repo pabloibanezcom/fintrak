@@ -4,8 +4,6 @@ import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
-router.use(authenticate); // all routes require auth
-
 /**
  * @swagger
  * /api/analytics/period-summary:
@@ -127,6 +125,6 @@ router.use(authenticate); // all routes require auth
  *       500:
  *         description: Internal server error
  */
-router.get('/analytics/period-summary', getPeriodSummary);
+router.get('/analytics/period-summary', authenticate, getPeriodSummary);
 
 export default router;
