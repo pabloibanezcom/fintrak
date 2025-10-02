@@ -1,14 +1,23 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import UserProfile from '../components/UserProfile';
 import { componentStyles } from '../styles';
 
 interface HomeScreenProps {
   onLogout: () => void;
+  onNavigateToProfile: () => void;
 }
 
-export default function HomeScreen({ onLogout }: HomeScreenProps) {
+export default function HomeScreen({ onLogout, onNavigateToProfile }: HomeScreenProps) {
   return (
     <View style={componentStyles.homeContainer}>
+      {/* Header with User Profile */}
+      <View style={componentStyles.headerContainer}>
+        <View style={{ width: 42 }} />
+        <Text style={componentStyles.headerTitle}>Home</Text>
+        <UserProfile onPress={onNavigateToProfile} />
+      </View>
+
       <ScrollView
         style={componentStyles.homeScrollView}
         showsVerticalScrollIndicator={false}

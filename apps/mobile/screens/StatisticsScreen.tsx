@@ -1,23 +1,28 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
+import UserProfile from '../components/UserProfile';
 import { componentStyles } from '../styles';
 
 interface StatisticsScreenProps {
   onLogout: () => void;
+  onNavigateToProfile: () => void;
 }
 
-export default function StatisticsScreen({ onLogout }: StatisticsScreenProps) {
+export default function StatisticsScreen({ onLogout, onNavigateToProfile }: StatisticsScreenProps) {
   return (
     <View style={componentStyles.homeContainer}>
+      {/* Header with User Profile */}
+      <View style={componentStyles.headerContainer}>
+        <View style={{ width: 42 }} />
+        <Text style={componentStyles.headerTitle}>Statistics</Text>
+        <UserProfile onPress={onNavigateToProfile} />
+      </View>
+
       <ScrollView
         style={componentStyles.homeScrollView}
         showsVerticalScrollIndicator={false}
       >
         <View style={componentStyles.homeContent}>
-          {/* Header Section */}
-          <View style={componentStyles.homeHeader}>
-            <Text style={componentStyles.homeTitle}>Statistics</Text>
-          </View>
 
           {/* Spending by Category */}
           <View style={componentStyles.homeSection}>

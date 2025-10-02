@@ -11,16 +11,19 @@ import {
 import { apiService, type PeriodSummaryResponse } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import Button from '../components/Button';
+import UserProfile from '../components/UserProfile';
 import { commonStyles, componentStyles } from '../styles';
 
 interface MonthlySummaryScreenProps {
   onLogout?: () => void;
   onNavigateHome?: () => void;
+  onNavigateToProfile: () => void;
 }
 
 export default function MonthlySummaryScreen({
   onLogout,
-  onNavigateHome
+  onNavigateHome,
+  onNavigateToProfile
 }: MonthlySummaryScreenProps) {
   const [summary, setSummary] = useState<PeriodSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -124,9 +127,21 @@ export default function MonthlySummaryScreen({
 
   if (loading) {
     return (
-      <View style={commonStyles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary[500]} testID="activity-indicator" />
-        <Text style={commonStyles.loadingText}>Loading summary...</Text>
+      <View style={commonStyles.screenContainer}>
+        <View style={componentStyles.headerContainer}>
+          <TouchableOpacity
+            style={componentStyles.headerButton}
+            onPress={onNavigateHome}
+          >
+            <Text style={componentStyles.headerButtonIcon}>←</Text>
+          </TouchableOpacity>
+          <Text style={componentStyles.headerTitle}>Summary</Text>
+          <UserProfile onPress={onNavigateToProfile} />
+        </View>
+        <View style={commonStyles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary[500]} testID="activity-indicator" />
+          <Text style={commonStyles.loadingText}>Loading summary...</Text>
+        </View>
       </View>
     );
   }
@@ -142,7 +157,7 @@ export default function MonthlySummaryScreen({
             <Text style={componentStyles.headerButtonIcon}>←</Text>
           </TouchableOpacity>
           <Text style={componentStyles.headerTitle}>Monthly Summary</Text>
-          <View style={componentStyles.headerButton} />
+          <UserProfile onPress={onNavigateToProfile} />
         </View>
         <View style={commonStyles.errorContainer}>
           <Text style={commonStyles.errorText}>Unable to load summary</Text>
@@ -168,7 +183,7 @@ export default function MonthlySummaryScreen({
           <Text style={componentStyles.headerButtonIcon}>←</Text>
         </TouchableOpacity>
         <Text style={componentStyles.headerTitle}>Summary</Text>
-        <View style={componentStyles.headerButton} />
+        <UserProfile onPress={onNavigateToProfile} />
       </View>
 
       {/* Month Selector */}

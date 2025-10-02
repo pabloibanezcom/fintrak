@@ -112,6 +112,19 @@ class ApiService {
     const endpoint = `/analytics/period-summary?${queryParams.toString()}`;
     return this.request<PeriodSummaryResponse>(endpoint);
   }
+
+  async getCurrentUser(): Promise<{
+    id: string;
+    email: string;
+    name?: string;
+    lastName?: string;
+    profilePicture?: string;
+    authProvider: 'email' | 'google';
+    createdAt: string;
+    updatedAt: string;
+  }> {
+    return this.request('/auth/me');
+  }
 }
 
 export const apiService = new ApiService();
