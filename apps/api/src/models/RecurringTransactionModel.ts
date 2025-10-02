@@ -1,18 +1,9 @@
-import type {
-  Category,
-  Currency,
-  RecurringTransactionPeriodicity,
-} from '@fintrak/types';
+import type { BaseRecurringTransaction } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IRecurringTransaction extends Document {
-  title: string;
-  currency: Currency;
-  category: Category;
-  transactionType: 'EXPENSE' | 'INCOME';
-  minAproxAmount?: number;
-  maxAproxAmount?: number;
-  periodicity: RecurringTransactionPeriodicity;
+export interface IRecurringTransaction
+  extends BaseRecurringTransaction,
+    Document {
   userId: string;
   createdAt: Date;
   updatedAt: Date;

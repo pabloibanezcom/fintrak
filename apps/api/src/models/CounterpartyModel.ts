@@ -1,16 +1,8 @@
+import type { Counterparty } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 import { counterpartySchemaDefinition } from './schemas/counterpartySchema';
 
-export interface ICounterparty extends Document {
-  key: string;
-  name: string;
-  type?: 'company' | 'person' | 'institution' | 'other';
-  logo?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  notes?: string;
-  titleTemplate?: string;
+export interface ICounterparty extends Counterparty, Document {
   userId: string;
   createdAt: Date;
   updatedAt: Date;
