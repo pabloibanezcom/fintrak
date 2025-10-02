@@ -8,6 +8,7 @@ import { componentStyles } from '../styles';
 interface ProfileScreenProps {
   onLogout: () => void;
   onBack: () => void;
+  onEditProfile: () => void;
 }
 
 interface MenuItem {
@@ -18,7 +19,7 @@ interface MenuItem {
   badge?: string;
 }
 
-export default function ProfileScreen({ onLogout, onBack }: ProfileScreenProps) {
+export default function ProfileScreen({ onLogout, onBack, onEditProfile }: ProfileScreenProps) {
   const { user } = useUser();
 
   const getInitials = () => {
@@ -102,7 +103,7 @@ export default function ProfileScreen({ onLogout, onBack }: ProfileScreenProps) 
         <Text style={componentStyles.headerTitle}>Profile</Text>
         <TouchableOpacity
           style={componentStyles.headerButton}
-          onPress={() => console.log('Edit profile')}
+          onPress={onEditProfile}
         >
           <Ionicons name="create-outline" size={20} color={colors.text.primary} />
         </TouchableOpacity>

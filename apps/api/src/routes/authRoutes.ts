@@ -6,6 +6,7 @@ import {
   googleTokenAuth,
   login,
   register,
+  updateUserProfile,
 } from '../controllers/AuthController';
 import { authenticate } from '../middleware/auth';
 import '../config/passport'; // Initialize passport configuration
@@ -242,5 +243,86 @@ router.post('/google/token', googleTokenAuth);
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/me', authenticate, getCurrentUser);
+
+/**
+ * @swagger
+ * /api/auth/me:
+ *   put:
+ *     summary: Update current user profile
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *             example:
+ *               name: "John"
+ *               lastName: "Doe"
+ *               email: "john.doe@example.com"
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 profilePicture:
+ *                   type: string
+ *                 authProvider:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *             example:
+ *               id: "60d0fe4f5311236168a109ca"
+ *               email: "john.doe@example.com"
+ *               name: "John"
+ *               lastName: "Doe"
+ *               profilePicture: "https://lh3.googleusercontent.com/..."
+ *               authProvider: "email"
+ *               createdAt: "2021-06-21T12:00:00.000Z"
+ *               updatedAt: "2021-06-21T12:30:00.000Z"
+ *       400:
+ *         description: Bad request - missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       409:
+ *         description: Email already in use
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.put('/me', authenticate, updateUserProfile);
 
 export default router;

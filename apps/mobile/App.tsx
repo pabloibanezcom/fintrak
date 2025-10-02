@@ -5,6 +5,7 @@ import MonthlySummaryScreen from './screens/MonthlySummaryScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
 import LoginScreen from './screens/LoginScreen';
 import BottomNavigation from './components/BottomNavigation';
 import AddModal from './components/AddModal';
@@ -24,8 +25,10 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<TabName>('home');
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('home');
   const [showProfile, setShowProfile] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(1));
   const [slideAnim] = useState(new Animated.Value(1000));
+  const [editFadeAnim] = useState(new Animated.Value(0));
   const [showAddModal, setShowAddModal] = useState(false);
   const { theme, isDark } = useTheme();
   const { fetchUser, clearUser } = useUser();
@@ -127,6 +130,38 @@ function AppContent() {
     }).start();
   };
 
+  const handleNavigateToEditProfile = () => {
+    // Fade in animation for edit profile
+    setShowEditProfile(true);
+    Animated.timing(editFadeAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleBackFromEditProfile = () => {
+    // Fade out animation
+    Animated.timing(editFadeAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setShowEditProfile(false);
+    });
+  };
+
+  const handleSaveProfile = async (userData: { name: string; lastName: string; email: string }) => {
+    try {
+      await apiService.updateUserProfile(userData);
+      await fetchUser(); // Refresh user data
+      handleBackFromEditProfile();
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      // TODO: Show error message to user
+    }
+  };
+
   const renderActiveScreen = () => {
     const handleNavigateHome = () => handleTabPress('home');
 
@@ -184,10 +219,32 @@ function AppContent() {
                 transform: [{ translateY: slideAnim }]
               }}
             >
-              <ProfileScreen onLogout={handleLogout} onBack={handleBackFromProfile} />
+              <ProfileScreen
+                onLogout={handleLogout}
+                onBack={handleBackFromProfile}
+                onEditProfile={handleNavigateToEditProfile}
+              />
             </Animated.View>
 
-            {!showProfile && (
+            {showEditProfile && (
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  opacity: editFadeAnim,
+                }}
+              >
+                <EditProfileScreen
+                  onBack={handleBackFromEditProfile}
+                  onSave={handleSaveProfile}
+                />
+              </Animated.View>
+            )}
+
+            {!showProfile && !showEditProfile && (
               <BottomNavigation
                 activeTab={activeTab}
                 onTabPress={handleTabPress}

@@ -189,3 +189,51 @@ export const getCurrentUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch user data' });
   }
 };
+
+// Update current user profile
+export const updateUserProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { name, lastName, email } = req.body;
+
+    // Validate input
+    if (!name || !lastName || !email) {
+      return res.status(400).json({ error: 'Name, last name, and email are required' });
+    }
+
+    // Check if email is already taken by another user
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+      if (existingUser) {
+        return res.status(409).json({ error: 'Email already in use' });
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name, lastName, email },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      lastName: user.lastName,
+      profilePicture: user.profilePicture,
+      authProvider: user.authProvider,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  } catch (_err) {
+    res.status(500).json({ error: 'Failed to update user profile' });
+  }
+};
