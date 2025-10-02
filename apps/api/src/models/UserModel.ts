@@ -1,16 +1,7 @@
+import type { User } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IUser extends Document {
-  email: string;
-  password?: string; // Optional for Google OAuth users
-  name?: string;
-  lastName?: string;
-  googleId?: string; // Google OAuth ID
-  profilePicture?: string; // Google profile picture URL
-  authProvider: 'email' | 'google'; // Track how user authenticated
-  createdAt: Date;
-  updatedAt: Date;
-}
+export interface IUser extends Document, User {}
 
 const UserSchema: Schema = new Schema(
   {
