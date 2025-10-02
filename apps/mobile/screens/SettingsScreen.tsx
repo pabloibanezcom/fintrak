@@ -1,27 +1,32 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import UserProfile from '../components/UserProfile';
 import { componentStyles } from '../styles';
 import { useTheme } from '../context/ThemeContext';
 
 interface SettingsScreenProps {
   onLogout: () => void;
+  onNavigateToProfile: () => void;
 }
 
-export default function SettingsScreen({ onLogout }: SettingsScreenProps) {
+export default function SettingsScreen({ onLogout, onNavigateToProfile }: SettingsScreenProps) {
   const { theme } = useTheme();
 
   return (
     <View style={componentStyles.homeContainer}>
+      {/* Header with User Profile */}
+      <View style={componentStyles.headerContainer}>
+        <View style={{ width: 42 }} />
+        <Text style={componentStyles.headerTitle}>Settings</Text>
+        <UserProfile onPress={onNavigateToProfile} />
+      </View>
+
       <ScrollView
         style={componentStyles.homeScrollView}
         showsVerticalScrollIndicator={false}
       >
         <View style={componentStyles.homeContent}>
-          {/* Header Section */}
-          <View style={componentStyles.homeHeader}>
-            <Text style={componentStyles.homeTitle}>Settings</Text>
-          </View>
 
           {/* Account Section */}
           <View style={componentStyles.homeSection}>
