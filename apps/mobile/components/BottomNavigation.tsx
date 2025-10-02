@@ -19,7 +19,7 @@ interface TabConfig {
 
 const tabs: TabConfig[] = [
   { name: 'home', icon: 'home-outline', label: 'Home' },
-  { name: 'expenses', icon: 'wallet-outline', label: 'Expenses' },
+  { name: 'expenses', icon: 'wallet-outline', label: 'Summary' },
   { name: 'statistics', icon: 'bar-chart-outline', label: 'Statistics' },
   { name: 'settings', icon: 'settings-outline', label: 'Settings' },
 ];

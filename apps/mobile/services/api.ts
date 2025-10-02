@@ -5,6 +5,40 @@ import type {
   LoginRequest,
 } from '@fintrak/types';
 
+export interface PeriodSummaryResponse {
+  period: {
+    from: string;
+    to: string;
+    currency: string;
+  };
+  expenses: {
+    total: number;
+    byCategory: Array<{
+      categoryId: string;
+      categoryKey: string;
+      categoryName: string;
+      categoryColor: string;
+      categoryIcon: string;
+      total: number;
+      count: number;
+    }>;
+  };
+  incomes: {
+    total: number;
+    byCategory: Array<{
+      categoryId: string;
+      categoryKey: string;
+      categoryName: string;
+      categoryColor: string;
+      categoryIcon: string;
+      total: number;
+      count: number;
+    }>;
+  };
+  balance: number;
+  latestTransactions: Array<any>;
+}
+
 const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000/api';
 
 class ApiService {
@@ -52,7 +86,7 @@ class ApiService {
     sortOrder?: 'asc' | 'desc';
   } = {}): Promise<ExpensesResponse> {
     const queryParams = new URLSearchParams();
-    
+
     if (params.limit) queryParams.append('limit', params.limit.toString());
     if (params.offset) queryParams.append('offset', params.offset.toString());
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
@@ -60,6 +94,23 @@ class ApiService {
 
     const endpoint = `/expenses/search${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return this.request<ExpensesResponse>(endpoint);
+  }
+
+  async getPeriodSummary(params: {
+    dateFrom: string;
+    dateTo: string;
+    currency?: string;
+    latestCount?: number;
+  }): Promise<PeriodSummaryResponse> {
+    const queryParams = new URLSearchParams();
+
+    queryParams.append('dateFrom', params.dateFrom);
+    queryParams.append('dateTo', params.dateTo);
+    if (params.currency) queryParams.append('currency', params.currency);
+    if (params.latestCount) queryParams.append('latestCount', params.latestCount.toString());
+
+    const endpoint = `/analytics/period-summary?${queryParams.toString()}`;
+    return this.request<PeriodSummaryResponse>(endpoint);
   }
 }
 

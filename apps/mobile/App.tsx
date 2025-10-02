@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StatusBar, ActivityIndicator, View, Animated } from 'react-native';
 import HomeScreen from './screens/HomeScreen';
-import ExpensesScreen from './screens/ExpensesScreen';
+import MonthlySummaryScreen from './screens/MonthlySummaryScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -95,7 +95,7 @@ function AppContent() {
       case 'home':
         return <HomeScreen onLogout={handleLogout} />;
       case 'expenses':
-        return <ExpensesScreen onLogout={handleLogout} onNavigateHome={handleNavigateHome} />;
+        return <MonthlySummaryScreen onLogout={handleLogout} onNavigateHome={handleNavigateHome} />;
       case 'statistics':
         return <StatisticsScreen onLogout={handleLogout} />;
       case 'settings':
