@@ -125,6 +125,26 @@ class ApiService {
   }> {
     return this.request('/auth/me');
   }
+
+  async updateUserProfile(data: {
+    name: string;
+    lastName: string;
+    email: string;
+  }): Promise<{
+    id: string;
+    email: string;
+    name?: string;
+    lastName?: string;
+    profilePicture?: string;
+    authProvider: 'email' | 'google';
+    createdAt: string;
+    updatedAt: string;
+  }> {
+    return this.request('/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const apiService = new ApiService();
