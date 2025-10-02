@@ -237,3 +237,47 @@ export const updateUserProfile = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to update user profile' });
   }
 };
+
+// Update user profile picture
+export const updateProfilePicture = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { profilePicture } = req.body;
+
+    if (!profilePicture) {
+      return res.status(400).json({ error: 'Profile picture is required' });
+    }
+
+    // Validate base64 image format
+    if (!profilePicture.startsWith('data:image/')) {
+      return res.status(400).json({ error: 'Invalid image format' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profilePicture },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      lastName: user.lastName,
+      profilePicture: user.profilePicture,
+      authProvider: user.authProvider,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  } catch (_err) {
+    res.status(500).json({ error: 'Failed to update profile picture' });
+  }
+};
