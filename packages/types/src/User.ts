@@ -1,11 +1,14 @@
-import type { UserProducts } from "./UserProducts";
-
 /**
- * Represents a user in the Fintrak system with their financial products.
- * 
+ * Represents a user in the Fintrak system.
+ *
  * @group Core Types
  */
 export interface User {
-  /** All financial products owned by the user */
-  products: UserProducts;
+  email: string;
+  password?: string; // Optional for Google OAuth users
+  name?: string;
+  lastName?: string;
+  googleId?: string; // Google OAuth ID
+  profilePicture?: string; // Google profile picture URL
+  authProvider: 'email' | 'google'; // Track how user authenticated
 }

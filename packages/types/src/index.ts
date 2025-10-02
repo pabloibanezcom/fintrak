@@ -55,3 +55,4 @@ export {
   PaginationInfo,
   ExpensesResponse,
 } from "./Auth";
+export { User } from "./User";
