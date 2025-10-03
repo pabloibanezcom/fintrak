@@ -5,6 +5,7 @@ import {
   SectionList,
   TouchableOpacity,
   RefreshControl,
+  Image,
 } from 'react-native';
 import type { Expense } from '@fintrak/types';
 import { useTheme } from '../context/ThemeContext';
@@ -144,6 +145,7 @@ export default function TransactionList({
   const renderTransactionItem = ({ item }: { item: Expense }) => {
     // Determine if this is an expense (negative amount)
     const isExpense = item.amount < 0 || true; // In expenses list, all items are expenses
+    const hasLogo = item.payee?.logo;
 
     return (
       <View style={componentStyles.transactionItemWrapper}>
@@ -154,8 +156,20 @@ export default function TransactionList({
           onPress={() => onTransactionPress?.(item)}
         >
           <View style={componentStyles.transactionIconContainer}>
-          <Text style={componentStyles.transactionIcon}>{getCategoryIcon(item.category)}</Text>
-        </View>
+            {hasLogo ? (
+              <Image
+                source={{ uri: item.payee.logo }}
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: 21,
+                }}
+                resizeMode="cover"
+              />
+            ) : (
+              <Text style={componentStyles.transactionIcon}>{getCategoryIcon(item.category)}</Text>
+            )}
+          </View>
         <View style={componentStyles.transactionContent}>
           <Text
             style={componentStyles.transactionTitle}
