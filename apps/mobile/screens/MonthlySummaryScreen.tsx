@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo, memo } from 'react';
 import {
   View,
   Text,
@@ -7,13 +7,116 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { apiService, type PeriodSummaryResponse } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import Button from '../components/Button';
 import UserProfile from '../components/UserProfile';
-import { commonStyles, componentStyles, colors } from '../styles';
+import { commonStyles, componentStyles, colors, spacing, typography } from '../styles';
+import { formatCurrency as formatCurrencyUtil } from '../utils/currency';
+
+interface MonthSelectorProps {
+  selectedDate: Date;
+  onMonthSelect: (date: Date) => void;
+}
+
+const MonthSelector = memo(({ selectedDate, onMonthSelect }: MonthSelectorProps) => {
+  const monthScrollRef = useRef<ScrollView>(null);
+
+  const monthsList = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const months = [];
+
+    // Show last 24 months (2 years)
+    for (let i = 23; i >= 0; i--) {
+      const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const isFuture = monthDate > now;
+      const monthYear = monthDate.getFullYear();
+
+      // Format: "Jan" or "Jan 24" for previous years
+      const monthName = monthDate.toLocaleString('default', { month: 'short' });
+      const label = monthYear === currentYear
+        ? monthName
+        : `${monthName} ${monthYear.toString().slice(-2)}`;
+
+      months.push({
+        key: `${monthDate.getFullYear()}-${monthDate.getMonth()}`,
+        label,
+        date: monthDate,
+        isFuture,
+      });
+    }
+
+    return months;
+  }, []);
+
+  useEffect(() => {
+    const selectedIndex = monthsList.findIndex(
+      (m) => m.date.getMonth() === selectedDate.getMonth() &&
+             m.date.getFullYear() === selectedDate.getFullYear()
+    );
+
+    if (selectedIndex > -1 && monthScrollRef.current) {
+      const buttonWidth = 72;
+      const screenWidth = 375;
+      const scrollPosition = Math.max(0, (selectedIndex * buttonWidth) - (screenWidth / 2) + (buttonWidth / 2));
+
+      setTimeout(() => {
+        monthScrollRef.current?.scrollTo({ x: scrollPosition, animated: false });
+      }, 50);
+    }
+  }, [selectedDate, monthsList]);
+
+  return (
+    <View style={{ height: 40, marginVertical: spacing.sm, paddingHorizontal: spacing.lg }}>
+      <ScrollView
+        ref={monthScrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          alignItems: 'center',
+        }}
+      >
+        {monthsList.map((month, index) => {
+          const isSelected = month.date.getMonth() === selectedDate.getMonth() &&
+                            month.date.getFullYear() === selectedDate.getFullYear();
+          return (
+            <TouchableOpacity
+              key={month.key}
+              onPress={() => onMonthSelect(month.date)}
+              disabled={month.isFuture}
+              style={{
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 8,
+                backgroundColor: isSelected ? colors.accent.primary : 'transparent',
+                opacity: month.isFuture ? 0.3 : 1,
+                marginRight: index < monthsList.length - 1 ? 8 : 0,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: typography.weights.regular,
+                  color: isSelected ? colors.text.inverse : colors.text.secondary,
+                }}
+              >
+                {month.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison: only re-render if the month/year changed
+  return prevProps.selectedDate.getMonth() === nextProps.selectedDate.getMonth() &&
+         prevProps.selectedDate.getFullYear() === nextProps.selectedDate.getFullYear();
+});
 
 interface MonthlySummaryScreenProps {
   onLogout?: () => void;
@@ -30,7 +133,10 @@ export default function MonthlySummaryScreen({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -116,10 +222,7 @@ export default function MonthlySummaryScreen({
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(amount);
+    return formatCurrencyUtil(amount, 'EUR');
   };
 
   const getMonthName = () => {
@@ -188,34 +291,7 @@ export default function MonthlySummaryScreen({
       </View>
 
       {/* Month Selector */}
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        backgroundColor: 'white',
-      }}>
-        <TouchableOpacity
-          onPress={goToPreviousMonth}
-          style={{ padding: 8 }}
-        >
-          <Text style={{ fontSize: 24, color: theme.colors.primary[500] }}>‹</Text>
-        </TouchableOpacity>
-        <Text style={{ fontSize: 16, fontWeight: '600' }}>
-          {getMonthName()}
-        </Text>
-        <TouchableOpacity
-          onPress={goToNextMonth}
-          disabled={isCurrentMonth()}
-          style={{ padding: 8 }}
-        >
-          <Text style={{
-            fontSize: 24,
-            color: isCurrentMonth() ? '#d1d5db' : theme.colors.primary[500]
-          }}>›</Text>
-        </TouchableOpacity>
-      </View>
+      <MonthSelector selectedDate={selectedDate} onMonthSelect={setSelectedDate} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -333,42 +409,62 @@ export default function MonthlySummaryScreen({
             {/* Latest Transactions */}
             {summary.latestTransactions.length > 0 && (
               <View>
-                <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
+                <Text style={componentStyles.sectionTitle}>
                   Latest Transactions
                 </Text>
-                {summary.latestTransactions.map((transaction, index) => (
-                  <View
-                    key={transaction._id || index}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: 12,
-                      backgroundColor: 'white',
-                      borderRadius: 8,
-                      marginBottom: 8,
-                    }}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: '500' }}>
-                        {transaction.title}
-                      </Text>
-                      <Text style={{ color: '#6b7280', fontSize: 12 }}>
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </Text>
+                {summary.latestTransactions.map((transaction, index) => {
+                  const getCategoryColor = () => {
+                    if (transaction.type === 'income') return colors.accent.primary;
+                    return colors.text.secondary;
+                  };
+
+                  const getCategoryIcon = () => {
+                    if (transaction.type === 'income') return '💰';
+                    return '💸';
+                  };
+
+                  const hasLogo = transaction.payee?.logo;
+
+                  return (
+                    <View key={transaction._id || index} style={componentStyles.transactionItemWrapper}>
+                      <View style={[componentStyles.transactionColorAccent, { backgroundColor: getCategoryColor() }]} />
+                      <View style={componentStyles.transactionItem}>
+                        <View style={componentStyles.transactionIconContainer}>
+                          {hasLogo ? (
+                            <Image
+                              source={{ uri: transaction.payee.logo }}
+                              style={{
+                                width: 42,
+                                height: 42,
+                                borderRadius: 21,
+                              }}
+                              resizeMode="cover"
+                            />
+                          ) : (
+                            <Text style={componentStyles.transactionIcon}>{getCategoryIcon()}</Text>
+                          )}
+                        </View>
+                        <View style={componentStyles.transactionContent}>
+                          <Text style={componentStyles.transactionTitle} numberOfLines={1}>
+                            {transaction.title}
+                          </Text>
+                          <Text style={componentStyles.transactionDate}>
+                            {new Date(transaction.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </Text>
+                        </View>
+                        <Text
+                          style={[
+                            componentStyles.transactionAmount,
+                            { color: transaction.type === 'income' ? colors.accent.primary : colors.text.primary }
+                          ]}
+                        >
+                          {transaction.type === 'income' ? '+' : '-'}
+                          {formatCurrency(transaction.amount)}
+                        </Text>
+                      </View>
                     </View>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: '600',
-                        color: transaction.type === 'income' ? '#10b981' : '#ef4444',
-                      }}
-                    >
-                      {transaction.type === 'income' ? '+' : '-'}
-                      {formatCurrency(transaction.amount)}
-                    </Text>
-                  </View>
-                ))}
+                  );
+                })}
               </View>
             )}
           </View>

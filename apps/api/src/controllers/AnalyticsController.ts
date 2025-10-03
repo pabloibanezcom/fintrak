@@ -110,14 +110,14 @@ export const getPeriodSummary = async (req: Request, res: Response) => {
     const limit = Number.parseInt(latestCount as string, 10);
     const latestExpenses = await ExpenseModel.find(baseQuery)
       .populate('category', 'key name color icon')
-      .populate('payee', 'key name type')
+      .populate('payee', 'key name type logo')
       .sort({ date: -1 })
       .limit(limit)
       .lean();
 
     const latestIncomes = await IncomeModel.find(baseQuery)
       .populate('category', 'key name color icon')
-      .populate('source', 'key name type')
+      .populate('source', 'key name type logo')
       .sort({ date: -1 })
       .limit(limit)
       .lean();
