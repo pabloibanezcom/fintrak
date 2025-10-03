@@ -8,7 +8,15 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
+
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import { Ionicons } from '@expo/vector-icons';
 import { apiService, type PeriodSummaryResponse } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
@@ -137,6 +145,7 @@ export default function MonthlySummaryScreen({
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
+  const [showAllExpenses, setShowAllExpenses] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -300,118 +309,244 @@ export default function MonthlySummaryScreen({
         }
       >
         {summary && (
-          <View style={{ padding: 16 }}>
-            {/* Balance Card */}
+          <View style={{ padding: spacing.lg }}>
+            {/* Current Balance */}
             <View style={{
-              backgroundColor: summary.balance >= 0 ? '#10b981' : '#ef4444',
-              borderRadius: 12,
-              padding: 20,
-              marginBottom: 20,
+              marginBottom: spacing.xl,
+              alignItems: 'center',
             }}>
-              <Text style={{ color: 'white', fontSize: 14, marginBottom: 8 }}>
-                Balance
+              <Text style={{
+                color: colors.text.secondary,
+                fontSize: 16,
+                marginBottom: spacing.xs,
+                fontWeight: typography.weights.regular,
+              }}>
+                Current Balance
               </Text>
-              <Text style={{ color: 'white', fontSize: 32, fontWeight: 'bold' }}>
+              <Text style={{
+                color: colors.text.primary,
+                fontSize: 26,
+                fontWeight: typography.weights.medium,
+              }}>
                 {formatCurrency(summary.balance)}
               </Text>
             </View>
 
-            {/* Income & Expenses Summary */}
-            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
-              <View style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16 }}>
-                <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Income</Text>
-                <Text style={{ color: '#10b981', fontSize: 20, fontWeight: 'bold' }}>
-                  {formatCurrency(summary.incomes.total)}
-                </Text>
-              </View>
-              <View style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16 }}>
-                <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Expenses</Text>
-                <Text style={{ color: '#ef4444', fontSize: 20, fontWeight: 'bold' }}>
-                  {formatCurrency(summary.expenses.total)}
-                </Text>
-              </View>
-            </View>
-
             {/* Expenses by Category */}
             {summary.expenses.byCategory.length > 0 && (
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
-                  Expenses by Category
-                </Text>
-                {summary.expenses.byCategory.map((category) => (
-                  <View
-                    key={category.categoryId}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: 12,
-                      backgroundColor: 'white',
-                      borderRadius: 8,
-                      marginBottom: 8,
-                      borderLeftWidth: 4,
-                      borderLeftColor: category.categoryColor,
-                    }}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: '500' }}>
-                        {category.categoryName}
-                      </Text>
-                      <Text style={{ color: '#6b7280', fontSize: 12 }}>
-                        {category.count} transaction{category.count !== 1 ? 's' : ''}
+              <View style={{ marginBottom: spacing.lg }}>
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: spacing.base,
+                }}>
+                  <Text style={{
+                    fontSize: 18,
+                    fontWeight: typography.weights.medium,
+                    color: colors.text.secondary,
+                  }}>
+                    Expenses
+                  </Text>
+                  <Text style={{
+                    fontSize: 20,
+                    fontWeight: typography.weights.bold,
+                    color: colors.text.primary,
+                  }}>
+                    {formatCurrency(summary.expenses.total)}
+                  </Text>
+                </View>
+
+                {/* Progress Bar */}
+                <View style={{
+                  height: 8,
+                  backgroundColor: colors.background.secondary,
+                  borderRadius: 4,
+                  flexDirection: 'row',
+                  overflow: 'hidden',
+                  marginBottom: spacing.base,
+                }}>
+                  {summary.expenses.byCategory.map((category, index) => {
+                    const percentage = (category.total / summary.expenses.total) * 100;
+                    return (
+                      <View
+                        key={category.categoryId}
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: category.categoryColor || colors.text.secondary,
+                        }}
+                      />
+                    );
+                  })}
+                </View>
+
+                {/* Category List */}
+                {(showAllExpenses ? summary.expenses.byCategory : summary.expenses.byCategory.slice(0, 3)).map((category) => {
+                  return (
+                    <View
+                      key={category.categoryId}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: spacing.sm,
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                        <View style={{ width: 24, alignItems: 'center', marginRight: spacing.sm }}>
+                          <Ionicons
+                            name={category.categoryIcon as any || 'cash-outline'}
+                            size={16}
+                            color={category.categoryColor || colors.text.secondary}
+                          />
+                        </View>
+                        <Text style={{
+                          fontSize: 14,
+                          fontWeight: typography.weights.regular,
+                          color: colors.text.primary,
+                        }}>
+                          {category.categoryName}
+                        </Text>
+                      </View>
+                      <Text style={{
+                        fontSize: 14,
+                        fontWeight: typography.weights.medium,
+                        color: colors.text.primary,
+                      }}>
+                        {formatCurrency(category.total)}
                       </Text>
                     </View>
-                    <Text style={{ fontSize: 16, fontWeight: '600' }}>
-                      {formatCurrency(category.total)}
+                  );
+                })}
+
+                {/* Show All Link */}
+                {summary.expenses.byCategory.length > 3 && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                      setShowAllExpenses(!showAllExpenses);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{
+                      fontSize: 14,
+                      fontWeight: typography.weights.medium,
+                      color: colors.accent.primary,
+                      marginTop: spacing.xs,
+                    }}>
+                      {showAllExpenses ? 'Show less' : 'Show all'}
                     </Text>
-                  </View>
-                ))}
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
             {/* Incomes by Category */}
             {summary.incomes.byCategory.length > 0 && (
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 12 }}>
-                  Incomes by Category
-                </Text>
-                {summary.incomes.byCategory.map((category) => (
-                  <View
-                    key={category.categoryId}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: 12,
-                      backgroundColor: 'white',
-                      borderRadius: 8,
-                      marginBottom: 8,
-                      borderLeftWidth: 4,
-                      borderLeftColor: category.categoryColor,
-                    }}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 16, fontWeight: '500' }}>
-                        {category.categoryName}
-                      </Text>
-                      <Text style={{ color: '#6b7280', fontSize: 12 }}>
-                        {category.count} transaction{category.count !== 1 ? 's' : ''}
+              <View style={{ marginBottom: spacing.xl * 1.5 }}>
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: spacing.base,
+                }}>
+                  <Text style={{
+                    fontSize: 18,
+                    fontWeight: typography.weights.medium,
+                    color: colors.text.secondary,
+                  }}>
+                    Incomes
+                  </Text>
+                  <Text style={{
+                    fontSize: 20,
+                    fontWeight: typography.weights.bold,
+                    color: colors.text.primary,
+                  }}>
+                    {formatCurrency(summary.incomes.total)}
+                  </Text>
+                </View>
+
+                {/* Progress Bar */}
+                <View style={{
+                  height: 8,
+                  backgroundColor: colors.background.secondary,
+                  borderRadius: 4,
+                  flexDirection: 'row',
+                  overflow: 'hidden',
+                  marginBottom: spacing.base,
+                }}>
+                  {summary.incomes.byCategory.map((category, index) => {
+                    const percentage = (category.total / summary.incomes.total) * 100;
+                    return (
+                      <View
+                        key={category.categoryId}
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: category.categoryColor || colors.text.secondary,
+                        }}
+                      />
+                    );
+                  })}
+                </View>
+
+                {/* Category List */}
+                {summary.incomes.byCategory.map((category) => {
+                  return (
+                    <View
+                      key={category.categoryId}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: spacing.sm,
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                        <View style={{ width: 24, alignItems: 'center', marginRight: spacing.sm }}>
+                          <Ionicons
+                            name={category.categoryIcon as any || 'cash-outline'}
+                            size={16}
+                            color={category.categoryColor || colors.text.secondary}
+                          />
+                        </View>
+                        <Text style={{
+                          fontSize: 14,
+                          fontWeight: typography.weights.regular,
+                          color: colors.text.primary,
+                        }}>
+                          {category.categoryName}
+                        </Text>
+                      </View>
+                      <Text style={{
+                        fontSize: 14,
+                        fontWeight: typography.weights.medium,
+                        color: colors.text.primary,
+                      }}>
+                        {formatCurrency(category.total)}
                       </Text>
                     </View>
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#10b981' }}>
-                      {formatCurrency(category.total)}
-                    </Text>
-                  </View>
-                ))}
+                  );
+                })}
               </View>
             )}
 
             {/* Latest Transactions */}
             {summary.latestTransactions.length > 0 && (
               <View>
-                <Text style={componentStyles.sectionTitle}>
-                  Latest Transactions
-                </Text>
+                <View style={componentStyles.sectionHeader}>
+                  <Text style={[componentStyles.sectionTitle, { marginBottom: 0 }]}>
+                    Latest Transactions
+                  </Text>
+                  <TouchableOpacity activeOpacity={0.7}>
+                    <Text style={{
+                      fontSize: 14,
+                      fontWeight: typography.weights.medium,
+                      color: colors.accent.primary,
+                    }}>
+                      Show all
+                    </Text>
+                  </TouchableOpacity>
+                </View>
                 {summary.latestTransactions.map((transaction, index) => {
                   const getCategoryColor = () => {
                     if (transaction.type === 'income') return colors.accent.primary;
@@ -437,11 +572,23 @@ export default function MonthlySummaryScreen({
                                 width: 42,
                                 height: 42,
                                 borderRadius: 21,
+                                borderWidth: 2,
+                                borderColor: transaction.category?.color || colors.text.secondary,
                               }}
                               resizeMode="cover"
                             />
                           ) : (
-                            <Text style={componentStyles.transactionIcon}>{getCategoryIcon()}</Text>
+                            <View style={{
+                              width: 46,
+                              height: 46,
+                              borderRadius: 23,
+                              borderWidth: 2,
+                              borderColor: transaction.category?.color || colors.text.secondary,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                              <Text style={componentStyles.transactionIcon}>{getCategoryIcon()}</Text>
+                            </View>
                           )}
                         </View>
                         <View style={componentStyles.transactionContent}>
@@ -449,7 +596,7 @@ export default function MonthlySummaryScreen({
                             {transaction.title}
                           </Text>
                           <Text style={componentStyles.transactionDate}>
-                            {new Date(transaction.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {new Date(transaction.date).getDate()} {new Date(transaction.date).toLocaleDateString('en-US', { month: 'short' })} | {transaction.category?.name || 'Uncategorized'}
                           </Text>
                         </View>
                         <Text
