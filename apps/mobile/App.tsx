@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StatusBar, ActivityIndicator, View, Animated } from 'react-native';
 import HomeScreen from './screens/HomeScreen';
 import MonthlySummaryScreen from './screens/MonthlySummaryScreen';
+import InvestmentsScreen from './screens/InvestmentsScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
-import SettingsScreen from './screens/SettingsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -15,7 +15,7 @@ import { authStorage } from './utils/authStorage';
 import { apiService } from './services/api';
 import { colors, commonStyles } from './styles';
 
-type TabName = 'home' | 'expenses' | 'statistics' | 'settings';
+type TabName = 'home' | 'expenses' | 'investments' | 'statistics';
 type ScreenName = TabName | 'profile';
 
 function AppContent() {
@@ -170,10 +170,10 @@ function AppContent() {
         return <HomeScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
       case 'expenses':
         return <MonthlySummaryScreen onLogout={handleLogout} onNavigateHome={handleNavigateHome} onNavigateToProfile={handleNavigateToProfile} />;
+      case 'investments':
+        return <InvestmentsScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
       case 'statistics':
         return <StatisticsScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
-      case 'settings':
-        return <SettingsScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
       default:
         return <HomeScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
     }
