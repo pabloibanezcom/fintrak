@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { componentStyles } from '../styles';
 
-type TabName = 'home' | 'expenses' | 'statistics' | 'settings';
+type TabName = 'home' | 'expenses' | 'investments' | 'statistics';
 
 interface BottomNavigationProps {
   activeTab: TabName;
@@ -20,8 +20,8 @@ interface TabConfig {
 const tabs: TabConfig[] = [
   { name: 'home', icon: 'home-outline', label: 'Home' },
   { name: 'expenses', icon: 'wallet-outline', label: 'Summary' },
+  { name: 'investments', icon: 'trending-up-outline', label: 'Investments' },
   { name: 'statistics', icon: 'bar-chart-outline', label: 'Statistics' },
-  { name: 'settings', icon: 'settings-outline', label: 'Settings' },
 ];
 
 export default function BottomNavigation({ activeTab, onTabPress, onAddPress }: BottomNavigationProps) {
