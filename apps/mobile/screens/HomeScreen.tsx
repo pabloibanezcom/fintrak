@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import UserProfile from '../components/UserProfile';
 import { componentStyles } from '../styles';
+import { useUser } from '../context/UserContext';
 
 interface HomeScreenProps {
   onLogout: () => void;
@@ -9,12 +10,19 @@ interface HomeScreenProps {
 }
 
 export default function HomeScreen({ onLogout, onNavigateToProfile }: HomeScreenProps) {
+  const { user } = useUser();
+  const displayName = user?.name && user?.lastName
+    ? `${user.name} ${user.lastName}`
+    : user?.name || user?.email || 'User';
+
   return (
     <View style={componentStyles.homeContainer}>
       {/* Header with User Profile */}
       <View style={componentStyles.headerContainer}>
-        <View style={{ width: 42 }} />
-        <Text style={componentStyles.headerTitle}>Home</Text>
+        <View style={componentStyles.welcomeSection}>
+          <Text style={componentStyles.welcomeSubtext}>Welcome back,</Text>
+          <Text style={componentStyles.welcomeName}>{displayName}</Text>
+        </View>
         <UserProfile onPress={onNavigateToProfile} />
       </View>
 
@@ -23,11 +31,6 @@ export default function HomeScreen({ onLogout, onNavigateToProfile }: HomeScreen
         showsVerticalScrollIndicator={false}
       >
         <View style={componentStyles.homeContent}>
-          {/* Header Section */}
-          <View style={componentStyles.homeHeader}>
-            <Text style={componentStyles.homeGreeting}>Good morning</Text>
-            <Text style={componentStyles.homeTitle}>Welcome back!</Text>
-          </View>
 
           {/* Balance Section */}
           <View style={componentStyles.homeSection}>

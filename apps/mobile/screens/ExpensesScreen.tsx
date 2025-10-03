@@ -6,13 +6,14 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { Expense } from '@fintrak/types';
 import { apiService } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import Button from '../components/Button';
 import TransactionList from '../components/TransactionList';
 import ExpenseDetailModal from '../components/ExpenseDetailModal';
-import { commonStyles, componentStyles } from '../styles';
+import { commonStyles, componentStyles, colors } from '../styles';
 
 interface ExpensesScreenProps {
   onLogout?: () => void;
@@ -92,7 +93,7 @@ export default function ExpensesScreen({ onLogout, onNavigateHome }: ExpensesScr
             style={componentStyles.headerButton}
             onPress={onNavigateHome}
           >
-            <Text style={componentStyles.headerButtonIcon}>←</Text>
+            <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={componentStyles.headerTitle}>Expenses</Text>
           <View style={componentStyles.headerButton} />
@@ -118,7 +119,7 @@ export default function ExpensesScreen({ onLogout, onNavigateHome }: ExpensesScr
           style={componentStyles.headerButton}
           onPress={onNavigateHome}
         >
-          <Text style={componentStyles.headerButtonIcon}>←</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={componentStyles.headerTitle}>Expenses</Text>
         <View style={componentStyles.headerButton} />

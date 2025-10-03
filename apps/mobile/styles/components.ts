@@ -466,6 +466,22 @@ export const componentStyles = StyleSheet.create({
     fontWeight: typography.weights.semiBold,
     color: colors.text.primary,
   },
+  welcomeSection: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  welcomeSubtext: {
+    fontSize: 12,
+    fontWeight: typography.weights.regular,
+    color: colors.text.secondary,
+    marginBottom: 2,
+  },
+  welcomeName: {
+    fontSize: 18,
+    fontWeight: typography.weights.medium,
+    color: colors.text.primary,
+    letterSpacing: -0.18,
+  },
   homeSection: {
     marginBottom: spacing.xl,
   },

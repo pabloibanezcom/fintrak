@@ -167,7 +167,7 @@ export default function EditProfileScreen({ onBack, onSave }: EditProfileScreenP
           style={componentStyles.headerButton}
           onPress={onBack}
         >
-          <Text style={componentStyles.headerButtonIcon}>←</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={componentStyles.headerTitle}>Edit Profile</Text>
         <View style={{ width: 40 }} />
