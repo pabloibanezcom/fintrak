@@ -98,7 +98,7 @@ export default function ProfileScreen({ onLogout, onBack, onEditProfile }: Profi
           style={componentStyles.headerButton}
           onPress={onBack}
         >
-          <Text style={componentStyles.headerButtonIcon}>←</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={componentStyles.headerTitle}>Profile</Text>
         <TouchableOpacity

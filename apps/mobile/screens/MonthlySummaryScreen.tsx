@@ -8,11 +8,12 @@ import {
   ScrollView,
   RefreshControl,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { apiService, type PeriodSummaryResponse } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import Button from '../components/Button';
 import UserProfile from '../components/UserProfile';
-import { commonStyles, componentStyles } from '../styles';
+import { commonStyles, componentStyles, colors } from '../styles';
 
 interface MonthlySummaryScreenProps {
   onLogout?: () => void;
@@ -133,7 +134,7 @@ export default function MonthlySummaryScreen({
             style={componentStyles.headerButton}
             onPress={onNavigateHome}
           >
-            <Text style={componentStyles.headerButtonIcon}>←</Text>
+            <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={componentStyles.headerTitle}>Summary</Text>
           <UserProfile onPress={onNavigateToProfile} />
@@ -154,7 +155,7 @@ export default function MonthlySummaryScreen({
             style={componentStyles.headerButton}
             onPress={onNavigateHome}
           >
-            <Text style={componentStyles.headerButtonIcon}>←</Text>
+            <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={componentStyles.headerTitle}>Monthly Summary</Text>
           <UserProfile onPress={onNavigateToProfile} />
@@ -180,7 +181,7 @@ export default function MonthlySummaryScreen({
           style={componentStyles.headerButton}
           onPress={onNavigateHome}
         >
-          <Text style={componentStyles.headerButtonIcon}>←</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={componentStyles.headerTitle}>Summary</Text>
         <UserProfile onPress={onNavigateToProfile} />
