@@ -2,6 +2,7 @@ export { BaseTransaction } from "./BaseTransaction";
 export { CashAccount } from "./CashAccount";
 export { Category } from "./Category";
 export { Counterparty } from "./Counterparty";
+export { CryptoAsset } from "./CryptoAsset";
 export { Currency } from "./Currency";
 export { Deposit } from "./Deposit";
 export { ETC } from "./ETC";

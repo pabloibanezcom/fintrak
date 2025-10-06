@@ -8,6 +8,7 @@ import multer from 'multer';
 import * as XLSX from 'xlsx';
 import CategoryModel from '../models/CategoryModel';
 import CounterpartyModel from '../models/CounterpartyModel';
+import CryptoAssetModel from '../models/CryptoAssetModel';
 import ExpenseModel from '../models/ExpenseModel';
 import IncomeModel from '../models/IncomeModel';
 import RecurringTransactionModel from '../models/RecurringTransactionModel';
@@ -836,6 +837,112 @@ export const importRecurringTransactions = async (
     console.error('Recurring transaction import error:', error);
     res.status(500).json({
       error: 'Failed to import recurring transactions',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const importCryptoAssets = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Parse JSON file
+    let cryptoAssetsData: any[];
+    try {
+      const fileContent = req.file.buffer.toString('utf-8');
+      const parsedData = JSON.parse(fileContent);
+
+      // Handle both array format and object with cryptoAssets property
+      cryptoAssetsData = Array.isArray(parsedData)
+        ? parsedData
+        : parsedData.cryptoAssets;
+
+      if (!Array.isArray(cryptoAssetsData)) {
+        return res.status(400).json({
+          error:
+            'Invalid JSON format. Expected array of crypto assets or object with cryptoAssets property',
+        });
+      }
+    } catch (error) {
+      return res.status(400).json({
+        error: 'Invalid JSON file',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+
+    const results = {
+      total: cryptoAssetsData.length,
+      imported: 0,
+      updated: 0,
+      errors: [] as string[],
+    };
+
+    for (let i = 0; i < cryptoAssetsData.length; i++) {
+      try {
+        const cryptoAssetData = cryptoAssetsData[i];
+
+        // Validate required fields
+        if (!cryptoAssetData.code || !cryptoAssetData.name) {
+          results.errors.push(
+            `Row ${i + 1}: Missing required fields (code, name)`
+          );
+          continue;
+        }
+
+        // Validate amount
+        if (
+          cryptoAssetData.amount !== undefined &&
+          cryptoAssetData.amount < 0
+        ) {
+          results.errors.push(`Row ${i + 1}: Amount must be non-negative`);
+          continue;
+        }
+
+        // Check if crypto asset already exists for this user
+        const existingCryptoAsset = await CryptoAssetModel.findOne({
+          userId,
+          code: cryptoAssetData.code,
+        });
+
+        const cryptoAssetDoc = {
+          name: cryptoAssetData.name,
+          code: cryptoAssetData.code,
+          amount: cryptoAssetData.amount || 0,
+          userId,
+        };
+
+        if (existingCryptoAsset) {
+          // Update existing crypto asset
+          await CryptoAssetModel.findOneAndUpdate(
+            { userId, code: cryptoAssetData.code },
+            cryptoAssetDoc,
+            { new: true }
+          );
+          results.updated++;
+        } else {
+          // Create new crypto asset
+          await CryptoAssetModel.create(cryptoAssetDoc);
+          results.imported++;
+        }
+      } catch (error) {
+        results.errors.push(
+          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
+    }
+
+    res.json(results);
+  } catch (error) {
+    console.error('Crypto asset import error:', error);
+    res.status(500).json({
+      error: 'Failed to import crypto assets',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
