@@ -304,4 +304,59 @@ router.post(
   controller.importRecurringTransactions
 );
 
+/**
+ * @swagger
+ * /api/import/crypto-assets:
+ *   post:
+ *     summary: Import crypto assets from JSON file
+ *     tags:
+ *       - Import
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: JSON file containing crypto assets
+ *     responses:
+ *       200:
+ *         description: Import results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                   description: Total number of crypto assets processed
+ *                 imported:
+ *                   type: number
+ *                   description: Number of crypto assets successfully imported
+ *                 updated:
+ *                   type: number
+ *                   description: Number of crypto assets updated
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: List of errors encountered during import
+ *       400:
+ *         description: Bad request - no file uploaded or invalid JSON
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+  '/crypto-assets',
+  controller.upload.single('file'),
+  controller.importCryptoAssets
+);
+
 export default router;

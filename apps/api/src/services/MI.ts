@@ -1,5 +1,6 @@
 import type {
   CashAccount,
+  CryptoAsset,
   Deposit,
   IndexedFund,
   MILoginResponse,
@@ -8,6 +9,8 @@ import type {
 } from '@fintrak/types';
 import { MIServiceError } from '@fintrak/types';
 import axios, { type AxiosError } from 'axios';
+import CryptoAssetModel from '../models/CryptoAssetModel';
+import { fetchCryptoPrices } from './CoinGecko';
 import {
   MICashAccountsToUserCashAccounts,
   MIDepositsToUserDeposits,
@@ -251,16 +254,61 @@ async function fetchSecuritiesData(): Promise<{
   });
 }
 
-export const fetchUserProducts = async (): Promise<UserProducts> => {
+async function fetchCryptoAssets(userId: string): Promise<CryptoAsset[]> {
+  try {
+    const cryptoAssets = await CryptoAssetModel.find({ userId });
+
+    if (cryptoAssets.length === 0) {
+      return [];
+    }
+
+    // Extract unique crypto codes
+    const cryptoCodes = [...new Set(cryptoAssets.map((asset) => asset.code))];
+
+    // Fetch current prices from CoinGecko
+    const prices = await fetchCryptoPrices(cryptoCodes);
+
+    // Map assets with populated values
+    return cryptoAssets.map((asset) => {
+      const assetPrices = prices[asset.code];
+      const value: Record<string, number> = {};
+
+      // Calculate value for each currency if prices are available
+      if (assetPrices) {
+        for (const [currency, price] of Object.entries(assetPrices)) {
+          value[currency.toUpperCase()] = asset.amount * price;
+        }
+      }
+
+      return {
+        _id: asset._id?.toString(),
+        userId: asset.userId,
+        name: asset.name,
+        code: asset.code,
+        amount: asset.amount,
+        value: Object.keys(value).length > 0 ? value : undefined,
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching crypto assets:', error);
+    return [];
+  }
+}
+
+export const fetchUserProducts = async (
+  userId?: string
+): Promise<UserProducts> => {
   try {
     console.log('Fetching user products...');
 
     // Fetch all products in parallel for better performance
-    const [deposits, cashAccounts, securities] = await Promise.allSettled([
-      fetchDeposits(),
-      fetchCashAccounts(),
-      fetchSecuritiesData(),
-    ]);
+    const [deposits, cashAccounts, securities, cryptoAssets] =
+      await Promise.allSettled([
+        fetchDeposits(),
+        fetchCashAccounts(),
+        fetchSecuritiesData(),
+        userId ? fetchCryptoAssets(userId) : Promise.resolve([]),
+      ]);
 
     return {
       deposits: deposits.status === 'fulfilled' ? deposits.value : [],
@@ -269,6 +317,8 @@ export const fetchUserProducts = async (): Promise<UserProducts> => {
       indexedFunds:
         securities.status === 'fulfilled' ? securities.value.indexedFunds : [],
       etcs: securities.status === 'fulfilled' ? securities.value.etcs : [],
+      cryptoAssets:
+        cryptoAssets.status === 'fulfilled' ? cryptoAssets.value : [],
     };
   } catch (error) {
     console.error('Unexpected error fetching user products:', error);
