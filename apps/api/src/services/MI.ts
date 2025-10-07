@@ -310,15 +310,52 @@ export const fetchUserProducts = async (
         userId ? fetchCryptoAssets(userId) : Promise.resolve([]),
       ]);
 
+    const depositItems = deposits.status === 'fulfilled' ? deposits.value : [];
+    const cashAccountItems =
+      cashAccounts.status === 'fulfilled' ? cashAccounts.value : [];
+    const indexedFundItems =
+      securities.status === 'fulfilled' ? securities.value.indexedFunds : [];
+    const etcItems =
+      securities.status === 'fulfilled' ? securities.value.etcs : [];
+    const cryptoAssetItems =
+      cryptoAssets.status === 'fulfilled' ? cryptoAssets.value : [];
+
+    // Calculate totals for each group
+    const depositsTotal = depositItems.reduce(
+      (sum, d) => sum + d.amount,
+      0
+    );
+    const cashAccountsTotal = cashAccountItems.reduce(
+      (sum, c) => sum + c.balance,
+      0
+    );
+    const indexedFundsTotal = indexedFundItems.reduce(
+      (sum, i) => sum + i.marketValue,
+      0
+    );
+    const etcsTotal = etcItems.reduce((sum, e) => sum + e.marketValue, 0);
+    const cryptoAssetsTotal = cryptoAssetItems.reduce((sum, crypto) => {
+      // Use EUR value if available, otherwise 0
+      return sum + (crypto.value?.EUR || 0);
+    }, 0);
+
+    // Calculate total value across all groups
+    const totalValue =
+      depositsTotal +
+      cashAccountsTotal +
+      indexedFundsTotal +
+      etcsTotal +
+      cryptoAssetsTotal;
+
     return {
-      deposits: deposits.status === 'fulfilled' ? deposits.value : [],
-      cashAccounts:
-        cashAccounts.status === 'fulfilled' ? cashAccounts.value : [],
-      indexedFunds:
-        securities.status === 'fulfilled' ? securities.value.indexedFunds : [],
-      etcs: securities.status === 'fulfilled' ? securities.value.etcs : [],
-      cryptoAssets:
-        cryptoAssets.status === 'fulfilled' ? cryptoAssets.value : [],
+      totalValue,
+      items: {
+        deposits: { items: depositItems, value: depositsTotal },
+        cashAccounts: { items: cashAccountItems, value: cashAccountsTotal },
+        indexedFunds: { items: indexedFundItems, value: indexedFundsTotal },
+        etcs: { items: etcItems, value: etcsTotal },
+        cryptoAssets: { items: cryptoAssetItems, value: cryptoAssetsTotal },
+      },
     };
   } catch (error) {
     console.error('Unexpected error fetching user products:', error);

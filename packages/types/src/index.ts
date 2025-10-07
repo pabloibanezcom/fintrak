@@ -48,7 +48,7 @@ export {
   SyncTransactionsRequest,
   SyncTransactionsResponse,
 } from "./Transaction";
-export { UserProducts } from "./UserProducts";
+export { UserProducts, ProductGroup, ProductItems } from "./UserProducts";
 export {
   LoginRequest,
   AuthResponse,
