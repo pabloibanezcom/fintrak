@@ -2,7 +2,7 @@ import type {
   CashAccount,
   CryptoAsset,
   Deposit,
-  IndexedFund,
+  InvestmentSummary,
   MILoginResponse,
   TokenData,
   UserProducts,
@@ -14,8 +14,8 @@ import { fetchCryptoPrices } from './CoinGecko';
 import {
   MICashAccountsToUserCashAccounts,
   MIDepositsToUserDeposits,
-  MIETCsToETCs,
-  MIIndexedFundsToIndexedFunds,
+  MIETCsToETCsSummary,
+  MIIndexedFundsToIndexedFundsSummary,
 } from './MICast';
 
 let tokenData: TokenData | null = null;
@@ -210,8 +210,8 @@ async function fetchCashAccounts(): Promise<CashAccount[]> {
 }
 
 async function fetchSecuritiesData(): Promise<{
-  indexedFunds: IndexedFund[];
-  etcs: IndexedFund[];
+  indexedFunds: InvestmentSummary[];
+  etcs: InvestmentSummary[];
 }> {
   return withRetry(async () => {
     const accessToken = await getToken();
@@ -248,8 +248,8 @@ async function fetchSecuritiesData(): Promise<{
       [];
 
     return {
-      indexedFunds: MIIndexedFundsToIndexedFunds(indexedFundsList),
-      etcs: MIETCsToETCs(etcsList),
+      indexedFunds: MIIndexedFundsToIndexedFundsSummary(indexedFundsList),
+      etcs: MIETCsToETCsSummary(etcsList),
     };
   });
 }
