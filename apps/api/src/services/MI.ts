@@ -20,6 +20,14 @@ import {
 
 let tokenData: TokenData | null = null;
 
+// Cache for user products with 60s TTL
+interface CacheEntry {
+  data: UserProducts;
+  expiresAt: number;
+}
+const userProductsCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 60 * 1000; // 60 seconds
+
 // Environment validation
 const validateEnvironment = (): void => {
   const requiredVars = ['MI_AUTH_UI', 'MI_API', 'MI_USER', 'MI_PASS'];
@@ -163,6 +171,7 @@ async function fetchFromMI<TInput, TOutput>(
 ): Promise<TOutput[]> {
   return withRetry(async () => {
     const accessToken = await getToken();
+    console.log(`[MI API] GET ${endpoint}`);
     const response = await axios.get(
       `${process.env.MI_API as string}${endpoint}`,
       {
@@ -215,6 +224,7 @@ async function fetchSecuritiesData(): Promise<{
 }> {
   return withRetry(async () => {
     const accessToken = await getToken();
+    console.log('[MI API] GET /securities-accounts/self');
     const response = await axios.get(
       `${process.env.MI_API as string}/securities-accounts/self`,
       {
@@ -299,7 +309,18 @@ export const fetchUserProducts = async (
   userId?: string
 ): Promise<UserProducts> => {
   try {
-    console.log('Fetching user products...');
+    // Use userId or 'default' as cache key
+    const cacheKey = userId || 'default';
+    const now = Date.now();
+
+    // Check if we have a valid cached entry
+    const cachedEntry = userProductsCache.get(cacheKey);
+    if (cachedEntry && now < cachedEntry.expiresAt) {
+      console.log('Returning cached user products');
+      return cachedEntry.data;
+    }
+
+    console.log('Fetching user products from MI API...');
 
     // Fetch all products in parallel for better performance
     const [deposits, cashAccounts, securities, cryptoAssets] =
@@ -353,7 +374,7 @@ export const fetchUserProducts = async (
       return Number(((value / totalValue) * 100).toFixed(1));
     };
 
-    return {
+    const result: UserProducts = {
       totalValue,
       items: {
         deposits: {
@@ -383,6 +404,14 @@ export const fetchUserProducts = async (
         },
       },
     };
+
+    // Cache the result
+    userProductsCache.set(cacheKey, {
+      data: result,
+      expiresAt: now + CACHE_TTL,
+    });
+
+    return result;
   } catch (error) {
     console.error('Unexpected error fetching user products:', error);
     throw new MIServiceError(
@@ -407,6 +436,11 @@ export const checkMIServiceHealth = async (): Promise<boolean> => {
 // Clear cached tokens (useful for testing or manual token refresh)
 export const clearTokenCache = (): void => {
   tokenData = null;
+};
+
+// Clear user products cache (useful for testing)
+export const clearUserProductsCache = (): void => {
+  userProductsCache.clear();
 };
 
 // Re-export MIServiceError for convenience
