@@ -3,6 +3,7 @@ import type {
   ExpensesResponse,
   AuthResponse,
   LoginRequest,
+  UserProducts,
 } from '@fintrak/types';
 
 export interface PeriodSummaryResponse {
@@ -160,6 +161,10 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify({ profilePicture }),
     });
+  }
+
+  async getUserProducts(): Promise<UserProducts> {
+    return this.request<UserProducts>('/products');
   }
 }
 

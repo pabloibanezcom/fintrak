@@ -347,14 +347,40 @@ export const fetchUserProducts = async (
       etcsTotal +
       cryptoAssetsTotal;
 
+    // Helper function to calculate percentage
+    const calculatePercentage = (value: number): number => {
+      if (totalValue === 0) return 0;
+      return Number(((value / totalValue) * 100).toFixed(1));
+    };
+
     return {
       totalValue,
       items: {
-        deposits: { items: depositItems, value: depositsTotal },
-        cashAccounts: { items: cashAccountItems, value: cashAccountsTotal },
-        indexedFunds: { items: indexedFundItems, value: indexedFundsTotal },
-        etcs: { items: etcItems, value: etcsTotal },
-        cryptoAssets: { items: cryptoAssetItems, value: cryptoAssetsTotal },
+        deposits: {
+          items: depositItems,
+          value: depositsTotal,
+          percentage: calculatePercentage(depositsTotal),
+        },
+        cashAccounts: {
+          items: cashAccountItems,
+          value: cashAccountsTotal,
+          percentage: calculatePercentage(cashAccountsTotal),
+        },
+        indexedFunds: {
+          items: indexedFundItems,
+          value: indexedFundsTotal,
+          percentage: calculatePercentage(indexedFundsTotal),
+        },
+        etcs: {
+          items: etcItems,
+          value: etcsTotal,
+          percentage: calculatePercentage(etcsTotal),
+        },
+        cryptoAssets: {
+          items: cryptoAssetItems,
+          value: cryptoAssetsTotal,
+          percentage: calculatePercentage(cryptoAssetsTotal),
+        },
       },
     };
   } catch (error) {

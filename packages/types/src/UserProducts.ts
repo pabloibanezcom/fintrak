@@ -14,6 +14,9 @@ export interface ProductGroup<T> {
 
   /** Total value of all products in this group */
   value: number;
+
+  /** Percentage of total portfolio value */
+  percentage: number;
 }
 
 /**
