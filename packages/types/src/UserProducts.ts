@@ -1,8 +1,7 @@
 import type { CashAccount } from "./CashAccount";
 import type { CryptoAsset } from "./CryptoAsset";
 import type { Deposit } from "./Deposit";
-import type { ETC } from "./ETC";
-import type { IndexedFund } from "./IndexedFund";
+import type { InvestmentSummary } from "./InvestmentSummary";
 
 /**
  * Collection of all financial products owned by a user.
@@ -18,10 +17,10 @@ export interface UserProducts {
   deposits: Deposit[];
 
   /** Index fund investments */
-  indexedFunds: IndexedFund[];
+  indexedFunds: InvestmentSummary[];
 
   /** Exchange Traded Commodities */
-  etcs: ETC[];
+  etcs: InvestmentSummary[];
 
   /** Cryptocurrency assets */
   cryptoAssets: CryptoAsset[];

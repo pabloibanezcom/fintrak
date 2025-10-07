@@ -7,9 +7,9 @@
 export interface IndexedFund {
   /** Unique account identifier */
   accountId: string;
-  
+
   /** Fund name */
-  name: string;
+  investmentName: string;
   
   /** Bank-specific product type code */
   productTypeCode: string;

@@ -1,8 +1,8 @@
 import type {
   CashAccount,
   Deposit,
-  ETC,
   IndexedFund,
+  InvestmentSummary,
   MICashAccount,
   MIDeposit,
   MIETC,
@@ -69,6 +69,35 @@ export const MIIndexedFundsToIndexedFunds = (
   return mapArrayWithTransforms<MIIndexedFund, IndexedFund>(MIIndexedFunds);
 };
 
-export const MIETCsToETCs = (MIETCs: MIETC[]): ETC[] => {
-  return mapArrayWithTransforms<MIETC, ETC>(MIETCs);
+export const MIIndexedFundsToIndexedFundsSummary = (
+  MIIndexedFunds: MIIndexedFund[]
+): InvestmentSummary[] => {
+  return mapArrayWithTransforms<MIIndexedFund, InvestmentSummary>(
+    MIIndexedFunds,
+    {
+      isin: 'isin',
+      investmentName: 'investmentName',
+      initialInvestment: 'initialInvestment',
+      marketValue: 'marketValue',
+      profit: 'profit',
+      totalReturn: 'totalReturn',
+      averageCost: 'averageCost',
+      liquidationValue: 'liquidationValue',
+    }
+  );
+};
+
+export const MIETCsToETCsSummary = (
+  MIETCs: MIETC[]
+): InvestmentSummary[] => {
+  return mapArrayWithTransforms<MIETC, InvestmentSummary>(MIETCs, {
+    isin: 'isin',
+    investmentName: 'investmentName',
+    initialInvestment: 'initialInvestment',
+    marketValue: 'marketValue',
+    profit: 'profit',
+    totalReturn: 'totalReturn',
+    averageCost: 'averageCost',
+    liquidationValue: 'liquidationValue',
+  });
 };

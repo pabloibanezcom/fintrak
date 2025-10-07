@@ -77,9 +77,9 @@ export interface MICashAccount {
 export interface MIIndexedFund {
   /** Unique account identifier */
   accountId: string;
-  
+
   /** Fund name */
-  name: string;
+  investmentName: string;
   
   /** Product type classification code */
   productTypeCode: string;
@@ -150,9 +150,9 @@ export interface MIIndexedFund {
 export interface MIETC {
   /** Unique account identifier */
   accountId: string;
-  
+
   /** ETC name */
-  name: string;
+  investmentName: string;
   
   /** Product type classification code */
   productTypeCode: string;

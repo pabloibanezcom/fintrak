@@ -20,6 +20,7 @@ export {
 } from "./Income";
 export { IndexedFund } from "./IndexedFund";
 export { Investment, Portfolio } from "./Investment";
+export { InvestmentSummary } from "./InvestmentSummary";
 export {
   MIDeposit,
   MICashAccount,
