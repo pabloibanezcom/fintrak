@@ -59,6 +59,10 @@
         {
           "name": "MI_PASS",
           "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-pass"
+        },
+        {
+          "name": "CRON_API_KEY",
+          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/cron-api-key"
         }
       ]
     }
