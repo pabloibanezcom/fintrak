@@ -1,0 +1,200 @@
+name: Deploy Main to AWS ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  AWS_REGION: eu-west-1
+  ECR_REPOSITORY: fintrak-api
+  ECS_CLUSTER: fintrak-cluster
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-main:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push Docker image
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ inputs.environment }}-${{ github.sha }}
+        ENVIRONMENT: ${{ inputs.environment }}
+      run: |
+        # Build image with environment-specific tag
+        docker buildx build \
+          --file apps/api/Dockerfile.monorepo \
+          --platform linux/amd64 \
+          --push \
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+          --tag $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT-latest \
+          .
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Create task definition
+      id: task-def
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ inputs.environment }}-${{ github.sha }}
+        ENVIRONMENT: ${{ inputs.environment }}
+      run: |
+        # Create environment-specific task definition
+        TASK_DEF_NAME="fintrak-api-$ENVIRONMENT"
+        SERVICE_NAME="fintrak-api-$ENVIRONMENT"
+
+        # Update task definition with environment-specific values
+        sed "s|YOUR_ECR_REPO_URI|$ECR_REGISTRY/$ECR_REPOSITORY|g" aws/ecs-task-definition.json > task-def-env.json
+        sed -i "s|YOUR_ACCOUNT_ID|${{ secrets.AWS_ACCOUNT_ID }}|g" task-def-env.json
+        sed -i "s|\"family\": \"fintrak-api\"|\"family\": \"$TASK_DEF_NAME\"|g" task-def-env.json
+        sed -i "s|:latest|:$IMAGE_TAG|g" task-def-env.json
+
+        # Update log group for environment
+        sed -i "s|/ecs/fintrak-api|/ecs/$TASK_DEF_NAME|g" task-def-env.json
+
+        echo "task-def-name=$TASK_DEF_NAME" >> $GITHUB_OUTPUT
+        echo "service-name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+
+    - name: Create CloudWatch log group
+      env:
+        ENVIRONMENT: ${{ inputs.environment }}
+      run: |
+        LOG_GROUP="/ecs/fintrak-api-$ENVIRONMENT"
+        aws logs create-log-group --log-group-name $LOG_GROUP --region $AWS_REGION || true
+
+    - name: Register task definition
+      id: task-def-register
+      run: |
+        aws ecs register-task-definition \
+          --cli-input-json file://task-def-env.json \
+          --region $AWS_REGION
+
+    - name: Check if ECS service exists
+      id: check-service
+      env:
+        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
+      run: |
+        if aws ecs describe-services \
+          --cluster $ECS_CLUSTER \
+          --services $SERVICE_NAME \
+          --region $AWS_REGION \
+          --query 'services[0].status' \
+          --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update existing ECS service
+      if: steps.check-service.outputs.exists == 'true'
+      env:
+        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
+        TASK_DEF_NAME: ${{ steps.task-def.outputs.task-def-name }}
+      run: |
+        aws ecs update-service \
+          --cluster $ECS_CLUSTER \
+          --service $SERVICE_NAME \
+          --task-definition $TASK_DEF_NAME \
+          --region $AWS_REGION
+
+    - name: Create new ECS service
+      if: steps.check-service.outputs.exists == 'false'
+      env:
+        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
+        TASK_DEF_NAME: ${{ steps.task-def.outputs.task-def-name }}
+      run: |
+        aws ecs create-service \
+          --cluster $ECS_CLUSTER \
+          --service-name $SERVICE_NAME \
+          --task-definition $TASK_DEF_NAME \
+          --desired-count 1 \
+          --launch-type FARGATE \
+          --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.SUBNET_IDS }}],securityGroups=[${{ secrets.SECURITY_GROUP_ID }}],assignPublicIp=ENABLED}" \
+          --region $AWS_REGION
+
+    - name: Wait for deployment to complete
+      env:
+        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
+      run: |
+        aws ecs wait services-stable \
+          --cluster $ECS_CLUSTER \
+          --services $SERVICE_NAME \
+          --region $AWS_REGION
+
+    - name: Get service endpoint
+      id: get-endpoint
+      env:
+        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
+      run: |
+        # Get the task ARN
+        TASK_ARN=$(aws ecs list-tasks \
+          --cluster $ECS_CLUSTER \
+          --service-name $SERVICE_NAME \
+          --query 'taskArns[0]' \
+          --output text \
+          --region $AWS_REGION)
+
+        # Get the public IP
+        PUBLIC_IP=$(aws ecs describe-tasks \
+          --cluster $ECS_CLUSTER \
+          --tasks $TASK_ARN \
+          --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
+          --output text \
+          --region $AWS_REGION | xargs -I {} aws ec2 describe-network-interfaces \
+          --network-interface-ids {} \
+          --query 'NetworkInterfaces[0].Association.PublicIp' \
+          --output text \
+          --region $AWS_REGION)
+
+        echo "endpoint=http://$PUBLIC_IP:3000" >> $GITHUB_OUTPUT
+
+    - name: Display deployment summary
+      run: |
+        echo "🚀 Deployment Complete!"
+        echo "Environment: ${{ inputs.environment }}"
+        echo "Service: ${{ steps.task-def.outputs.service-name }}"
+        echo "Endpoint: ${{ steps.get-endpoint.outputs.endpoint }}"
+        echo "API Docs: ${{ steps.get-endpoint.outputs.endpoint }}/api/docs"
+        echo "Deployed from commit: ${{ github.sha }}"
+
+    - name: Cleanup temporary files
+      run: |
+        rm -f task-def-env.json
