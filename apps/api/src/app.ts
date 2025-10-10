@@ -28,12 +28,14 @@ app.use(passport.initialize());
 // Swagger documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerOptions));
 
+// Cron routes MUST come first (no auth required)
+app.use('/api', cronRoutes);
+
 app.use('/api', analyticsRoutes);
 app.use('/api/auth/', authRoutes);
 app.use('/api/bank', bankRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', counterpartyRoutes);
-app.use('/api', cronRoutes);
 app.use('/api', cryptoAssetRoutes);
 app.use('/api', expenseRoutes);
 app.use('/api/import', importRoutes);
