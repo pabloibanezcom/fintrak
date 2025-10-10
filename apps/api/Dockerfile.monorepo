@@ -6,10 +6,11 @@ WORKDIR /app
 # Copy package files from root
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
+COPY pnpm-workspace.yaml ./
 COPY tsconfig.json ./
 
-# Install pnpm and TypeScript globally
-RUN npm install -g pnpm typescript
+# Install pnpm globally
+RUN npm install -g pnpm
 
 # Copy packages and apps
 COPY packages/ ./packages/
@@ -18,16 +19,16 @@ COPY apps/ ./apps/
 # Install dependencies from root (this handles workspace dependencies)
 RUN pnpm install --frozen-lockfile
 
-# Build types package only (API will run with ts-node)
+# Build types package
 WORKDIR /app
 RUN pnpm --filter @fintrak/types build
 
-# Install ts-node globally for production
-RUN npm install -g ts-node
+# Build API package
+RUN pnpm --filter @fintrak/api build
 
-# Expose port  
+# Expose port
 EXPOSE 3000
 
-# Start the application from API directory with ts-node
+# Start the compiled application
 WORKDIR /app/apps/api
-CMD ["ts-node", "src/index.ts"]
+CMD ["node", "dist/index.js"]
