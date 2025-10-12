@@ -214,6 +214,12 @@ export default function MonthlySummaryScreen({
       });
 
       console.log('Period summary response:', response);
+
+      // Animate content change when switching months (after initial load)
+      if (initialLoadDone) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      }
+
       setSummary(response);
 
       if (!initialLoadDone) {
