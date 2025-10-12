@@ -1,5 +1,10 @@
 import React, { useEffect, useState, memo } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl, Alert, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
+
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 import type { UserProducts } from '@fintrak/types';
 import UserProfile from '../components/UserProfile';
 import { componentStyles, commonStyles, colors, spacing, typography } from '../styles';
@@ -107,6 +112,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
       setError(null);
 
       const response = await apiService.getUserProducts(selectedPeriod);
+
+      // Animate content change when switching periods (after initial load)
+      if (initialLoadDone) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      }
+
       setProducts(response);
 
       if (!initialLoadDone) {
