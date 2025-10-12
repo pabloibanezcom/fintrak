@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, RefreshControl, Alert } from 'react-native';
+import React, { useEffect, useState, memo } from 'react';
+import { View, Text, ScrollView, ActivityIndicator, RefreshControl, Alert, TouchableOpacity } from 'react-native';
 import type { UserProducts } from '@fintrak/types';
 import UserProfile from '../components/UserProfile';
 import { componentStyles, commonStyles, colors, spacing, typography } from '../styles';
@@ -12,15 +12,88 @@ interface InvestmentsScreenProps {
   onNavigateToProfile: () => void;
 }
 
+type ComparisonPeriod = '1d' | '7d' | '1m' | '1y';
+
+interface PeriodSelectorProps {
+  selectedPeriod: ComparisonPeriod;
+  onPeriodSelect: (period: ComparisonPeriod) => void;
+}
+
+const PeriodSelector = memo(({ selectedPeriod, onPeriodSelect }: PeriodSelectorProps) => {
+  const periods: { value: ComparisonPeriod; label: string }[] = [
+    { value: '1d', label: '1D' },
+    { value: '7d', label: '7D' },
+    { value: '1m', label: '1M' },
+    { value: '1y', label: '1Y' },
+  ];
+
+  return (
+    <View style={{
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      gap: spacing.sm,
+    }}>
+      {periods.map((period) => {
+        const isSelected = period.value === selectedPeriod;
+        return (
+          <TouchableOpacity
+            key={period.value}
+            onPress={() => onPeriodSelect(period.value)}
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              borderRadius: 8,
+              backgroundColor: isSelected ? colors.accent.primary : 'transparent',
+              borderWidth: 1,
+              borderColor: isSelected ? colors.accent.primary : colors.border.light,
+              minWidth: 60,
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: isSelected ? '600' : '400',
+                color: isSelected ? colors.text.inverse : colors.text.secondary,
+              }}
+            >
+              {period.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+});
+
+// Helper component to display comparison change
+const ComparisonBadge = ({ value, percentage }: { value: number; percentage: number }) => {
+  if (value === 0 && percentage === 0) return null;
+
+  const isPositive = value >= 0;
+  const color = isPositive ? '#4CAF50' : colors.accent.error; // Green for positive, red for negative
+  const sign = isPositive ? '+' : '';
+
+  return (
+    <Text style={{ color, fontSize: typography.sizes.sm, fontWeight: '600', marginTop: spacing.xs }}>
+      {sign}{formatCurrency(value, 'EUR')} ({sign}{percentage}%)
+    </Text>
+  );
+};
+
 export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: InvestmentsScreenProps) {
   const [products, setProducts] = useState<UserProducts | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<ComparisonPeriod>('1d');
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [selectedPeriod]);
 
   const loadProducts = async (isRefresh = false) => {
     try {
@@ -31,7 +104,7 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
       }
       setError(null);
 
-      const response = await apiService.getUserProducts();
+      const response = await apiService.getUserProducts(selectedPeriod);
       setProducts(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load investments';
@@ -97,6 +170,9 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
         <UserProfile onPress={onNavigateToProfile} />
       </View>
 
+      {/* Period Selector */}
+      <PeriodSelector selectedPeriod={selectedPeriod} onPeriodSelect={setSelectedPeriod} />
+
       <ScrollView
         style={componentStyles.homeScrollView}
         showsVerticalScrollIndicator={false}
@@ -114,6 +190,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
               <Text style={componentStyles.homeCardAmount}>
                 {formatCurrency(products?.totalValue || 0, 'EUR')}
               </Text>
+              {(products as any)?.comparison?.available && (
+                <ComparisonBadge
+                  value={(products as any).comparison.valueDifference}
+                  percentage={(products as any).comparison.percentageDifference}
+                />
+              )}
             </View>
           </View>
 
@@ -129,6 +211,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
                   <Text style={componentStyles.homeCardAmount}>
                     {formatCurrency(products.items.cashAccounts.value, 'EUR')}
                   </Text>
+                  {(products.items.cashAccounts as any).comparison && (
+                    <ComparisonBadge
+                      value={(products.items.cashAccounts as any).comparison.valueDifference}
+                      percentage={(products.items.cashAccounts as any).comparison.percentageDifference}
+                    />
+                  )}
                   <Text style={componentStyles.homeCardSubtext}>
                     {products.items.cashAccounts.percentage}% of portfolio
                   </Text>
@@ -142,6 +230,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
                   <Text style={componentStyles.homeCardAmount}>
                     {formatCurrency(products.items.deposits.value, 'EUR')}
                   </Text>
+                  {(products.items.deposits as any).comparison && (
+                    <ComparisonBadge
+                      value={(products.items.deposits as any).comparison.valueDifference}
+                      percentage={(products.items.deposits as any).comparison.percentageDifference}
+                    />
+                  )}
                   <Text style={componentStyles.homeCardSubtext}>
                     {products.items.deposits.percentage}% of portfolio
                   </Text>
@@ -155,6 +249,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
                   <Text style={componentStyles.homeCardAmount}>
                     {formatCurrency(products.items.indexedFunds.value, 'EUR')}
                   </Text>
+                  {(products.items.indexedFunds as any).comparison && (
+                    <ComparisonBadge
+                      value={(products.items.indexedFunds as any).comparison.valueDifference}
+                      percentage={(products.items.indexedFunds as any).comparison.percentageDifference}
+                    />
+                  )}
                   <Text style={componentStyles.homeCardSubtext}>
                     {products.items.indexedFunds.percentage}% of portfolio
                   </Text>
@@ -168,6 +268,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
                   <Text style={componentStyles.homeCardAmount}>
                     {formatCurrency(products.items.etcs.value, 'EUR')}
                   </Text>
+                  {(products.items.etcs as any).comparison && (
+                    <ComparisonBadge
+                      value={(products.items.etcs as any).comparison.valueDifference}
+                      percentage={(products.items.etcs as any).comparison.percentageDifference}
+                    />
+                  )}
                   <Text style={componentStyles.homeCardSubtext}>
                     {products.items.etcs.percentage}% of portfolio
                   </Text>
@@ -181,6 +287,12 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
                   <Text style={componentStyles.homeCardAmount}>
                     {formatCurrency(products.items.cryptoAssets.value, 'EUR')}
                   </Text>
+                  {(products.items.cryptoAssets as any).comparison && (
+                    <ComparisonBadge
+                      value={(products.items.cryptoAssets as any).comparison.valueDifference}
+                      percentage={(products.items.cryptoAssets as any).comparison.percentageDifference}
+                    />
+                  )}
                   <Text style={componentStyles.homeCardSubtext}>
                     {products.items.cryptoAssets.percentage}% of portfolio
                   </Text>
