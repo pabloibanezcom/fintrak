@@ -32,7 +32,6 @@ const PeriodSelector = memo(({ selectedPeriod, onPeriodSelect }: PeriodSelectorP
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      marginVertical: spacing.sm,
       paddingHorizontal: spacing.lg,
       gap: spacing.sm,
     }}>
@@ -170,9 +169,6 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
         <UserProfile onPress={onNavigateToProfile} />
       </View>
 
-      {/* Period Selector */}
-      <PeriodSelector selectedPeriod={selectedPeriod} onPeriodSelect={setSelectedPeriod} />
-
       <ScrollView
         style={componentStyles.homeScrollView}
         showsVerticalScrollIndicator={false}
@@ -197,6 +193,11 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
                 />
               )}
             </View>
+          </View>
+
+          {/* Period Selector */}
+          <View style={{ marginTop: spacing.md, marginBottom: spacing.xl }}>
+            <PeriodSelector selectedPeriod={selectedPeriod} onPeriodSelect={setSelectedPeriod} />
           </View>
 
           {/* Holdings */}
