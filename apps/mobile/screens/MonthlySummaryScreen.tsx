@@ -146,6 +146,7 @@ export default function MonthlySummaryScreen({
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [showAllExpenses, setShowAllExpenses] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -195,9 +196,10 @@ export default function MonthlySummaryScreen({
 
   const loadSummary = async (isRefresh = false) => {
     try {
+      // Only show loading spinner on initial load, not when changing months
       if (isRefresh) {
         setRefreshing(true);
-      } else {
+      } else if (!initialLoadDone) {
         setLoading(true);
       }
       setError(null);
@@ -213,11 +215,15 @@ export default function MonthlySummaryScreen({
 
       console.log('Period summary response:', response);
       setSummary(response);
+
+      if (!initialLoadDone) {
+        setInitialLoadDone(true);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load summary';
       console.error('Error loading summary:', err);
       setError(errorMessage);
-      if (!isRefresh) {
+      if (!isRefresh && !initialLoadDone) {
         Alert.alert('Error', errorMessage);
       }
     } finally {
