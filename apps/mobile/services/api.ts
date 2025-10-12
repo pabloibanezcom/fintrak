@@ -163,8 +163,9 @@ class ApiService {
     });
   }
 
-  async getUserProducts(): Promise<UserProducts> {
-    return this.request<UserProducts>('/products');
+  async getUserProducts(compare?: '1d' | '7d' | '1m' | '1y'): Promise<UserProducts> {
+    const endpoint = compare ? `/products?compare=${compare}` : '/products';
+    return this.request<UserProducts>(endpoint);
   }
 }
 
