@@ -21,8 +21,8 @@ router.use(authenticate); // all routes require auth
  *         required: false
  *         schema:
  *           type: string
- *           enum: [1d, 7d, 1m, 1y]
- *         description: Compare current value with snapshot from specified period ago (1d=1 day, 7d=7 days, 1m=1 month, 1y=1 year)
+ *           enum: [1d, 7d, 1m, 3m, 1y]
+ *         description: Compare current value with snapshot from specified period ago (1d=1 day, 7d=7 days, 1m=1 month, 3m=3 months, 1y=1 year)
  *     responses:
  *       200:
  *         description: User products retrieved successfully

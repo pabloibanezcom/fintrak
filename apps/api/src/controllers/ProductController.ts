@@ -36,12 +36,15 @@ export const getProducts = async (req: Request, res: Response) => {
       case '1m':
         comparisonDate.setUTCMonth(comparisonDate.getUTCMonth() - 1);
         break;
+      case '3m':
+        comparisonDate.setUTCMonth(comparisonDate.getUTCMonth() - 3);
+        break;
       case '1y':
         comparisonDate.setUTCFullYear(comparisonDate.getUTCFullYear() - 1);
         break;
       default:
         return res.status(400).json({
-          error: 'Invalid comparison period. Use: 1d, 7d, 1m, or 1y'
+          error: 'Invalid comparison period. Use: 1d, 7d, 1m, 3m, or 1y'
         });
     }
 

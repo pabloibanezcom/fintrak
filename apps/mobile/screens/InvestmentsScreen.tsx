@@ -12,7 +12,7 @@ interface InvestmentsScreenProps {
   onNavigateToProfile: () => void;
 }
 
-type ComparisonPeriod = '1d' | '7d' | '1m' | '1y';
+type ComparisonPeriod = '1d' | '7d' | '1m' | '3m' | '1y';
 
 interface PeriodSelectorProps {
   selectedPeriod: ComparisonPeriod;
@@ -24,6 +24,7 @@ const PeriodSelector = memo(({ selectedPeriod, onPeriodSelect }: PeriodSelectorP
     { value: '1d', label: '1D' },
     { value: '7d', label: '7D' },
     { value: '1m', label: '1M' },
+    { value: '3m', label: '3M' },
     { value: '1y', label: '1Y' },
   ];
 
