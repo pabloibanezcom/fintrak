@@ -2856,9 +2856,17 @@
               "path": [
                 "api",
                 "products"
+              ],
+              "query": [
+                {
+                  "key": "compare",
+                  "value": "1d",
+                  "description": "Compare with snapshot from specified period ago (1d, 7d, 1m, 1y)",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Retrieve all financial products (deposits, cash accounts, indexed funds) for the authenticated user from the MI service"
+            "description": "Retrieve all financial products (deposits, cash accounts, indexed funds) for the authenticated user from the MI service. Optionally compare with previous snapshots using the 'compare' query parameter."
           },
           "response": [
             {

@@ -11,10 +11,18 @@ router.use(authenticate); // all routes require auth
  * /api/products:
  *   get:
  *     summary: Get user's financial products
- *     description: Retrieves all financial products (deposits, cash accounts, indexed funds) for the authenticated user from the MI service
+ *     description: Retrieves all financial products (deposits, cash accounts, indexed funds) for the authenticated user from the MI service. Optionally compare with previous snapshots.
  *     tags: [Products]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: compare
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [1d, 7d, 1m, 1y]
+ *         description: Compare current value with snapshot from specified period ago (1d=1 day, 7d=7 days, 1m=1 month, 1y=1 year)
  *     responses:
  *       200:
  *         description: User products retrieved successfully
@@ -40,6 +48,22 @@ router.use(authenticate); // all routes require auth
  *                   value: 15000
  *                   currency: "EUR"
  *                   performance: 7.2
+ *               comparison:
+ *                 period: "1d"
+ *                 available: true
+ *                 previousValue: 29500
+ *                 currentValue: 30000
+ *                 valueDifference: 500
+ *                 percentageDifference: 1.69
+ *                 comparisonDate: "2025-10-11T00:00:00.000Z"
+ *       400:
+ *         description: Invalid comparison period
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error: "Invalid comparison period. Use: 1d, 7d, 1m, or 1y"
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
