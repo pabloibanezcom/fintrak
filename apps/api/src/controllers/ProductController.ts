@@ -5,6 +5,7 @@ import {
   getSnapshots,
   getLatestSnapshot,
   getSnapshotByDate,
+  getSnapshotByDateOrOldest,
 } from '../services/ProductSnapshot';
 
 export const getProducts = async (req: Request, res: Response) => {
@@ -44,17 +45,17 @@ export const getProducts = async (req: Request, res: Response) => {
         });
     }
 
-    // Get the snapshot for the comparison date
-    const previousSnapshot = await getSnapshotByDate(userId!, comparisonDate);
+    // Get the snapshot for the comparison date or closest older snapshot
+    const previousSnapshot = await getSnapshotByDateOrOldest(userId!, comparisonDate);
 
-    // If no previous snapshot exists, return current data without comparison
+    // If no previous snapshot exists at all, return current data without comparison
     if (!previousSnapshot) {
       return res.json({
         ...userData,
         comparison: {
           period,
           available: false,
-          message: `No snapshot available for ${period} ago`
+          message: 'No snapshots available for comparison'
         }
       });
     }
