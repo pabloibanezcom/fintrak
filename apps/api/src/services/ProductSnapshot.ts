@@ -3,11 +3,11 @@ import { ProductSnapshot } from '../models/ProductSnapshotModel';
 import { fetchUserProducts } from './MI';
 
 /**
- * Get the start of day (midnight) for a given date
+ * Get the start of day (midnight UTC) for a given date
  */
 const getStartOfDay = (date: Date = new Date()): Date => {
   const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
+  startOfDay.setUTCHours(0, 0, 0, 0);
   return startOfDay;
 };
 
