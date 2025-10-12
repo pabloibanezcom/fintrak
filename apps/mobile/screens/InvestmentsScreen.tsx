@@ -90,6 +90,7 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<ComparisonPeriod>('1d');
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -97,20 +98,25 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
 
   const loadProducts = async (isRefresh = false) => {
     try {
+      // Only show loading spinner on initial load, not when changing periods
       if (isRefresh) {
         setRefreshing(true);
-      } else {
+      } else if (!initialLoadDone) {
         setLoading(true);
       }
       setError(null);
 
       const response = await apiService.getUserProducts(selectedPeriod);
       setProducts(response);
+
+      if (!initialLoadDone) {
+        setInitialLoadDone(true);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load investments';
       console.error('Error loading products:', err);
       setError(errorMessage);
-      if (!isRefresh) {
+      if (!isRefresh && !initialLoadDone) {
         Alert.alert('Error', errorMessage);
       }
     } finally {
