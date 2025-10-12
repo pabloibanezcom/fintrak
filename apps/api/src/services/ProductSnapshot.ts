@@ -68,3 +68,32 @@ export const getSnapshotByDate = async (userId: string, date: Date) => {
     date: getStartOfDay(date),
   });
 };
+
+/**
+ * Get snapshot for a specific date or the closest older snapshot
+ * Falls back to the oldest available snapshot if the exact date doesn't exist
+ */
+export const getSnapshotByDateOrOldest = async (userId: string, targetDate: Date) => {
+  const normalizedDate = getStartOfDay(targetDate);
+
+  // Try to get exact date first
+  let snapshot = await ProductSnapshot.findOne({
+    userId,
+    date: normalizedDate,
+  });
+
+  // If not found, get the closest snapshot before or equal to target date
+  if (!snapshot) {
+    snapshot = await ProductSnapshot.findOne({
+      userId,
+      date: { $lte: normalizedDate },
+    }).sort({ date: -1 });
+  }
+
+  // If still not found (target date is before all snapshots), get the oldest snapshot
+  if (!snapshot) {
+    snapshot = await ProductSnapshot.findOne({ userId }).sort({ date: 1 });
+  }
+
+  return snapshot;
+};
