@@ -133,6 +133,7 @@ jobs:
           --cluster $ECS_CLUSTER \
           --service $SERVICE_NAME \
           --task-definition $TASK_DEF_NAME \
+          --desired-count 1 \
           --region $AWS_REGION
 
     - name: Create new ECS service
