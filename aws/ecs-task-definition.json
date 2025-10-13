@@ -1,6 +1,6 @@
 {
   "family": "fintrak-api",
-  "networkMode": "bridge",
+  "networkMode": "host",
   "requiresCompatibilities": ["EC2"],
   "cpu": "256",
   "memory": "512",
@@ -15,7 +15,6 @@
       "portMappings": [
         {
           "containerPort": 3000,
-          "hostPort": 3000,
           "protocol": "tcp"
         }
       ],
