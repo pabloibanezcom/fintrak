@@ -1,7 +1,7 @@
 {
   "family": "fintrak-api",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "bridge",
+  "requiresCompatibilities": ["EC2"],
   "cpu": "256",
   "memory": "512",
   "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
@@ -10,9 +10,12 @@
     {
       "name": "fintrak-api",
       "image": "YOUR_ECR_REPO_URI:latest",
+      "cpu": 256,
+      "memory": 512,
       "portMappings": [
         {
           "containerPort": 3000,
+          "hostPort": 3000,
           "protocol": "tcp"
         }
       ],
