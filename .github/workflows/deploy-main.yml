@@ -146,8 +146,7 @@ jobs:
           --service-name $SERVICE_NAME \
           --task-definition $TASK_DEF_NAME \
           --desired-count 1 \
-          --launch-type FARGATE \
-          --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.SUBNET_IDS }}],securityGroups=[${{ secrets.SECURITY_GROUP_ID }}],assignPublicIp=ENABLED}" \
+          --launch-type EC2 \
           --region $AWS_REGION
 
     - name: Wait for deployment to complete
@@ -164,23 +163,26 @@ jobs:
       env:
         SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
       run: |
-        # Get the task ARN
-        TASK_ARN=$(aws ecs list-tasks \
+        # For EC2 launch type, we use the static Elastic IP
+        # Get the container instance
+        CONTAINER_INSTANCE=$(aws ecs list-container-instances \
           --cluster $ECS_CLUSTER \
-          --service-name $SERVICE_NAME \
-          --query 'taskArns[0]' \
+          --query 'containerInstanceArns[0]' \
           --output text \
           --region $AWS_REGION)
 
-        # Get the public IP
-        PUBLIC_IP=$(aws ecs describe-tasks \
+        # Get the EC2 instance ID
+        EC2_INSTANCE=$(aws ecs describe-container-instances \
           --cluster $ECS_CLUSTER \
-          --tasks $TASK_ARN \
-          --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
+          --container-instances $CONTAINER_INSTANCE \
+          --query 'containerInstances[0].ec2InstanceId' \
           --output text \
-          --region $AWS_REGION | xargs -I {} aws ec2 describe-network-interfaces \
-          --network-interface-ids {} \
-          --query 'NetworkInterfaces[0].Association.PublicIp' \
+          --region $AWS_REGION)
+
+        # Get the Elastic IP associated with the instance
+        PUBLIC_IP=$(aws ec2 describe-instances \
+          --instance-ids $EC2_INSTANCE \
+          --query 'Reservations[0].Instances[0].PublicIpAddress' \
           --output text \
           --region $AWS_REGION)
 
