@@ -160,32 +160,14 @@ jobs:
 
     - name: Get service endpoint
       id: get-endpoint
-      env:
-        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
       run: |
-        # For EC2 launch type, we use the static Elastic IP
-        # Get the container instance
-        CONTAINER_INSTANCE=$(aws ecs list-container-instances \
-          --cluster $ECS_CLUSTER \
-          --query 'containerInstanceArns[0]' \
-          --output text \
-          --region $AWS_REGION)
-
-        # Get the EC2 instance ID
-        EC2_INSTANCE=$(aws ecs describe-container-instances \
-          --cluster $ECS_CLUSTER \
-          --container-instances $CONTAINER_INSTANCE \
-          --query 'containerInstances[0].ec2InstanceId' \
-          --output text \
-          --region $AWS_REGION)
-
-        # Get the Elastic IP associated with the instance
-        PUBLIC_IP=$(aws ec2 describe-instances \
-          --instance-ids $EC2_INSTANCE \
-          --query 'Reservations[0].Instances[0].PublicIpAddress' \
-          --output text \
-          --region $AWS_REGION)
-
+        # We use a static Elastic IP for the production environment
+        if [ "${{ inputs.environment }}" = "production" ]; then
+          PUBLIC_IP="34.250.157.94"
+        else
+          # For other environments, you would need to set up their IPs
+          PUBLIC_IP="unknown"
+        fi
         echo "endpoint=http://$PUBLIC_IP:3000" >> $GITHUB_OUTPUT
 
     - name: Display deployment summary
