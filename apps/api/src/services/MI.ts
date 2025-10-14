@@ -342,10 +342,7 @@ export const fetchUserProducts = async (
       cryptoAssets.status === 'fulfilled' ? cryptoAssets.value : [];
 
     // Calculate totals for each group
-    const depositsTotal = depositItems.reduce(
-      (sum, d) => sum + d.amount,
-      0
-    );
+    const depositsTotal = depositItems.reduce((sum, d) => sum + d.amount, 0);
     const cashAccountsTotal = cashAccountItems.reduce(
       (sum, c) => sum + c.balance,
       0

@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import User, { type IUser } from '../models/UserModel';
+import { requireAuth } from '../utils/authUtils';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'defaultsecret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -165,10 +166,8 @@ export const googleTokenAuth = async (req: Request, res: Response) => {
 // Get current user data
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     const user = await User.findById(userId).select('-password');
     if (!user) {
@@ -193,16 +192,16 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 // Update current user profile
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     const { name, lastName, email } = req.body;
 
     // Validate input
     if (!name || !lastName || !email) {
-      return res.status(400).json({ error: 'Name, last name, and email are required' });
+      return res
+        .status(400)
+        .json({ error: 'Name, last name, and email are required' });
     }
 
     // Check if email is already taken by another user
@@ -241,10 +240,8 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 // Update user profile picture
 export const updateProfilePicture = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     const { profilePicture } = req.body;
 

@@ -10,8 +10,9 @@ import CryptoAssetModel from '../../models/CryptoAssetModel';
 
 jest.mock('../../models/CryptoAssetModel');
 
-const mockCryptoAssetModel =
-  CryptoAssetModel as jest.Mocked<typeof CryptoAssetModel>;
+const mockCryptoAssetModel = CryptoAssetModel as jest.Mocked<
+  typeof CryptoAssetModel
+>;
 
 describe('CryptoAssetController', () => {
   let req: Partial<Request>;
@@ -76,9 +77,7 @@ describe('CryptoAssetController', () => {
     });
 
     it('should return 500 on database error', async () => {
-      mockCryptoAssetModel.find.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockCryptoAssetModel.find.mockRejectedValue(new Error('Database error'));
 
       await getAllCryptoAssets(req as Request, res as Response);
 

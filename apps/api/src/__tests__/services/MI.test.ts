@@ -1,12 +1,12 @@
-import axios from 'axios';
 import type { UserProducts } from '@fintrak/types';
-import {
-  fetchUserProducts,
-  clearUserProductsCache,
-  clearTokenCache,
-} from '../../services/MI';
+import axios from 'axios';
 import CryptoAssetModel from '../../models/CryptoAssetModel';
 import * as CoinGecko from '../../services/CoinGecko';
+import {
+  clearTokenCache,
+  clearUserProductsCache,
+  fetchUserProducts,
+} from '../../services/MI';
 
 jest.mock('axios');
 jest.mock('../../models/CryptoAssetModel');
@@ -165,7 +165,9 @@ describe('MI Service - User Products Caching', () => {
       .mockImplementation(() => {});
     await fetchUserProducts('user123');
 
-    expect(consoleLogSpy).toHaveBeenCalledWith('Returning cached user products');
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      'Returning cached user products'
+    );
     expect(mockedAxios.get).not.toHaveBeenCalled(); // No API calls
     expect(mockedAxios.post).not.toHaveBeenCalled(); // No login calls
 

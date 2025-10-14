@@ -16,7 +16,7 @@ const getStartOfDay = (date: Date = new Date()): Date => {
  * If a snapshot already exists for today, it will be updated
  */
 export const saveDailySnapshot = async (
-  userId: string,
+  userId: string
 ): Promise<UserProducts> => {
   const userProducts = await fetchUserProducts(userId);
   const today = getStartOfDay();
@@ -29,7 +29,7 @@ export const saveDailySnapshot = async (
       snapshot: userProducts,
       createdAt: new Date(),
     },
-    { upsert: true, new: true },
+    { upsert: true, new: true }
   );
 
   return userProducts;
@@ -41,7 +41,7 @@ export const saveDailySnapshot = async (
 export const getSnapshots = async (
   userId: string,
   startDate: Date,
-  endDate: Date,
+  endDate: Date
 ) => {
   return ProductSnapshot.find({
     userId,
@@ -73,7 +73,10 @@ export const getSnapshotByDate = async (userId: string, date: Date) => {
  * Get snapshot for a specific date or the closest older snapshot
  * Falls back to the oldest available snapshot if the exact date doesn't exist
  */
-export const getSnapshotByDateOrOldest = async (userId: string, targetDate: Date) => {
+export const getSnapshotByDateOrOldest = async (
+  userId: string,
+  targetDate: Date
+) => {
   const normalizedDate = getStartOfDay(targetDate);
 
   // Try to get exact date first
