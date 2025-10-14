@@ -72,7 +72,7 @@ describe('ImportController - importRecurringTransactions', () => {
     expect(statusMock).toHaveBeenCalledWith(400);
     expect(jsonMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        error: 'Invalid JSON file',
+        error: expect.stringContaining('Invalid JSON file'),
       })
     );
   });

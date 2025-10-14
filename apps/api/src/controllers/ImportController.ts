@@ -19,6 +19,29 @@ import { requireAuth } from '../utils/authUtils';
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
 
+/**
+ * Helper to handle import errors with proper status codes
+ */
+const handleImportError = (
+  res: Response,
+  error: unknown,
+  entityName: string
+) => {
+  console.error(`${entityName} import error:`, error);
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  // Return 400 for validation errors (invalid JSON/format)
+  const statusCode =
+    errorMessage.includes('Invalid JSON') ||
+    errorMessage.includes('Invalid format')
+      ? 400
+      : 500;
+  res.status(statusCode).json({
+    error:
+      statusCode === 400 ? errorMessage : `Failed to import ${entityName}`,
+    ...(statusCode === 400 && { details: errorMessage }),
+  });
+};
+
 interface ParsedTransaction {
   date: string;
   description: string;
@@ -364,11 +387,7 @@ export const importCategories = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Category import error:', error);
-    res.status(500).json({
-      error: 'Failed to import categories',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    handleImportError(res, error, 'categories');
   }
 };
 
@@ -402,11 +421,7 @@ export const importTags = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Tag import error:', error);
-    res.status(500).json({
-      error: 'Failed to import tags',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    handleImportError(res, error, 'tags');
   }
 };
 
@@ -457,11 +472,7 @@ export const importCounterparties = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Counterparty import error:', error);
-    res.status(500).json({
-      error: 'Failed to import counterparties',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    handleImportError(res, error, 'counterparties');
   }
 };
 
@@ -580,11 +591,7 @@ export const importRecurringTransactions = async (
 
     res.json(results);
   } catch (error) {
-    console.error('Recurring transaction import error:', error);
-    res.status(500).json({
-      error: 'Failed to import recurring transactions',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    handleImportError(res, error, 'recurring transactions');
   }
 };
 
@@ -624,10 +631,6 @@ export const importCryptoAssets = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Crypto asset import error:', error);
-    res.status(500).json({
-      error: 'Failed to import crypto assets',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    handleImportError(res, error, 'crypto assets');
   }
 };
