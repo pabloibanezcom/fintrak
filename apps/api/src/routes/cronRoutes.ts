@@ -43,6 +43,9 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/cron/snapshots/daily', controller.createDailySnapshotsForAllUsers);
+router.post(
+  '/cron/snapshots/daily',
+  controller.createDailySnapshotsForAllUsers
+);
 
 export default router;

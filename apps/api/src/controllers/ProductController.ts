@@ -1,16 +1,19 @@
 import type { Request, Response } from 'express';
 import { fetchUserProducts } from '../services/MI';
 import {
-  saveDailySnapshot,
-  getSnapshots,
   getLatestSnapshot,
   getSnapshotByDate,
   getSnapshotByDateOrOldest,
+  getSnapshots,
+  saveDailySnapshot,
 } from '../services/ProductSnapshot';
+import { requireAuth } from '../utils/authUtils';
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { compare } = req.query;
 
     const userData = await fetchUserProducts(userId);
@@ -44,12 +47,15 @@ export const getProducts = async (req: Request, res: Response) => {
         break;
       default:
         return res.status(400).json({
-          error: 'Invalid comparison period. Use: 1d, 7d, 1m, 3m, or 1y'
+          error: 'Invalid comparison period. Use: 1d, 7d, 1m, 3m, or 1y',
         });
     }
 
     // Get the snapshot for the comparison date or closest older snapshot
-    const previousSnapshot = await getSnapshotByDateOrOldest(userId!, comparisonDate);
+    const previousSnapshot = await getSnapshotByDateOrOldest(
+      userId!,
+      comparisonDate
+    );
 
     // If no previous snapshot exists at all, return current data without comparison
     if (!previousSnapshot) {
@@ -58,17 +64,18 @@ export const getProducts = async (req: Request, res: Response) => {
         comparison: {
           period,
           available: false,
-          message: 'No snapshots available for comparison'
-        }
+          message: 'No snapshots available for comparison',
+        },
       });
     }
 
     // Helper function to calculate comparison metrics
     const calculateComparison = (current: number, previous: number) => {
       const valueDifference = current - previous;
-      const percentageDifference = previous === 0
-        ? 0
-        : Number(((valueDifference / previous) * 100).toFixed(2));
+      const percentageDifference =
+        previous === 0
+          ? 0
+          : Number(((valueDifference / previous) * 100).toFixed(2));
       return { valueDifference, percentageDifference };
     };
 
@@ -98,8 +105,8 @@ export const getProducts = async (req: Request, res: Response) => {
             ...currentItem,
             comparison: {
               previousValue,
-              ...comparison
-            }
+              ...comparison,
+            },
           };
         }
 
@@ -109,8 +116,8 @@ export const getProducts = async (req: Request, res: Response) => {
           comparison: {
             previousValue: 0,
             valueDifference: currentValue,
-            percentageDifference: 0
-          }
+            percentageDifference: 0,
+          },
         };
       });
     };
@@ -135,7 +142,7 @@ export const getProducts = async (req: Request, res: Response) => {
           comparison: calculateComparison(
             userData.items.deposits.value,
             previousSnapshot.snapshot.items.deposits.value
-          )
+          ),
         },
         cashAccounts: {
           ...userData.items.cashAccounts,
@@ -148,7 +155,7 @@ export const getProducts = async (req: Request, res: Response) => {
           comparison: calculateComparison(
             userData.items.cashAccounts.value,
             previousSnapshot.snapshot.items.cashAccounts.value
-          )
+          ),
         },
         indexedFunds: {
           ...userData.items.indexedFunds,
@@ -161,7 +168,7 @@ export const getProducts = async (req: Request, res: Response) => {
           comparison: calculateComparison(
             userData.items.indexedFunds.value,
             previousSnapshot.snapshot.items.indexedFunds.value
-          )
+          ),
         },
         etcs: {
           ...userData.items.etcs,
@@ -174,7 +181,7 @@ export const getProducts = async (req: Request, res: Response) => {
           comparison: calculateComparison(
             userData.items.etcs.value,
             previousSnapshot.snapshot.items.etcs.value
-          )
+          ),
         },
         cryptoAssets: {
           ...userData.items.cryptoAssets,
@@ -187,9 +194,9 @@ export const getProducts = async (req: Request, res: Response) => {
           comparison: calculateComparison(
             userData.items.cryptoAssets.value,
             previousSnapshot.snapshot.items.cryptoAssets.value
-          )
-        }
-      }
+          ),
+        },
+      },
     };
 
     res.json({
@@ -201,8 +208,8 @@ export const getProducts = async (req: Request, res: Response) => {
         currentValue,
         valueDifference: totalComparison.valueDifference,
         percentageDifference: totalComparison.percentageDifference,
-        comparisonDate: previousSnapshot.date
-      }
+        comparisonDate: previousSnapshot.date,
+      },
     });
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -212,10 +219,9 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const createSnapshot = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const snapshot = await saveDailySnapshot(userId);
     res.json({
       message: 'Snapshot saved successfully',
@@ -229,10 +235,9 @@ export const createSnapshot = async (req: Request, res: Response) => {
 
 export const getSnapshotHistory = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { startDate, endDate } = req.query;
 
     if (!startDate || !endDate) {
@@ -244,7 +249,7 @@ export const getSnapshotHistory = async (req: Request, res: Response) => {
     const snapshots = await getSnapshots(
       userId,
       new Date(startDate as string),
-      new Date(endDate as string),
+      new Date(endDate as string)
     );
     res.json(snapshots);
   } catch (error) {
@@ -255,10 +260,9 @@ export const getSnapshotHistory = async (req: Request, res: Response) => {
 
 export const getRecentSnapshot = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const snapshot = await getLatestSnapshot(userId);
 
     if (!snapshot) {
@@ -274,10 +278,9 @@ export const getRecentSnapshot = async (req: Request, res: Response) => {
 
 export const getSnapshotForDate = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { date } = req.query;
 
     if (!date) {

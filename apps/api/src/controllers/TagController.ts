@@ -3,13 +3,13 @@
 import type { Tag } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import TagModel from '../models/TagModel';
+import { requireAuth } from '../utils/authUtils';
 
 export const getTags = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const tags = await TagModel.find({ userId }).sort({ name: 1 });
     res.json(tags);
   } catch (error) {
@@ -20,10 +20,9 @@ export const getTags = async (req: Request, res: Response) => {
 
 export const getTagById = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
 
     const tag = await TagModel.findOne({ key: id, userId });
@@ -40,10 +39,9 @@ export const getTagById = async (req: Request, res: Response) => {
 
 export const createTag = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const tagData: Tag = req.body;
 
     // Check if tag with same key already exists for this user
@@ -73,10 +71,9 @@ export const createTag = async (req: Request, res: Response) => {
 
 export const updateTag = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
     const updateData: Partial<Tag> = req.body;
 
@@ -102,10 +99,9 @@ export const updateTag = async (req: Request, res: Response) => {
 
 export const deleteTag = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
+
     const { id } = req.params;
 
     const tag = await TagModel.findOneAndDelete({ key: id, userId });

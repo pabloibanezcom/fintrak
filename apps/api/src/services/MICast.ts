@@ -87,9 +87,7 @@ export const MIIndexedFundsToIndexedFundsSummary = (
   );
 };
 
-export const MIETCsToETCsSummary = (
-  MIETCs: MIETC[]
-): InvestmentSummary[] => {
+export const MIETCsToETCsSummary = (MIETCs: MIETC[]): InvestmentSummary[] => {
   return mapArrayWithTransforms<MIETC, InvestmentSummary>(MIETCs, {
     isin: 'isin',
     investmentName: 'investmentName',

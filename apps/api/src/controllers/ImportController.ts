@@ -13,6 +13,7 @@ import ExpenseModel from '../models/ExpenseModel';
 import IncomeModel from '../models/IncomeModel';
 import RecurringTransactionModel from '../models/RecurringTransactionModel';
 import TagModel from '../models/TagModel';
+import { requireAuth } from '../utils/authUtils';
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
@@ -31,10 +32,8 @@ interface ParsedTransaction {
 
 export const importTransactions = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -335,10 +334,8 @@ export const importTransactions = async (req: Request, res: Response) => {
 
 export const importCategories = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -431,10 +428,8 @@ export const importCategories = async (req: Request, res: Response) => {
 
 export const importTags = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -524,10 +519,8 @@ export const importTags = async (req: Request, res: Response) => {
 
 export const importCounterparties = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -643,10 +636,8 @@ export const importRecurringTransactions = async (
   res: Response
 ) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -844,10 +835,8 @@ export const importRecurringTransactions = async (
 
 export const importCryptoAssets = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
+    const userId = requireAuth(req, res);
+    if (!userId) return;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });

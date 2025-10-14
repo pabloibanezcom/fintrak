@@ -1,5 +1,5 @@
-import mongoose, { Schema } from 'mongoose';
 import type { UserProducts } from '@fintrak/types';
+import mongoose, { Schema } from 'mongoose';
 
 export interface IProductSnapshot {
   userId: mongoose.Types.ObjectId;
@@ -36,5 +36,5 @@ ProductSnapshotSchema.index({ userId: 1, date: 1 }, { unique: true });
 
 export const ProductSnapshot = mongoose.model<IProductSnapshot>(
   'ProductSnapshot',
-  ProductSnapshotSchema,
+  ProductSnapshotSchema
 );

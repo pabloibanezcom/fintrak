@@ -9,7 +9,7 @@ import { saveDailySnapshot } from '../services/ProductSnapshot';
  */
 export const createDailySnapshotsForAllUsers = async (
   req: Request,
-  res: Response,
+  res: Response
 ) => {
   try {
     // Verify the request is from authorized source (API key)
