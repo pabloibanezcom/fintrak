@@ -13,6 +13,7 @@ import ExpenseModel from '../models/ExpenseModel';
 import IncomeModel from '../models/IncomeModel';
 import RecurringTransactionModel from '../models/RecurringTransactionModel';
 import TagModel from '../models/TagModel';
+import { GenericImportService } from '../services/GenericImportService';
 import { requireAuth } from '../utils/authUtils';
 
 const storage = multer.memoryStorage();
@@ -341,80 +342,25 @@ export const importCategories = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Parse JSON file
-    let categoriesData: any[];
-    try {
-      const fileContent = req.file.buffer.toString('utf-8');
-      const parsedData = JSON.parse(fileContent);
-
-      // Handle both array format and object with categories property
-      categoriesData = Array.isArray(parsedData)
-        ? parsedData
-        : parsedData.categories;
-
-      if (!Array.isArray(categoriesData)) {
-        return res.status(400).json({
-          error:
-            'Invalid JSON format. Expected array of categories or object with categories property',
-        });
-      }
-    } catch (error) {
-      return res.status(400).json({
-        error: 'Invalid JSON file',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-
-    const results = {
-      total: categoriesData.length,
-      imported: 0,
-      updated: 0,
-      errors: [] as string[],
-    };
-
-    for (let i = 0; i < categoriesData.length; i++) {
-      try {
-        const categoryData = categoriesData[i];
-
-        // Validate required fields
-        if (!categoryData.key || !categoryData.name) {
-          results.errors.push(
-            `Row ${i + 1}: Missing required fields (key, name)`
-          );
-          continue;
-        }
-
-        // Check if category already exists
-        const existingCategory = await CategoryModel.findOne({
+    const results = await GenericImportService.importFromJSON(
+      req.file.buffer,
+      userId,
+      {
+        model: CategoryModel,
+        entityName: 'categories',
+        arrayPropertyName: 'categories',
+        requiredFields: ['key', 'name'],
+        uniqueField: 'key',
+        transformData: (rawData, userId) => ({
+          key: rawData.key,
+          name: rawData.name,
+          color: rawData.color || '#6B7280',
+          icon: rawData.icon || 'folder',
+          keywords: rawData.keywords || [],
           userId,
-          key: categoryData.key,
-        });
-
-        const categoryDoc = {
-          key: categoryData.key,
-          name: categoryData.name,
-          color: categoryData.color || '#6B7280',
-          icon: categoryData.icon || 'folder',
-          keywords: categoryData.keywords || [],
-          userId,
-        };
-
-        if (existingCategory) {
-          // Replace existing category (delete and recreate to ensure complete replacement)
-          await CategoryModel.deleteOne({ userId, key: categoryData.key });
-          await CategoryModel.create(categoryDoc);
-          results.updated++;
-        } else {
-          // Create new category
-          await CategoryModel.create(categoryDoc);
-          results.imported++;
-        }
-      } catch (error) {
-        results.errors.push(
-          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+        }),
       }
-    }
+    );
 
     res.json(results);
   } catch (error) {
@@ -435,77 +381,24 @@ export const importTags = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Parse JSON file
-    let tagsData: any[];
-    try {
-      const fileContent = req.file.buffer.toString('utf-8');
-      const parsedData = JSON.parse(fileContent);
-
-      // Handle both array format and object with tags property
-      tagsData = Array.isArray(parsedData) ? parsedData : parsedData.tags;
-
-      if (!Array.isArray(tagsData)) {
-        return res.status(400).json({
-          error:
-            'Invalid JSON format. Expected array of tags or object with tags property',
-        });
-      }
-    } catch (error) {
-      return res.status(400).json({
-        error: 'Invalid JSON file',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-
-    const results = {
-      total: tagsData.length,
-      imported: 0,
-      updated: 0,
-      errors: [] as string[],
-    };
-
-    for (let i = 0; i < tagsData.length; i++) {
-      try {
-        const tagData = tagsData[i];
-
-        // Validate required fields
-        if (!tagData.key || !tagData.name) {
-          results.errors.push(
-            `Row ${i + 1}: Missing required fields (key, name)`
-          );
-          continue;
-        }
-
-        // Check if tag already exists
-        const existingTag = await TagModel.findOne({
+    const results = await GenericImportService.importFromJSON(
+      req.file.buffer,
+      userId,
+      {
+        model: TagModel,
+        entityName: 'tags',
+        arrayPropertyName: 'tags',
+        requiredFields: ['key', 'name'],
+        uniqueField: 'key',
+        transformData: (rawData, userId) => ({
+          key: rawData.key,
+          name: rawData.name,
+          color: rawData.color || '#6B7280',
+          icon: rawData.icon || 'pricetag',
           userId,
-          key: tagData.key,
-        });
-
-        const tagDoc = {
-          key: tagData.key,
-          name: tagData.name,
-          color: tagData.color || '#6B7280',
-          icon: tagData.icon || 'pricetag',
-          userId,
-        };
-
-        if (existingTag) {
-          // Replace existing tag (delete and recreate to ensure complete replacement)
-          await TagModel.deleteOne({ userId, key: tagData.key });
-          await TagModel.create(tagDoc);
-          results.updated++;
-        } else {
-          // Create new tag
-          await TagModel.create(tagDoc);
-          results.imported++;
-        }
-      } catch (error) {
-        results.errors.push(
-          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+        }),
       }
-    }
+    );
 
     res.json(results);
   } catch (error) {
@@ -526,100 +419,41 @@ export const importCounterparties = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Parse JSON file
-    let counterpartiesData: any[];
-    try {
-      const fileContent = req.file.buffer.toString('utf-8');
-      const parsedData = JSON.parse(fileContent);
-
-      // Handle both array format and object with counterparties property
-      counterpartiesData = Array.isArray(parsedData)
-        ? parsedData
-        : parsedData.counterparties;
-
-      if (!Array.isArray(counterpartiesData)) {
-        return res.status(400).json({
-          error:
-            'Invalid JSON format. Expected array of counterparties or object with counterparties property',
-        });
-      }
-    } catch (error) {
-      return res.status(400).json({
-        error: 'Invalid JSON file',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-
-    const results = {
-      total: counterpartiesData.length,
-      imported: 0,
-      updated: 0,
-      errors: [] as string[],
-    };
-
-    for (let i = 0; i < counterpartiesData.length; i++) {
-      try {
-        const counterpartyData = counterpartiesData[i];
-
-        // Validate required fields
-        if (!counterpartyData.key || !counterpartyData.name) {
-          results.errors.push(
-            `Row ${i + 1}: Missing required fields (key, name)`
-          );
-          continue;
-        }
-
-        // Validate type value if provided
-        if (
-          counterpartyData.type &&
-          !['company', 'person', 'institution', 'other'].includes(
-            counterpartyData.type
-          )
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: Invalid type value. Expected: company, person, institution, or other`
-          );
-          continue;
-        }
-
-        // Check if counterparty already exists
-        const existingCounterparty = await CounterpartyModel.findOne({
+    const results = await GenericImportService.importFromJSON(
+      req.file.buffer,
+      userId,
+      {
+        model: CounterpartyModel,
+        entityName: 'counterparties',
+        arrayPropertyName: 'counterparties',
+        requiredFields: ['key', 'name'],
+        uniqueField: 'key',
+        customValidate: (rawData) => {
+          // Validate type value if provided
+          if (
+            rawData.type &&
+            !['company', 'person', 'institution', 'other'].includes(
+              rawData.type
+            )
+          ) {
+            return 'Invalid type value. Expected: company, person, institution, or other';
+          }
+          return undefined;
+        },
+        transformData: (rawData, userId) => ({
+          key: rawData.key,
+          name: rawData.name,
+          type: rawData.type || 'other',
+          logo: rawData.logo,
+          email: rawData.email,
+          phone: rawData.phone,
+          address: rawData.address,
+          notes: rawData.notes,
+          titleTemplate: rawData.titleTemplate,
           userId,
-          key: counterpartyData.key,
-        });
-
-        const counterpartyDoc = {
-          key: counterpartyData.key,
-          name: counterpartyData.name,
-          type: counterpartyData.type || 'other',
-          logo: counterpartyData.logo,
-          email: counterpartyData.email,
-          phone: counterpartyData.phone,
-          address: counterpartyData.address,
-          notes: counterpartyData.notes,
-          titleTemplate: counterpartyData.titleTemplate,
-          userId,
-        };
-
-        if (existingCounterparty) {
-          // Replace existing counterparty (delete and recreate to ensure complete replacement)
-          await CounterpartyModel.deleteOne({
-            userId,
-            key: counterpartyData.key,
-          });
-          await CounterpartyModel.create(counterpartyDoc);
-          results.updated++;
-        } else {
-          // Create new counterparty
-          await CounterpartyModel.create(counterpartyDoc);
-          results.imported++;
-        }
-      } catch (error) {
-        results.errors.push(
-          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+        }),
       }
-    }
+    );
 
     res.json(results);
   } catch (error) {
@@ -643,185 +477,106 @@ export const importRecurringTransactions = async (
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Parse JSON file
-    let recurringTransactionsData: any[];
-    try {
-      const fileContent = req.file.buffer.toString('utf-8');
-      const parsedData = JSON.parse(fileContent);
+    const results = await GenericImportService.importFromJSON(
+      req.file.buffer,
+      userId,
+      {
+        model: RecurringTransactionModel,
+        entityName: 'recurring transactions',
+        arrayPropertyName: 'recurringTransactions',
+        requiredFields: [
+          'title',
+          'currency',
+          'category',
+          'transactionType',
+          'periodicity',
+        ],
+        uniqueField: 'title', // Note: actual uniqueness is composite (title + periodicity)
+        customValidate: (rawData) => {
+          // Validate currency
+          if (!['EUR', 'GBP', 'USD'].includes(rawData.currency)) {
+            return 'Invalid currency. Expected: EUR, GBP, or USD';
+          }
 
-      // Handle both array format and object with recurringTransactions property
-      recurringTransactionsData = Array.isArray(parsedData)
-        ? parsedData
-        : parsedData.recurringTransactions;
+          // Validate transaction type
+          if (!['EXPENSE', 'INCOME'].includes(rawData.transactionType)) {
+            return 'Invalid transaction type. Expected: EXPENSE or INCOME';
+          }
 
-      if (!Array.isArray(recurringTransactionsData)) {
-        return res.status(400).json({
-          error:
-            'Invalid JSON format. Expected array of recurring transactions or object with recurringTransactions property',
-        });
-      }
-    } catch (error) {
-      return res.status(400).json({
-        error: 'Invalid JSON file',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
+          // Validate periodicity
+          if (
+            !['MONTHLY', 'QUARTERLY', 'YEARLY'].includes(rawData.periodicity)
+          ) {
+            return 'Invalid periodicity. Expected: MONTHLY, QUARTERLY, or YEARLY';
+          }
 
-    const results = {
-      total: recurringTransactionsData.length,
-      imported: 0,
-      updated: 0,
-      errors: [] as string[],
-    };
+          // Validate amount ranges
+          if (
+            rawData.minAproxAmount !== undefined &&
+            rawData.minAproxAmount < 0
+          ) {
+            return 'minAproxAmount must be non-negative';
+          }
 
-    for (let i = 0; i < recurringTransactionsData.length; i++) {
-      try {
-        const recurringTransactionData = recurringTransactionsData[i];
+          if (
+            rawData.maxAproxAmount !== undefined &&
+            rawData.maxAproxAmount < 0
+          ) {
+            return 'maxAproxAmount must be non-negative';
+          }
 
-        // Validate required fields
-        if (
-          !recurringTransactionData.title ||
-          !recurringTransactionData.currency ||
-          !recurringTransactionData.category ||
-          !recurringTransactionData.transactionType ||
-          !recurringTransactionData.periodicity
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: Missing required fields (title, currency, category, transactionType, periodicity)`
-          );
-          continue;
-        }
+          if (
+            rawData.minAproxAmount !== undefined &&
+            rawData.maxAproxAmount !== undefined &&
+            rawData.minAproxAmount > rawData.maxAproxAmount
+          ) {
+            return 'minAproxAmount cannot be greater than maxAproxAmount';
+          }
 
-        // Validate currency
-        if (
-          !['EUR', 'GBP', 'USD'].includes(recurringTransactionData.currency)
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: Invalid currency. Expected: EUR, GBP, or USD`
-          );
-          continue;
-        }
-
-        // Validate transaction type
-        if (
-          !['EXPENSE', 'INCOME'].includes(
-            recurringTransactionData.transactionType
-          )
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: Invalid transaction type. Expected: EXPENSE or INCOME`
-          );
-          continue;
-        }
-
-        // Validate periodicity
-        if (
-          !['MONTHLY', 'QUARTERLY', 'YEARLY'].includes(
-            recurringTransactionData.periodicity
-          )
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: Invalid periodicity. Expected: MONTHLY, QUARTERLY, or YEARLY`
-          );
-          continue;
-        }
-
-        // Validate amount ranges if provided
-        if (
-          recurringTransactionData.minAproxAmount !== undefined &&
-          recurringTransactionData.minAproxAmount < 0
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: minAproxAmount must be non-negative`
-          );
-          continue;
-        }
-
-        if (
-          recurringTransactionData.maxAproxAmount !== undefined &&
-          recurringTransactionData.maxAproxAmount < 0
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: maxAproxAmount must be non-negative`
-          );
-          continue;
-        }
-
-        if (
-          recurringTransactionData.minAproxAmount !== undefined &&
-          recurringTransactionData.maxAproxAmount !== undefined &&
-          recurringTransactionData.minAproxAmount >
-            recurringTransactionData.maxAproxAmount
-        ) {
-          results.errors.push(
-            `Row ${i + 1}: minAproxAmount cannot be greater than maxAproxAmount`
-          );
-          continue;
-        }
-
-        // Find or create category
-        let category = await CategoryModel.findOne({
-          userId,
-          key: recurringTransactionData.category,
-        });
-
-        if (!category) {
-          // Category doesn't exist, create a basic one
-          category = await CategoryModel.create({
-            key: recurringTransactionData.category,
-            name:
-              recurringTransactionData.category.charAt(0).toUpperCase() +
-              recurringTransactionData.category.slice(1),
-            color: '#6B7280',
-            icon: 'folder',
-            keywords: [],
+          return undefined;
+        },
+        findExisting: async (rawData, userId, model) => {
+          // Use composite key for uniqueness check
+          return model.findOne({
             userId,
+            title: rawData.title,
+            periodicity: rawData.periodicity,
           });
-        }
-
-        // Check if recurring transaction already exists (same user, title, and periodicity)
-        const existingRecurringTransaction =
-          await RecurringTransactionModel.findOne({
+        },
+        transformData: async (rawData, userId) => {
+          // Find or create category
+          let category = await CategoryModel.findOne({
             userId,
-            title: recurringTransactionData.title,
-            periodicity: recurringTransactionData.periodicity,
+            key: rawData.category,
           });
 
-        const recurringTransactionDoc = {
-          title: recurringTransactionData.title,
-          currency: recurringTransactionData.currency as Currency,
-          category: category._id,
-          transactionType: recurringTransactionData.transactionType,
-          minAproxAmount: recurringTransactionData.minAproxAmount,
-          maxAproxAmount: recurringTransactionData.maxAproxAmount,
-          periodicity:
-            recurringTransactionData.periodicity as RecurringTransactionPeriodicity,
-          userId,
-        };
-
-        if (existingRecurringTransaction) {
-          // Update existing recurring transaction
-          await RecurringTransactionModel.findOneAndUpdate(
-            {
+          if (!category) {
+            // Category doesn't exist, create a basic one
+            category = await CategoryModel.create({
+              key: rawData.category,
+              name:
+                rawData.category.charAt(0).toUpperCase() +
+                rawData.category.slice(1),
+              color: '#6B7280',
+              icon: 'folder',
+              keywords: [],
               userId,
-              title: recurringTransactionData.title,
-              periodicity: recurringTransactionData.periodicity,
-            },
-            recurringTransactionDoc,
-            { new: true }
-          );
-          results.updated++;
-        } else {
-          // Create new recurring transaction
-          await RecurringTransactionModel.create(recurringTransactionDoc);
-          results.imported++;
-        }
-      } catch (error) {
-        results.errors.push(
-          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+            });
+          }
+
+          return {
+            title: rawData.title,
+            currency: rawData.currency as Currency,
+            category: category._id,
+            transactionType: rawData.transactionType,
+            minAproxAmount: rawData.minAproxAmount,
+            maxAproxAmount: rawData.maxAproxAmount,
+            periodicity: rawData.periodicity as RecurringTransactionPeriodicity,
+            userId,
+          };
+        },
       }
-    }
+    );
 
     res.json(results);
   } catch (error) {
@@ -842,90 +597,30 @@ export const importCryptoAssets = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Parse JSON file
-    let cryptoAssetsData: any[];
-    try {
-      const fileContent = req.file.buffer.toString('utf-8');
-      const parsedData = JSON.parse(fileContent);
-
-      // Handle both array format and object with cryptoAssets property
-      cryptoAssetsData = Array.isArray(parsedData)
-        ? parsedData
-        : parsedData.cryptoAssets;
-
-      if (!Array.isArray(cryptoAssetsData)) {
-        return res.status(400).json({
-          error:
-            'Invalid JSON format. Expected array of crypto assets or object with cryptoAssets property',
-        });
-      }
-    } catch (error) {
-      return res.status(400).json({
-        error: 'Invalid JSON file',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-
-    const results = {
-      total: cryptoAssetsData.length,
-      imported: 0,
-      updated: 0,
-      errors: [] as string[],
-    };
-
-    for (let i = 0; i < cryptoAssetsData.length; i++) {
-      try {
-        const cryptoAssetData = cryptoAssetsData[i];
-
-        // Validate required fields
-        if (!cryptoAssetData.code || !cryptoAssetData.name) {
-          results.errors.push(
-            `Row ${i + 1}: Missing required fields (code, name)`
-          );
-          continue;
-        }
-
-        // Validate amount
-        if (
-          cryptoAssetData.amount !== undefined &&
-          cryptoAssetData.amount < 0
-        ) {
-          results.errors.push(`Row ${i + 1}: Amount must be non-negative`);
-          continue;
-        }
-
-        // Check if crypto asset already exists for this user
-        const existingCryptoAsset = await CryptoAssetModel.findOne({
+    const results = await GenericImportService.importFromJSON(
+      req.file.buffer,
+      userId,
+      {
+        model: CryptoAssetModel,
+        entityName: 'crypto assets',
+        arrayPropertyName: 'cryptoAssets',
+        requiredFields: ['code', 'name'],
+        uniqueField: 'code',
+        customValidate: (rawData) => {
+          // Validate amount if provided
+          if (rawData.amount !== undefined && rawData.amount < 0) {
+            return 'Amount must be non-negative';
+          }
+          return undefined;
+        },
+        transformData: (rawData, userId) => ({
+          name: rawData.name,
+          code: rawData.code,
+          amount: rawData.amount || 0,
           userId,
-          code: cryptoAssetData.code,
-        });
-
-        const cryptoAssetDoc = {
-          name: cryptoAssetData.name,
-          code: cryptoAssetData.code,
-          amount: cryptoAssetData.amount || 0,
-          userId,
-        };
-
-        if (existingCryptoAsset) {
-          // Update existing crypto asset
-          await CryptoAssetModel.findOneAndUpdate(
-            { userId, code: cryptoAssetData.code },
-            cryptoAssetDoc,
-            { new: true }
-          );
-          results.updated++;
-        } else {
-          // Create new crypto asset
-          await CryptoAssetModel.create(cryptoAssetDoc);
-          results.imported++;
-        }
-      } catch (error) {
-        results.errors.push(
-          `Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+        }),
       }
-    }
+    );
 
     res.json(results);
   } catch (error) {
