@@ -2,6 +2,7 @@
 
 import type { Request, Response } from 'express';
 import ExpenseModel from '../models/ExpenseModel';
+import IncomeModel from '../models/IncomeModel';
 import { requireAuth } from '../utils/authUtils';
 import { handleGenericError } from '../utils/errorUtils';
 import { buildDateRangeQuery } from '../utils/queryUtils';
@@ -24,9 +25,6 @@ export const getPeriodSummary = async (req: Request, res: Response) => {
     const dateQuery = buildDateRangeQuery(dateFrom as string, dateTo as string);
     if (dateQuery) baseQuery.date = dateQuery;
     if (currency) baseQuery.currency = currency;
-
-    // Import IncomeModel
-    const IncomeModel = (await import('../models/IncomeModel')).default;
 
     // Get expenses with category totals
     const expenseAggregation = await ExpenseModel.aggregate([
