@@ -48,6 +48,11 @@ const axiosConfig = {
   },
 };
 
+/**
+ * Login to MI service and return token data.
+ * Note: Although MI returns a refresh token, we currently re-login instead
+ * of using it, as the refresh endpoint behavior isn't well-documented.
+ */
 async function loginToMI(): Promise<TokenData> {
   validateEnvironment();
 
@@ -86,39 +91,22 @@ async function loginToMI(): Promise<TokenData> {
   }
 }
 
-async function refreshTokenIfNeeded(): Promise<void> {
-  if (!tokenData) return;
-
+/**
+ * Get a valid access token, logging in if needed.
+ * Uses a 5-minute buffer before expiration to avoid edge cases.
+ */
+async function getToken(): Promise<string> {
   const now = Date.now();
   const bufferTime = 5 * 60 * 1000; // 5 minutes buffer
 
-  // If refresh token is about to expire, force re-login
-  if (now >= tokenData.refreshExpiresAt - bufferTime) {
-    tokenData = null;
-    return;
-  }
-
-  // If access token needs refresh
-  if (now >= tokenData.expiresAt - bufferTime) {
+  // Login if no token exists or if token is expired/about to expire
+  if (!tokenData || now >= tokenData.expiresAt - bufferTime) {
     try {
-      // For now, we'll re-login instead of using refresh token
-      // This can be enhanced later if MI service supports token refresh
       tokenData = await loginToMI();
     } catch (error) {
-      console.error(
-        'Failed to refresh token, will re-login on next request:',
-        error
-      );
-      tokenData = null;
+      console.error('Failed to login to MI service:', error);
+      throw error;
     }
-  }
-}
-
-async function getToken(): Promise<string> {
-  if (!tokenData || Date.now() >= tokenData.expiresAt) {
-    tokenData = await loginToMI();
-  } else {
-    await refreshTokenIfNeeded();
   }
 
   return tokenData.accessToken;
