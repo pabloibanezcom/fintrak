@@ -36,8 +36,7 @@ const handleImportError = (
       ? 400
       : 500;
   res.status(statusCode).json({
-    error:
-      statusCode === 400 ? errorMessage : `Failed to import ${entityName}`,
+    error: statusCode === 400 ? errorMessage : `Failed to import ${entityName}`,
     ...(statusCode === 400 && { details: errorMessage }),
   });
 };
