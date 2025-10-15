@@ -60,7 +60,12 @@ describe('AnalyticsController', () => {
         color: '#4CAF50',
         icon: 'cart',
       },
-      payee: { key: 'supermarket', name: 'Supermarket', type: 'merchant', logo: null },
+      payee: {
+        key: 'supermarket',
+        name: 'Supermarket',
+        type: 'merchant',
+        logo: null,
+      },
     },
     {
       _id: 'exp2',
@@ -73,7 +78,12 @@ describe('AnalyticsController', () => {
         color: '#2196F3',
         icon: 'car',
       },
-      payee: { key: 'gas-station', name: 'Gas Station', type: 'merchant', logo: null },
+      payee: {
+        key: 'gas-station',
+        name: 'Gas Station',
+        type: 'merchant',
+        logo: null,
+      },
     },
   ];
 
@@ -89,7 +99,12 @@ describe('AnalyticsController', () => {
         color: '#FF9800',
         icon: 'money',
       },
-      source: { key: 'employer', name: 'Company Ltd', type: 'employer', logo: null },
+      source: {
+        key: 'employer',
+        name: 'Company Ltd',
+        type: 'employer',
+        logo: null,
+      },
     },
   ];
 
@@ -112,8 +127,12 @@ describe('AnalyticsController', () => {
     console.error = jest.fn();
 
     // Setup default mocks
-    mockExpenseModel.aggregate = jest.fn().mockResolvedValue(mockExpenseAggregation);
-    mockIncomeModel.aggregate = jest.fn().mockResolvedValue(mockIncomeAggregation);
+    mockExpenseModel.aggregate = jest
+      .fn()
+      .mockResolvedValue(mockExpenseAggregation);
+    mockIncomeModel.aggregate = jest
+      .fn()
+      .mockResolvedValue(mockIncomeAggregation);
 
     mockExpenseModel.find = jest.fn().mockReturnValue({
       populate: jest.fn().mockReturnThis(),
@@ -323,7 +342,9 @@ describe('AnalyticsController', () => {
         dateFrom: '2024-01-01',
         dateTo: '2024-01-31',
       };
-      mockExpenseModel.aggregate = jest.fn().mockRejectedValue(new Error('Database error'));
+      mockExpenseModel.aggregate = jest
+        .fn()
+        .mockRejectedValue(new Error('Database error'));
 
       await getPeriodSummary(req as Request, res as Response);
 
