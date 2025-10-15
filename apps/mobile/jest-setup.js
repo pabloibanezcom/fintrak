@@ -7,6 +7,14 @@ jest.mock('expo-constants', () => ({
   }
 }));
 
+// Mock @expo/vector-icons
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: 'Ionicons',
+  MaterialIcons: 'MaterialIcons',
+  FontAwesome: 'FontAwesome',
+  Feather: 'Feather',
+}));
+
 // React Native Testing Setup
 
 // Mock fetch
