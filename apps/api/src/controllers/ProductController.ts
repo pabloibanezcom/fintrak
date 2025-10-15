@@ -9,6 +9,7 @@ import {
   saveDailySnapshot,
 } from '../services/ProductSnapshot';
 import { requireAuth } from '../utils/authUtils';
+import { handleGenericError } from '../utils/errorUtils';
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -83,8 +84,7 @@ export const getProducts = async (req: Request, res: Response) => {
       comparison: result.comparison,
     });
   } catch (error) {
-    console.error('Error fetching user data:', error);
-    res.status(500).json({ error: 'Failed to fetch user data' });
+    return handleGenericError(res, 'fetch user data', error);
   }
 };
 
@@ -99,8 +99,7 @@ export const createSnapshot = async (req: Request, res: Response) => {
       snapshot,
     });
   } catch (error) {
-    console.error('Error creating snapshot:', error);
-    res.status(500).json({ error: 'Failed to create snapshot' });
+    return handleGenericError(res, 'create snapshot', error);
   }
 };
 
@@ -124,8 +123,7 @@ export const getSnapshotHistory = async (req: Request, res: Response) => {
     );
     res.json(snapshots);
   } catch (error) {
-    console.error('Error fetching snapshots:', error);
-    res.status(500).json({ error: 'Failed to fetch snapshots' });
+    return handleGenericError(res, 'fetch snapshots', error);
   }
 };
 
@@ -142,8 +140,7 @@ export const getRecentSnapshot = async (req: Request, res: Response) => {
 
     res.json(snapshot);
   } catch (error) {
-    console.error('Error fetching latest snapshot:', error);
-    res.status(500).json({ error: 'Failed to fetch latest snapshot' });
+    return handleGenericError(res, 'fetch latest snapshot', error);
   }
 };
 
@@ -168,7 +165,6 @@ export const getSnapshotForDate = async (req: Request, res: Response) => {
 
     res.json(snapshot);
   } catch (error) {
-    console.error('Error fetching snapshot by date:', error);
-    res.status(500).json({ error: 'Failed to fetch snapshot' });
+    return handleGenericError(res, 'fetch snapshot', error);
   }
 };
