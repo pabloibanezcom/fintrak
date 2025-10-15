@@ -12,9 +12,10 @@ import * as ProductSnapshotService from '../../services/ProductSnapshot';
 jest.mock('../../services/MI');
 jest.mock('../../services/ProductSnapshot');
 
-const mockFetchUserProducts = MIService.fetchUserProducts as jest.MockedFunction<
-  typeof MIService.fetchUserProducts
->;
+const mockFetchUserProducts =
+  MIService.fetchUserProducts as jest.MockedFunction<
+    typeof MIService.fetchUserProducts
+  >;
 const mockSaveDailySnapshot =
   ProductSnapshotService.saveDailySnapshot as jest.MockedFunction<
     typeof ProductSnapshotService.saveDailySnapshot
@@ -319,7 +320,10 @@ describe('ProductController', () => {
         startDate: '2024-01-01',
         endDate: '2024-01-31',
       };
-      const mockSnapshots = [mockSnapshot, { ...mockSnapshot, _id: 'snapshot2' }];
+      const mockSnapshots = [
+        mockSnapshot,
+        { ...mockSnapshot, _id: 'snapshot2' },
+      ];
       mockGetSnapshots.mockResolvedValue(mockSnapshots as any);
 
       await getSnapshotHistory(req as Request, res as Response);

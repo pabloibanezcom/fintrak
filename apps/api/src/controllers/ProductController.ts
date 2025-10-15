@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { fetchUserProducts } from '../services/MI';
+import { ProductComparisonService } from '../services/ProductComparisonService';
 import {
   getLatestSnapshot,
   getSnapshotByDate,
@@ -69,147 +70,17 @@ export const getProducts = async (req: Request, res: Response) => {
       });
     }
 
-    // Helper function to calculate comparison metrics
-    const calculateComparison = (current: number, previous: number) => {
-      const valueDifference = current - previous;
-      const percentageDifference =
-        previous === 0
-          ? 0
-          : Number(((valueDifference / previous) * 100).toFixed(2));
-      return { valueDifference, percentageDifference };
-    };
-
-    // Helper function to get nested value from object using dot notation
-    const getNestedValue = (obj: any, path: string): number => {
-      return path.split('.').reduce((acc, part) => acc?.[part], obj) || 0;
-    };
-
-    // Helper function to add comparison to individual items
-    const addItemComparisons = (
-      currentItems: any[],
-      previousItems: any[],
-      identifierKey: string,
-      valueKey: string
-    ) => {
-      return currentItems.map((currentItem) => {
-        const previousItem = previousItems.find(
-          (prev: any) => prev[identifierKey] === currentItem[identifierKey]
-        );
-
-        const currentValue = getNestedValue(currentItem, valueKey);
-
-        if (previousItem) {
-          const previousValue = getNestedValue(previousItem, valueKey);
-          const comparison = calculateComparison(currentValue, previousValue);
-          return {
-            ...currentItem,
-            comparison: {
-              previousValue,
-              ...comparison,
-            },
-          };
-        }
-
-        // No previous data for this item (new item)
-        return {
-          ...currentItem,
-          comparison: {
-            previousValue: 0,
-            valueDifference: currentValue,
-            percentageDifference: 0,
-          },
-        };
-      });
-    };
-
-    // Calculate overall differences
-    const previousValue = previousSnapshot.snapshot.totalValue;
-    const currentValue = userData.totalValue;
-    const totalComparison = calculateComparison(currentValue, previousValue);
-
-    // Add comparisons to each product category and individual items
-    const enrichedData = {
-      ...userData,
-      items: {
-        deposits: {
-          ...userData.items.deposits,
-          items: addItemComparisons(
-            userData.items.deposits.items,
-            previousSnapshot.snapshot.items.deposits.items,
-            'depositId',
-            'amount'
-          ),
-          comparison: calculateComparison(
-            userData.items.deposits.value,
-            previousSnapshot.snapshot.items.deposits.value
-          ),
-        },
-        cashAccounts: {
-          ...userData.items.cashAccounts,
-          items: addItemComparisons(
-            userData.items.cashAccounts.items,
-            previousSnapshot.snapshot.items.cashAccounts.items,
-            'accountId',
-            'balance'
-          ),
-          comparison: calculateComparison(
-            userData.items.cashAccounts.value,
-            previousSnapshot.snapshot.items.cashAccounts.value
-          ),
-        },
-        indexedFunds: {
-          ...userData.items.indexedFunds,
-          items: addItemComparisons(
-            userData.items.indexedFunds.items,
-            previousSnapshot.snapshot.items.indexedFunds.items,
-            'isin',
-            'marketValue'
-          ),
-          comparison: calculateComparison(
-            userData.items.indexedFunds.value,
-            previousSnapshot.snapshot.items.indexedFunds.value
-          ),
-        },
-        etcs: {
-          ...userData.items.etcs,
-          items: addItemComparisons(
-            userData.items.etcs.items,
-            previousSnapshot.snapshot.items.etcs.items,
-            'isin',
-            'marketValue'
-          ),
-          comparison: calculateComparison(
-            userData.items.etcs.value,
-            previousSnapshot.snapshot.items.etcs.value
-          ),
-        },
-        cryptoAssets: {
-          ...userData.items.cryptoAssets,
-          items: addItemComparisons(
-            userData.items.cryptoAssets.items,
-            previousSnapshot.snapshot.items.cryptoAssets.items,
-            'code',
-            'value.EUR'
-          ),
-          comparison: calculateComparison(
-            userData.items.cryptoAssets.value,
-            previousSnapshot.snapshot.items.cryptoAssets.value
-          ),
-        },
-      },
-    };
+    // Use ProductComparisonService to calculate comparisons
+    const result = ProductComparisonService.compareWithSnapshot(
+      userData,
+      previousSnapshot.snapshot,
+      period,
+      previousSnapshot.date
+    );
 
     res.json({
-      ...enrichedData,
-      comparison: {
-        period,
-        available: true,
-        previousValue,
-        currentValue,
-        valueDifference: totalComparison.valueDifference,
-        percentageDifference: totalComparison.percentageDifference,
-        comparisonDate: previousSnapshot.date,
-      },
+      ...result.enrichedData,
+      comparison: result.comparison,
     });
   } catch (error) {
     console.error('Error fetching user data:', error);
