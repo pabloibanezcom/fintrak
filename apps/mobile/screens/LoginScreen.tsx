@@ -13,7 +13,7 @@ import { useTheme } from '../context/ThemeContext';
 import Input from '../components/Input';
 import { Ionicons } from '@expo/vector-icons';
 import { componentStyles } from '../styles';
-import { useGoogleSignIn } from '../src/hooks/useGoogleSignIn';
+import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
 
 interface LoginScreenProps {
   onLoginSuccess: (token: string) => void;
