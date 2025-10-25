@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import type {
   ExpensesResponse,
   AuthResponse,
@@ -40,7 +41,25 @@ export interface PeriodSummaryResponse {
   latestTransactions: Array<any>;
 }
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl || 'http://localhost:3000/api';
+// Get the appropriate API URL based on platform and configuration
+const getApiBaseUrl = (): string => {
+  // If explicitly configured in app.json, use that
+  const configuredUrl = Constants.expoConfig?.extra?.apiBaseUrl;
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  // Otherwise, use platform-specific localhost URLs
+  if (Platform.OS === 'android') {
+    // Android emulator uses 10.0.2.2 to access host machine's localhost
+    return 'http://10.0.2.2:3000/api';
+  }
+
+  // iOS simulator and web can use localhost
+  return 'http://localhost:3000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   private token: string | null = null;
