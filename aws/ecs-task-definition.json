@@ -1,17 +1,15 @@
 {
   "family": "fintrak-api",
-  "networkMode": "host",
-  "requiresCompatibilities": ["EC2"],
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::402996622342:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::402996622342:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "fintrak-api",
-      "image": "YOUR_ECR_REPO_URI:latest",
-      "cpu": 256,
-      "memory": 512,
+      "image": "402996622342.dkr.ecr.eu-west-1.amazonaws.com/fintrak-api:latest",
       "portMappings": [
         {
           "containerPort": 3000,
@@ -40,31 +38,31 @@
       "secrets": [
         {
           "name": "MONGODB_URI",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mongodb-uri"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/mongodb-uri"
         },
         {
           "name": "JWT_SECRET",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/jwt-secret"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/jwt-secret"
         },
         {
           "name": "MI_AUTH_UI",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-auth-ui"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/mi-auth-ui"
         },
         {
           "name": "MI_API",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-api"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/mi-api"
         },
         {
           "name": "MI_USER",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-user"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/mi-user"
         },
         {
           "name": "MI_PASS",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/mi-pass"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/mi-pass"
         },
         {
           "name": "CRON_API_KEY",
-          "valueFrom": "arn:aws:ssm:eu-west-1:YOUR_ACCOUNT_ID:parameter/fintrak/cron-api-key"
+          "valueFrom": "arn:aws:ssm:eu-west-1:402996622342:parameter/fintrak/cron-api-key"
         }
       ]
     }
