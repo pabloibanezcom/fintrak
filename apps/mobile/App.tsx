@@ -6,6 +6,7 @@ import InvestmentsScreen from './screens/InvestmentsScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
+import TransactionDetailScreen from './screens/TransactionDetailScreen';
 import LoginScreen from './screens/LoginScreen';
 import BottomNavigation from './components/BottomNavigation';
 import AddModal from './components/AddModal';
@@ -14,9 +15,10 @@ import { UserProvider, useUser } from './context/UserContext';
 import { authStorage } from './utils/authStorage';
 import { apiService } from './services/api';
 import { colors, commonStyles } from './styles';
+import type { Expense } from '@fintrak/types';
 
 type TabName = 'home' | 'expenses' | 'investments' | 'statistics';
-type ScreenName = TabName | 'profile';
+type ScreenName = TabName | 'profile' | 'transactionDetail';
 
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -26,6 +28,8 @@ function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('home');
   const [showProfile, setShowProfile] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Expense | null>(null);
+  const [selectedMonthDate, setSelectedMonthDate] = useState<Date | undefined>(undefined);
   const [fadeAnim] = useState(new Animated.Value(1));
   const [slideAnim] = useState(new Animated.Value(1000));
   const [editFadeAnim] = useState(new Animated.Value(0));
@@ -162,14 +166,76 @@ function AppContent() {
     }
   };
 
+  const handleNavigateToTransactionDetail = (transaction: Expense, selectedDate?: Date) => {
+    setSelectedTransaction(transaction);
+    if (selectedDate) {
+      setSelectedMonthDate(selectedDate);
+    }
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      setCurrentScreen('transactionDetail');
+    }, 150);
+  };
+
+  const handleBackFromTransactionDetail = () => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      setCurrentScreen(activeTab);
+      setSelectedTransaction(null);
+    }, 150);
+  };
+
   const renderActiveScreen = () => {
     const handleNavigateHome = () => handleTabPress('home');
+
+    // Handle transaction detail screen
+    if (currentScreen === 'transactionDetail' && selectedTransaction) {
+      return (
+        <TransactionDetailScreen
+          transaction={selectedTransaction}
+          onBack={handleBackFromTransactionDetail}
+          onNavigateToProfile={handleNavigateToProfile}
+        />
+      );
+    }
 
     switch (activeTab) {
       case 'home':
         return <HomeScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
       case 'expenses':
-        return <MonthlySummaryScreen onLogout={handleLogout} onNavigateHome={handleNavigateHome} onNavigateToProfile={handleNavigateToProfile} />;
+        return (
+          <MonthlySummaryScreen
+            onLogout={handleLogout}
+            onNavigateHome={handleNavigateHome}
+            onNavigateToProfile={handleNavigateToProfile}
+            onNavigateToTransactionDetail={handleNavigateToTransactionDetail}
+            initialSelectedDate={selectedMonthDate}
+          />
+        );
       case 'investments':
         return <InvestmentsScreen onLogout={handleLogout} onNavigateToProfile={handleNavigateToProfile} />;
       case 'statistics':
@@ -244,7 +310,7 @@ function AppContent() {
               </Animated.View>
             )}
 
-            {!showProfile && !showEditProfile && (
+            {!showProfile && !showEditProfile && currentScreen !== 'transactionDetail' && (
               <BottomNavigation
                 activeTab={activeTab}
                 onTabPress={handleTabPress}

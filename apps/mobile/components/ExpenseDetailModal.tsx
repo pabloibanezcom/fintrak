@@ -2,16 +2,18 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Modal, Pressable, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Expense } from '@fintrak/types';
-import { componentStyles } from '../styles';
+import { componentStyles, colors, spacing } from '../styles';
 import { formatExpenseAmount } from '../utils/currency';
+import Button from './Button';
 
 interface ExpenseDetailModalProps {
   visible: boolean;
   expense: Expense | null;
   onClose: () => void;
+  onViewDetails?: () => void;
 }
 
-export default function ExpenseDetailModal({ visible, expense, onClose }: ExpenseDetailModalProps) {
+export default function ExpenseDetailModal({ visible, expense, onClose, onViewDetails }: ExpenseDetailModalProps) {
   if (!expense) return null;
 
   const getCategoryIcon = (category?: { name: string }) => {
@@ -107,6 +109,23 @@ export default function ExpenseDetailModal({ visible, expense, onClose }: Expens
                   </View>
                 )}
               </View>
+
+              {/* Action Button */}
+              {onViewDetails && (
+                <View style={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.base }}>
+                  <Button
+                    title="View Full Details"
+                    onPress={() => {
+                      onClose();
+                      setTimeout(() => {
+                        onViewDetails();
+                      }, 300);
+                    }}
+                    variant="primary"
+                    size="md"
+                  />
+                </View>
+              )}
             </ScrollView>
           </Pressable>
         </View>
