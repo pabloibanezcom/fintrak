@@ -22,8 +22,10 @@ import { apiService, type PeriodSummaryResponse } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import Button from '../components/Button';
 import UserProfile from '../components/UserProfile';
+import ExpenseDetailModal from '../components/ExpenseDetailModal';
 import { commonStyles, componentStyles, colors, spacing, typography } from '../styles';
 import { formatCurrency as formatCurrencyUtil } from '../utils/currency';
+import type { Expense } from '@fintrak/types';
 
 interface MonthSelectorProps {
   selectedDate: Date;
@@ -130,23 +132,32 @@ interface MonthlySummaryScreenProps {
   onLogout?: () => void;
   onNavigateHome?: () => void;
   onNavigateToProfile: () => void;
+  onNavigateToTransactionDetail?: (transaction: Expense, selectedDate?: Date) => void;
+  initialSelectedDate?: Date;
 }
 
 export default function MonthlySummaryScreen({
   onLogout,
   onNavigateHome,
-  onNavigateToProfile
+  onNavigateToProfile,
+  onNavigateToTransactionDetail,
+  initialSelectedDate
 }: MonthlySummaryScreenProps) {
   const [summary, setSummary] = useState<PeriodSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(() => {
+    if (initialSelectedDate) {
+      return initialSelectedDate;
+    }
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [showAllExpenses, setShowAllExpenses] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Expense | null>(null);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -248,6 +259,18 @@ export default function MonthlySummaryScreen({
 
   const getMonthName = () => {
     return selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  };
+
+  const handleTransactionPress = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setShowTransactionModal(true);
+  };
+
+  const handleViewDetails = () => {
+    if (selectedTransaction && onNavigateToTransactionDetail) {
+      // Pass both transaction and current selected date
+      onNavigateToTransactionDetail(selectedTransaction, selectedDate);
+    }
   };
 
   if (loading) {
@@ -575,7 +598,11 @@ export default function MonthlySummaryScreen({
                   return (
                     <View key={transaction._id || index} style={componentStyles.transactionItemWrapper}>
                       <View style={[componentStyles.transactionColorAccent, { backgroundColor: getCategoryColor() }]} />
-                      <View style={componentStyles.transactionItem}>
+                      <TouchableOpacity
+                        style={componentStyles.transactionItem}
+                        activeOpacity={0.7}
+                        onPress={() => handleTransactionPress(transaction)}
+                      >
                         <View style={componentStyles.transactionIconContainer}>
                           {hasLogo ? (
                             <Image
@@ -620,7 +647,7 @@ export default function MonthlySummaryScreen({
                           {transaction.type === 'income' ? '+' : '-'}
                           {formatCurrency(transaction.amount)}
                         </Text>
-                      </View>
+                      </TouchableOpacity>
                     </View>
                   );
                 })}
@@ -629,6 +656,14 @@ export default function MonthlySummaryScreen({
           </View>
         )}
       </ScrollView>
+
+      {/* Transaction Detail Modal */}
+      <ExpenseDetailModal
+        visible={showTransactionModal}
+        expense={selectedTransaction}
+        onClose={() => setShowTransactionModal(false)}
+        onViewDetails={handleViewDetails}
+      />
     </View>
   );
 }

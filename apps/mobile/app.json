@@ -41,7 +41,8 @@
       ]
     ],
     "extra": {
-      "googleClientIdIos": "116154499655-5oti2e4enpasnalkpvts774euhtmotnm.apps.googleusercontent.com"
+      "googleClientIdIos": "116154499655-5oti2e4enpasnalkpvts774euhtmotnm.apps.googleusercontent.com",
+      "apiBaseUrl": "http://192.168.1.98:3000/api"
     }
   }
 }
