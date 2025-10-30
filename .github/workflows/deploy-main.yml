@@ -142,12 +142,18 @@ jobs:
         SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
         TASK_DEF_NAME: ${{ steps.task-def.outputs.task-def-name }}
       run: |
+        # Get default VPC and subnets
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" --region $AWS_REGION --query 'Vpcs[0].VpcId' --output text)
+        SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --region $AWS_REGION --query 'Subnets[*].SubnetId' --output text | tr '\t' ',')
+        SECURITY_GROUP=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=fintrak-api-sg" --region $AWS_REGION --query 'SecurityGroups[0].GroupId' --output text)
+
         aws ecs create-service \
           --cluster $ECS_CLUSTER \
           --service-name $SERVICE_NAME \
           --task-definition $TASK_DEF_NAME \
           --desired-count 1 \
-          --launch-type EC2 \
+          --launch-type FARGATE \
+          --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SECURITY_GROUP],assignPublicIp=ENABLED}" \
           --region $AWS_REGION
 
     - name: Wait for deployment to complete
@@ -161,14 +167,32 @@ jobs:
 
     - name: Get service endpoint
       id: get-endpoint
+      env:
+        SERVICE_NAME: ${{ steps.task-def.outputs.service-name }}
       run: |
-        # We use a static Elastic IP for the production environment
-        if [ "${{ inputs.environment }}" = "production" ]; then
-          PUBLIC_IP="34.250.157.94"
-        else
-          # For other environments, you would need to set up their IPs
-          PUBLIC_IP="unknown"
-        fi
+        # Get the task ARN
+        TASK_ARN=$(aws ecs list-tasks \
+          --cluster $ECS_CLUSTER \
+          --service-name $SERVICE_NAME \
+          --region $AWS_REGION \
+          --query 'taskArns[0]' \
+          --output text)
+
+        # Get the network interface ID
+        ENI_ID=$(aws ecs describe-tasks \
+          --cluster $ECS_CLUSTER \
+          --tasks $TASK_ARN \
+          --region $AWS_REGION \
+          --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' \
+          --output text)
+
+        # Get the public IP
+        PUBLIC_IP=$(aws ec2 describe-network-interfaces \
+          --network-interface-ids $ENI_ID \
+          --region $AWS_REGION \
+          --query 'NetworkInterfaces[0].Association.PublicIp' \
+          --output text)
+
         echo "endpoint=http://$PUBLIC_IP:3000" >> $GITHUB_OUTPUT
 
     - name: Display deployment summary
