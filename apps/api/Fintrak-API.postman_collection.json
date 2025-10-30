@@ -3799,6 +3799,186 @@
       "description": "Complete CRUD operations for crypto asset management"
     },
     {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload Media",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "type",
+                  "value": "counterparty-logo",
+                  "description": "Media type: counterparty-logo, profile-picture, receipt, document, or other",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/upload/media",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "upload",
+                "media"
+              ]
+            },
+            "description": "Upload media file to S3. Files are organized by user ID and media type: users/{userId}/{type}/{filename}"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    },
+                    {
+                      "key": "type",
+                      "value": "counterparty-logo",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{rootUrl}}/api/upload/media",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "upload",
+                    "media"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"url\": \"https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/58feb8671193816378bc3987192537e3.png\",\n  \"type\": \"counterparty-logo\",\n  \"userId\": \"68835f15998c6de77ad7a51b\"\n}"
+            },
+            {
+              "name": "No File Uploaded",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "type",
+                      "value": "counterparty-logo",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{rootUrl}}/api/upload/media",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "upload",
+                    "media"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"No file uploaded\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    },
+                    {
+                      "key": "type",
+                      "value": "counterparty-logo",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{rootUrl}}/api/upload/media",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "upload",
+                    "media"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Unauthorized\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Upload media files to AWS S3 organized by user ID and media type"
+    },
+    {
       "name": "Cron",
       "item": [
         {
