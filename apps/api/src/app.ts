@@ -16,6 +16,7 @@ import incomeRoutes from './routes/incomeRoutes';
 import productRoutes from './routes/productRoutes';
 import recurringTransactionRoutes from './routes/recurringTransactionRoutes';
 import tagRoutes from './routes/tagRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api', incomeRoutes);
 app.use('/api', productRoutes);
 app.use('/api', recurringTransactionRoutes);
 app.use('/api', tagRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.use('/', (_req, res) => {
   res.send('Welcome to Fintrak');
