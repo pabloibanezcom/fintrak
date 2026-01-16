@@ -41,10 +41,16 @@ Create `.env` files in `apps/api`:
 MONGODB_URI=mongodb://localhost:27017/fintrak
 JWT_SECRET=your-secret-key
 MI_AUTH_UI=your-mi-auth-url
-MI_API=your-mi-api-url  
+MI_API=your-mi-api-url
 MI_USER=your-mi-username
 MI_PASS=your-mi-password
 PORT=3000
+
+# AWS S3 Configuration (for media uploads)
+AWS_REGION=eu-west-1
+S3_BUCKET_NAME=fintrak-media-prod
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 ```
 
 ## 🛠️ Development

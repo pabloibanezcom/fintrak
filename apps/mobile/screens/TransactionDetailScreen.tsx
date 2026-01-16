@@ -9,21 +9,50 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { Expense } from '@fintrak/types';
+import type { Expense, Counterparty } from '@fintrak/types';
 import { commonStyles, componentStyles, colors, spacing, typography } from '../styles';
 import { formatExpenseAmount } from '../utils/currency';
 import UserProfile from '../components/UserProfile';
 
+/**
+ * Transaction Detail Screen
+ *
+ * Displays comprehensive details for a single transaction including:
+ * - Transaction amount, date, and time
+ * - Category with color-coded badge
+ * - Payee/counterparty information with logo
+ * - Tags, description, and metadata
+ * - Navigable counterparty details
+ *
+ * @example
+ * <TransactionDetailScreen
+ *   transaction={selectedTransaction}
+ *   onBack={() => navigateBack()}
+ *   onNavigateToProfile={() => navigateToProfile()}
+ *   onNavigateToCounterpartyDetail={(cp) => showCounterpartyDetail(cp)}
+ * />
+ *
+ * @component
+ */
 interface TransactionDetailScreenProps {
+  /** The transaction to display in detail view */
   transaction: Expense;
+
+  /** Callback when user presses back button */
   onBack: () => void;
+
+  /** Callback when user taps profile avatar */
   onNavigateToProfile: () => void;
+
+  /** Optional callback when user taps on payee to view counterparty details */
+  onNavigateToCounterpartyDetail?: (counterparty: Counterparty) => void;
 }
 
 export default function TransactionDetailScreen({
   transaction,
   onBack,
   onNavigateToProfile,
+  onNavigateToCounterpartyDetail,
 }: TransactionDetailScreenProps) {
   const getCategoryIcon = (category?: { name: string }) => {
     if (!category) return '💰';
@@ -87,7 +116,7 @@ export default function TransactionDetailScreen({
             <View style={styles.iconSection}>
               {hasLogo ? (
                 <Image
-                  source={{ uri: transaction.payee.logo }}
+                  source={{ uri: transaction.payee!.logo }}
                   style={[styles.logoImage, { borderColor: categoryColor }]}
                   resizeMode="cover"
                 />
@@ -147,15 +176,22 @@ export default function TransactionDetailScreen({
             </View>
 
             {transaction.payee && (
-              <View style={styles.detailRow}>
+              <TouchableOpacity
+                style={styles.detailRow}
+                onPress={() => onNavigateToCounterpartyDetail?.(transaction.payee!)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.detailIcon}>
                   <Ionicons name="business-outline" size={20} color={colors.text.secondary} />
                 </View>
                 <View style={styles.detailContent}>
                   <Text style={styles.detailLabel}>Payee</Text>
-                  <Text style={styles.detailValue}>{transaction.payee.name}</Text>
+                  <View style={styles.counterpartyRow}>
+                    <Text style={styles.detailValue}>{transaction.payee.name}</Text>
+                    <Ionicons name="chevron-forward" size={16} color={colors.text.secondary} />
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
           </View>
 
@@ -322,6 +358,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text.primary,
     fontWeight: typography.weights.medium,
+  },
+  counterpartyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   monoText: {
     fontFamily: 'monospace',

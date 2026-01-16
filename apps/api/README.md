@@ -61,6 +61,12 @@ A TypeScript Express.js API for financial tracking that integrates with external
    MI_API=https://api.mi-service.com/v1
    MI_USER=your-mi-username
    MI_PASS=your-mi-password
+
+   # AWS S3 Configuration (for media uploads)
+   AWS_REGION=eu-west-1
+   S3_BUCKET_NAME=fintrak-media-prod
+   AWS_ACCESS_KEY_ID=your-aws-access-key-id
+   AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
    ```
 
 4. **Start the development server**
@@ -181,6 +187,120 @@ The application integrates with an external financial institution (MI) service t
 - **Data Transformation**: Converts MI service responses to standardized formats
 - **Retry Logic**: Automatic retry on authentication failures
 
+## Media Upload (S3 Integration)
+
+The API supports file uploads to AWS S3 for media storage such as counterparty logos, profile pictures, receipts, and documents.
+
+### Features
+
+- 📤 **Secure Uploads**: JWT-authenticated endpoint for file uploads
+- 🗂️ **Organized Storage**: Files organized by user and media type
+- ✅ **Validation**: File type (images/PDFs) and size (10MB max) validation
+- 🌐 **Public URLs**: Returns public S3 URLs for uploaded files
+- 🔒 **IAM Security**: Uses AWS IAM credentials for secure bucket access
+
+### Setup
+
+1. **Create an S3 Bucket**
+   ```bash
+   # Create bucket in AWS Console or via CLI
+   aws s3 mb s3://fintrak-media-prod --region eu-west-1
+   ```
+
+2. **Configure Bucket Permissions**
+   - Enable public read access for uploaded files
+   - Configure CORS for web uploads (if needed)
+
+   Example bucket policy:
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Sid": "PublicReadGetObject",
+         "Effect": "Allow",
+         "Principal": "*",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::fintrak-media-prod/*"
+       }
+     ]
+   }
+   ```
+
+3. **Create IAM User with S3 Permissions**
+
+   Required IAM policy:
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": [
+           "s3:PutObject",
+           "s3:GetObject",
+           "s3:DeleteObject"
+         ],
+         "Resource": "arn:aws:s3:::fintrak-media-prod/*"
+       }
+     ]
+   }
+   ```
+
+4. **Configure Environment Variables**
+
+   Add AWS credentials to your `.env` file (see Environment Setup above)
+
+### File Organization
+
+Files are automatically organized in S3 with the following structure:
+```
+s3://fintrak-media-prod/
+└── users/
+    └── {userId}/
+        ├── counterparty-logo/
+        │   └── filename.jpg
+        ├── profile-picture/
+        │   └── avatar.png
+        ├── receipt/
+        │   └── receipt-123.pdf
+        ├── document/
+        │   └── statement.pdf
+        └── other/
+            └── file.jpg
+```
+
+### Usage Example
+
+```bash
+# Upload a counterparty logo
+curl -X POST http://localhost:3000/api/upload/media \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -F "file=@logo.jpg" \
+  -F "type=counterparty-logo"
+
+# Response
+{
+  "url": "https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/123/counterparty-logo/logo.jpg",
+  "type": "counterparty-logo",
+  "userId": "123"
+}
+```
+
+### Supported Media Types
+
+- `counterparty-logo` - Company/vendor logos
+- `profile-picture` - User profile avatars
+- `receipt` - Transaction receipts
+- `document` - Financial documents
+- `other` - Miscellaneous files
+
+### File Restrictions
+
+- **Allowed types**: Images (JPEG, PNG, GIF, WebP) and PDFs
+- **Maximum size**: 10MB per file
+- **Authentication**: JWT token required
+
 ## Environment Variables
 
 | Variable | Description | Required | Default |
@@ -192,6 +312,12 @@ The application integrates with an external financial institution (MI) service t
 | `MI_API` | MI service API base URL | Yes | - |
 | `MI_USER` | MI service username | Yes | - |
 | `MI_PASS` | MI service password | Yes | - |
+| `AWS_REGION` | AWS region for S3 bucket | No | eu-west-1 |
+| `S3_BUCKET_NAME` | S3 bucket name for media storage | No | fintrak-media-prod |
+| `AWS_ACCESS_KEY_ID` | AWS IAM access key ID | Yes* | - |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM secret access key | Yes* | - |
+
+*Required only if using media upload features
 
 ## Contributing
 
