@@ -1,0 +1,238 @@
+================================================================================
+                     FINTRAK TEST COVERAGE SUMMARY
+================================================================================
+
+CURRENT STATE:
+- Total source files: 84
+- Files with tests: 23 (27%)
+- Files needing tests: 61 (73%)
+- Test files: ~25 test suites
+
+QUICK REFERENCE BY PRIORITY:
+
+CRITICAL (7 items - Test Immediately)
+├── Auth Middleware (1 file)
+├── Bank Controller + TinkService (2 files)
+├── Upload Controller + S3Service (2 files)
+├── UserContext (1 file)
+└── AuthStorage + Mobile API Service (2 files)
+
+HIGH (13 items - High Impact)
+├── Routes: bank, upload, analytics, expense, income, product, recurring, 
+│           crypto, import, tag, cron (11 route tests)
+├── Query Utils (1 file)
+├── Google Sign-In Hook (1 file)
+└── Mobile Screens (8 screens - critical UI tests)
+
+MEDIUM (16 items - Important for Data Integrity)
+├── Remaining Models (6 files)
+├── Utilities: mongo, auth, error (3 files)
+├── Mobile Components (8 components)
+└── Theme Context (1 file)
+
+LOW (25 items - Nice to Have)
+├── Configuration files (3 files)
+├── Service utilities: MICast, etc (2 files)
+├── Type definitions (22 files)
+└── Currency utilities expansion
+
+================================================================================
+                           EXISTING COVERAGE
+================================================================================
+
+API LAYER (18 tests)
+  Controllers: 10/18 covered
+    ✓ Auth, Category, Counterparty, Income, Expense, Recurring, Product
+    ✓ CryptoAsset, Import, Analytics
+    ✗ Bank, Upload, Tag, Cron (CRITICAL GAPS)
+
+  Services: 2/10 covered
+    ✓ MI (with caching), CoinGecko
+    ✗ S3, Tink, GenericImport, ProductComparison, TransactionSearch,
+      GoCardless, MICast (HIGH IMPACT GAPS)
+
+  Routes: 2/14 covered
+    ✓ Auth, Category
+    ✗ Bank, Upload, Analytics, Counterparty, Expense, Income, Product,
+      Recurring, Crypto, Import, Tag, Cron (INTEGRATION GAPS)
+
+  Models: 5/11 covered
+    ✓ User, Category, Counterparty, Recurring, CryptoAsset
+    ✗ Transaction, Expense, Income, Tag, ProductSnapshot, Product
+
+  Utilities: 0/4 covered
+    ✗ queryUtils, mongoUtils, authUtils, errorUtils
+
+  Middleware: 0/3 covered
+    ✗ Auth (CRITICAL), Passport, DB
+
+  Integration: 1/1 covered
+    ✓ Counterparty integration test
+
+MOBILE LAYER (4 tests)
+  Screens: 2/10 covered
+    ✓ Login, Expenses
+    ✗ Home, Profile, EditProfile, Settings, Statistics, Investments,
+      MonthlySummary, TransactionDetail, CounterpartyDetail
+
+  Context: 0/2 covered
+    ✗ UserContext (CRITICAL), ThemeContext
+
+  Services: 1/1 covered (PARTIAL)
+    ~ API service - needs expansion for all endpoints
+
+  Utilities: 1/2 covered (PARTIAL)
+    ~ Currency - needs edge case tests
+    ✗ AuthStorage (CRITICAL)
+
+  Hooks: 0/1 covered
+    ✗ useGoogleSignIn
+
+  Components: 0/8 covered
+    ✗ AddModal, Button, Input, Card, BottomNavigation, TransactionList,
+      UserProfile, ExpenseDetailModal
+
+TYPES (0 tests)
+  - Type definitions are compile-time safe
+  - Could benefit from runtime validation tests
+
+================================================================================
+                       TESTING BY BUSINESS DOMAIN
+================================================================================
+
+AUTHENTICATION & SECURITY
+  Current: Auth controller (partial), Login screen
+  Missing: Auth middleware (CRITICAL), AuthStorage (CRITICAL),
+           User context (CRITICAL), OAuth flow
+  Impact: HIGH - Foundation of all user features
+
+FINANCIAL TRANSACTIONS
+  Current: Expense, Income, Recurring controllers (partial)
+  Missing: Transaction routes, Search service, Analytics, Detail screens
+  Impact: HIGH - Core feature
+
+BANK INTEGRATION
+  Current: None
+  Missing: Bank controller (CRITICAL), Tink service (CRITICAL),
+           GoCardless service, Bank routes
+  Impact: CRITICAL - New major feature
+
+FILE MANAGEMENT
+  Current: None
+  Missing: Upload controller (CRITICAL), S3 service (CRITICAL),
+           Upload routes
+  Impact: CRITICAL - Media upload feature
+
+DATA IMPORT/EXPORT
+  Current: Import controller (partial)
+  Missing: Generic import service (CRITICAL), Import routes
+  Impact: HIGH - User data migration
+
+ANALYTICS & REPORTING
+  Current: Analytics controller (partial)
+  Missing: Analytics routes, Product comparison service, ProductSnapshot
+           service, Period summary calculation
+  Impact: HIGH - Dashboard features
+
+CRYPTOCURRENCY
+  Current: CryptoAsset controller (partial), CoinGecko service (partial)
+  Missing: Crypto routes, More edge case tests
+  Impact: MEDIUM - Portfolio feature
+
+USER MANAGEMENT
+  Current: User model, Auth controller
+  Missing: User context (CRITICAL), User screens, Profile editing
+  Impact: HIGH - User profile features
+
+================================================================================
+                        RECOMMENDED TEST ORDER
+================================================================================
+
+WEEK 1: Foundation (Critical Auth & Core APIs)
+  1. Auth middleware tests
+  2. AuthStorage tests
+  3. UserContext tests
+  4. Auth/Login endpoint tests (strengthen existing)
+
+WEEK 2: API Layer Core Services
+  5. S3Service + UploadController tests
+  6. TinkService + BankController tests
+  7. GenericImportService tests
+  8. CronController tests
+
+WEEK 3: API Routes & Query Building
+  9. Bank routes tests
+  10. Upload routes tests
+  11. QueryUtils tests
+  12. All transaction routes tests
+
+WEEK 4: Mobile Layer
+  13. Mobile API service expansion tests
+  14. UserContext integration with mobile
+  15. useGoogleSignIn hook tests
+  16. AuthStorage integration
+
+WEEK 5: Advanced Services
+  17. TransactionSearchService tests
+  18. ProductComparisonService tests
+  19. Analytics endpoint tests
+  20. GoCardlessService tests
+
+WEEK 6+: Mobile Screens & Components
+  21. Home screen tests
+  22. Profile screens tests
+  23. Investment screens tests
+  24. UI component tests (Add, Button, Input, etc)
+
+================================================================================
+                          TEST INFRASTRUCTURE
+================================================================================
+
+AVAILABLE TOOLS:
+  ✓ Jest configured in both apps
+  ✓ Testing Library (React Native, DOM)
+  ✓ Supertest for HTTP testing
+  ✓ MongoDB test database setup
+  ✓ Existing test helpers (testDb.ts, testApp.ts)
+  ✓ Mock support for axios, fetch
+
+RECOMMENDED ADDITIONS:
+  - Consistent mock factory patterns for all models
+  - Test data fixtures/seeds
+  - API response mocking utilities
+  - E2E test configuration
+  - Code coverage reporting setup
+
+================================================================================
+                            KEY METRICS
+================================================================================
+
+Test Coverage Goals:
+  Critical path: 90%+ coverage
+  Important features: 80%+ coverage
+  Supporting code: 60%+ coverage
+  Overall target: 70%+ coverage
+
+Current Status:
+  Critical path: ~30% coverage
+  Important features: ~35% coverage
+  Supporting code: ~10% coverage
+  Overall: ~27% coverage
+
+Gap Analysis:
+  +60% coverage needed for critical path
+  +45% coverage needed for important features
+  +50% coverage needed for supporting code
+  +43% overall coverage improvement needed
+
+Estimated Effort:
+  80 test cases for critical path (~40 hours)
+  60 test cases for important features (~30 hours)
+  40 test cases for supporting code (~20 hours)
+  Total: ~90 hours for comprehensive coverage
+
+================================================================================
+
+Generated: 2024-11-10
+Report covers: All files in apps/api, apps/mobile, packages/types
+
