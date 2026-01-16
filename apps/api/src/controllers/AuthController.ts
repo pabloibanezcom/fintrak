@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import User, { type IUser } from '../models/UserModel';
 import { requireAuth } from '../utils/authUtils';
+import { uploadFile, deleteFile } from '../services/s3Service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'defaultsecret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -254,9 +255,41 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid image format' });
     }
 
+    // Extract the base64 data and mime type
+    const matches = profilePicture.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!matches) {
+      return res.status(400).json({ error: 'Invalid base64 image format' });
+    }
+
+    const [, imageType, base64Data] = matches;
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Get current user to check for existing profile picture
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Delete old profile picture from S3 if it exists and is an S3 URL
+    if (currentUser.profilePicture?.includes('s3.') && currentUser.profilePicture.includes('profile-picture')) {
+      try {
+        await deleteFile(currentUser.profilePicture);
+      } catch (deleteError) {
+        console.error('Failed to delete old profile picture:', deleteError);
+        // Continue with upload even if delete fails
+      }
+    }
+
+    // Upload to S3
+    const s3Url = await uploadFile(buffer, `profile.${imageType}`, {
+      userId,
+      mediaType: 'profile-picture',
+    });
+
+    // Update user with new S3 URL
     const user = await User.findByIdAndUpdate(
       userId,
-      { profilePicture },
+      { profilePicture: s3Url },
       { new: true, runValidators: true }
     ).select('-password');
 
@@ -274,7 +307,8 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
-  } catch (_err) {
+  } catch (err) {
+    console.error('Failed to update profile picture:', err);
     res.status(500).json({ error: 'Failed to update profile picture' });
   }
 };
