@@ -7,6 +7,7 @@ import StatisticsScreen from './screens/StatisticsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import TransactionDetailScreen from './screens/TransactionDetailScreen';
+import CounterpartyDetailScreen from './screens/CounterpartyDetailScreen';
 import LoginScreen from './screens/LoginScreen';
 import BottomNavigation from './components/BottomNavigation';
 import AddModal from './components/AddModal';
@@ -15,10 +16,10 @@ import { UserProvider, useUser } from './context/UserContext';
 import { authStorage } from './utils/authStorage';
 import { apiService } from './services/api';
 import { colors, commonStyles } from './styles';
-import type { Expense } from '@fintrak/types';
+import type { Expense, Counterparty } from '@fintrak/types';
 
 type TabName = 'home' | 'expenses' | 'investments' | 'statistics';
-type ScreenName = TabName | 'profile' | 'transactionDetail';
+type ScreenName = TabName | 'profile' | 'transactionDetail' | 'counterpartyDetail';
 
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,6 +30,7 @@ function AppContent() {
   const [showProfile, setShowProfile] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Expense | null>(null);
+  const [selectedCounterparty, setSelectedCounterparty] = useState<Counterparty | null>(null);
   const [selectedMonthDate, setSelectedMonthDate] = useState<Date | undefined>(undefined);
   const [fadeAnim] = useState(new Animated.Value(1));
   const [slideAnim] = useState(new Animated.Value(1000));
@@ -209,8 +211,71 @@ function AppContent() {
     }, 150);
   };
 
+  const handleNavigateToCounterpartyDetail = (counterparty: Counterparty) => {
+    setSelectedCounterparty(counterparty);
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      setCurrentScreen('counterpartyDetail');
+    }, 150);
+  };
+
+  const handleBackFromCounterpartyDetail = () => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    setTimeout(() => {
+      setCurrentScreen('transactionDetail');
+      setSelectedCounterparty(null);
+    }, 150);
+  };
+
+  const handleCounterpartyUpdate = (updatedCounterparty: Counterparty) => {
+    setSelectedCounterparty(updatedCounterparty);
+    // Update the transaction's payee if it's currently selected
+    if (selectedTransaction && selectedTransaction.payee?.key === updatedCounterparty.key) {
+      setSelectedTransaction({
+        ...selectedTransaction,
+        payee: updatedCounterparty,
+      });
+    }
+  };
+
   const renderActiveScreen = () => {
     const handleNavigateHome = () => handleTabPress('home');
+
+    // Handle counterparty detail screen
+    if (currentScreen === 'counterpartyDetail' && selectedCounterparty) {
+      return (
+        <CounterpartyDetailScreen
+          counterparty={selectedCounterparty}
+          onBack={handleBackFromCounterpartyDetail}
+          onNavigateToProfile={handleNavigateToProfile}
+          onUpdate={handleCounterpartyUpdate}
+        />
+      );
+    }
 
     // Handle transaction detail screen
     if (currentScreen === 'transactionDetail' && selectedTransaction) {
@@ -219,6 +284,7 @@ function AppContent() {
           transaction={selectedTransaction}
           onBack={handleBackFromTransactionDetail}
           onNavigateToProfile={handleNavigateToProfile}
+          onNavigateToCounterpartyDetail={handleNavigateToCounterpartyDetail}
         />
       );
     }

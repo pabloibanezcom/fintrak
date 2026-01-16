@@ -5,6 +5,7 @@ import type {
   AuthResponse,
   LoginRequest,
   UserProducts,
+  Counterparty,
 } from '@fintrak/types';
 
 export interface PeriodSummaryResponse {
@@ -186,6 +187,94 @@ class ApiService {
     const endpoint = compare ? `/products?compare=${compare}` : '/products';
     return this.request<UserProducts>(endpoint);
   }
+
+  /**
+   * Fetches full counterparty details by ID
+   *
+   * @param id - Counterparty unique key
+   * @returns Promise resolving to complete Counterparty object
+   * @throws {Error} API request failed with status code
+   *
+   * @example
+   * const counterparty = await apiService.getCounterparty('amazon');
+   */
+  async getCounterparty(id: string): Promise<Counterparty> {
+    return this.request<Counterparty>(`/counterparties/${id}`);
+  }
+
+  /**
+   * Updates counterparty information
+   *
+   * Supports partial updates - only provided fields will be updated.
+   *
+   * @param id - Counterparty unique key
+   * @param data - Partial counterparty data to update
+   * @returns Promise resolving to updated Counterparty object
+   * @throws {Error} API request failed or counterparty not found
+   *
+   * @example
+   * const updated = await apiService.updateCounterparty('amazon', {
+   *   email: 'newemail@amazon.com',
+   *   phone: '+1-800-123-4567'
+   * });
+   */
+  async updateCounterparty(id: string, data: Partial<Counterparty>): Promise<Counterparty> {
+    return this.request<Counterparty>(`/counterparties/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Uploads media file to S3 storage via API
+   *
+   * Uploads images or PDFs to organized S3 bucket structure.
+   * Files are organized as: users/{userId}/{mediaType}/{filename}
+   *
+   * @param formData - FormData containing:
+   *   - file: Image or PDF file (max 10MB)
+   *   - type: One of 'counterparty-logo', 'profile-picture', 'receipt', 'document', 'other'
+   * @returns Promise resolving to upload result with S3 URL
+   * @throws {Error} Upload failed or file validation error
+   *
+   * @example
+   * const formData = new FormData();
+   * formData.append('file', {
+   *   uri: imageUri,
+   *   name: 'logo.jpg',
+   *   type: 'image/jpeg'
+   * });
+   * formData.append('type', 'counterparty-logo');
+   * const result = await apiService.uploadMedia(formData);
+   * console.log(result.url); // S3 public URL
+   */
+  async uploadMedia(formData: FormData): Promise<{ url: string; type: string; userId: string }> {
+    const url = `${API_BASE_URL}/upload/media`;
+
+    const headers: Record<string, string> = {};
+
+    if (this.token) {
+      headers.Authorization = `Bearer ${this.token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  }
 }
 
 export const apiService = new ApiService();
+
+// Export helper functions for convenience
+export const uploadMedia = (formData: FormData) => apiService.uploadMedia(formData);
+export const updateCounterparty = (id: string, data: Partial<Counterparty>) =>
+  apiService.updateCounterparty(id, data);
+export const getCounterparty = (id: string) => apiService.getCounterparty(id);
