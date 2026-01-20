@@ -4,6 +4,62 @@ import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
+// Callback route must be BEFORE authenticate middleware (it's a redirect from TrueLayer)
+/**
+ * @swagger
+ * /api/bank/callback:
+ *   get:
+ *     summary: Handle OAuth callback
+ *     description: Exchange authorization code for access token and store bank connection. The state parameter contains the user ID.
+ *     tags: [Bank Integration (TrueLayer)]
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Authorization code from TrueLayer
+ *       - in: query
+ *         name: state
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: State parameter containing user ID
+ *     responses:
+ *       200:
+ *         description: Bank connection successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Bank connection successful
+ *                 accountsConnected:
+ *                   type: number
+ *                   example: 2
+ *                 accounts:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       accountId:
+ *                         type: string
+ *                       iban:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       type:
+ *                         type: string
+ *                       provider:
+ *                         type: string
+ *       400:
+ *         description: Missing authorization code or state
+ */
+router.get('/callback', controller.handleCallback);
+
+// All routes below require authentication
 router.use(authenticate);
 
 /**
@@ -11,22 +67,31 @@ router.use(authenticate);
  * /api/bank/providers:
  *   get:
  *     summary: Get available bank providers
- *     description: Retrieves list of available banks/providers via Tink (filtered by market). Requires user authentication token from Tink OAuth flow.
- *     tags: [Bank Integration (Tink)]
+ *     description: Retrieves list of supported Spanish banks (Santander, BBVA) via TrueLayer.
+ *     tags: [Bank Integration (TrueLayer)]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: market
- *         schema:
- *           type: string
- *           default: ES
- *         description: Market code (defaults to ES for Spain)
  *     responses:
  *       200:
  *         description: Providers retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: es-santander-oauth2
+ *                   name:
+ *                     type: string
+ *                     example: Santander
+ *                   logo:
+ *                     type: string
+ *                     example: https://truelayer-provider-assets.s3.amazonaws.com/es/logos/santander.svg
  *       401:
- *         description: User token required (get token from /authorize flow)
+ *         description: User not authenticated
  */
 router.get('/providers', controller.getProviders);
 
@@ -35,8 +100,8 @@ router.get('/providers', controller.getProviders);
  * /api/bank/authorize:
  *   post:
  *     summary: Get authorization URL
- *     description: Generate Tink authorization URL for user to connect their bank
- *     tags: [Bank Integration (Tink)]
+ *     description: Generate TrueLayer authorization URL for user to connect their bank account
+ *     tags: [Bank Integration (TrueLayer)]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -51,9 +116,10 @@ router.get('/providers', controller.getProviders);
  *               redirectUri:
  *                 type: string
  *                 description: URL to redirect after bank authentication
+ *                 example: https://yourapp.com/bank-callback
  *               state:
  *                 type: string
- *                 description: Optional state parameter for security
+ *                 description: Optional state parameter for security (CSRF protection)
  *     responses:
  *       200:
  *         description: Authorization URL generated
@@ -64,79 +130,143 @@ router.get('/providers', controller.getProviders);
  *               properties:
  *                 authorizationUrl:
  *                   type: string
+ *                   example: https://auth.truelayer-sandbox.com/?response_type=code&client_id=...
+ *       400:
+ *         description: Missing required field
+ *       401:
+ *         description: User not authenticated
  */
 router.post('/authorize', controller.getAuthorizationUrl);
 
 /**
  * @swagger
- * /api/bank/callback:
+ * /api/bank/connections:
  *   get:
- *     summary: Handle OAuth callback
- *     description: Exchange authorization code for access token
- *     tags: [Bank Integration (Tink)]
- *     parameters:
- *       - in: query
- *         name: code
- *         required: true
- *         schema:
- *           type: string
- *         description: Authorization code from Tink
+ *     summary: Get all bank connections
+ *     description: Retrieves all connected banks for the user (Santander, BBVA, etc.)
+ *     tags: [Bank Integration (TrueLayer)]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Authorization successful
+ *         description: Bank connections retrieved
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 accessToken:
- *                   type: string
- *                 expiresIn:
- *                   type: number
- *                 refreshToken:
- *                   type: string
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   bankId:
+ *                     type: string
+ *                     example: santander
+ *                   bankName:
+ *                     type: string
+ *                     example: Santander
+ *                   connectedAccounts:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         accountId:
+ *                           type: string
+ *                         iban:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         type:
+ *                           type: string
+ *                         currency:
+ *                           type: string
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                   updatedAt:
+ *                     type: string
+ *                     format: date-time
+ *       401:
+ *         description: User not authenticated
  */
-router.get('/callback', controller.handleCallback);
+router.get('/connections', controller.getConnections);
+
+/**
+ * @swagger
+ * /api/bank/connections/{bankId}:
+ *   delete:
+ *     summary: Delete a bank connection
+ *     description: Removes a bank connection and all associated data
+ *     tags: [Bank Integration (TrueLayer)]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bankId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bank ID (e.g., santander, bbva)
+ *     responses:
+ *       200:
+ *         description: Bank connection deleted successfully
+ *       401:
+ *         description: User not authenticated
+ *       404:
+ *         description: Connection not found
+ */
+router.delete('/connections/:bankId', controller.deleteConnection);
 
 /**
  * @swagger
  * /api/bank/accounts:
  *   get:
  *     summary: Get connected bank accounts
- *     description: Retrieves user's connected bank accounts from Tink
- *     tags: [Bank Integration (Tink)]
+ *     description: Retrieves user's connected bank accounts from TrueLayer
+ *     tags: [Bank Integration (TrueLayer)]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Connected accounts retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   account_id:
+ *                     type: string
+ *                   account_type:
+ *                     type: string
+ *                     enum: [TRANSACTION, SAVINGS, BUSINESS, OTHER]
+ *                   display_name:
+ *                     type: string
+ *                   currency:
+ *                     type: string
+ *                   account_number:
+ *                     type: object
+ *                     properties:
+ *                       iban:
+ *                         type: string
+ *                   provider:
+ *                     type: object
+ *                     properties:
+ *                       display_name:
+ *                         type: string
+ *       401:
+ *         description: User not authenticated
+ *       404:
+ *         description: No bank connection found
  */
 router.get('/accounts', controller.getAccounts);
 
 /**
  * @swagger
- * /api/bank/transactions:
+ * /api/bank/accounts/{accountId}/balance:
  *   get:
- *     summary: Get all transactions
- *     description: Retrieves all transactions from all connected accounts
- *     tags: [Bank Integration (Tink)]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Transactions retrieved successfully
- */
-router.get('/transactions', controller.getTransactions);
-
-/**
- * @swagger
- * /api/bank/accounts/{accountId}/transactions:
- *   get:
- *     summary: Get account transactions
- *     description: Retrieves transactions for a specific bank account from Tink
- *     tags: [Bank Integration (Tink)]
+ *     summary: Get account balance
+ *     description: Retrieves current balance for a specific bank account
+ *     tags: [Bank Integration (TrueLayer)]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -148,7 +278,89 @@ router.get('/transactions', controller.getTransactions);
  *         description: Bank account ID
  *     responses:
  *       200:
+ *         description: Balance retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 currency:
+ *                   type: string
+ *                   example: EUR
+ *                 available:
+ *                   type: number
+ *                   example: 1234.56
+ *                 current:
+ *                   type: number
+ *                   example: 1234.56
+ *                 overdraft:
+ *                   type: number
+ *       401:
+ *         description: User not authenticated
+ *       404:
+ *         description: No bank connection found
+ */
+router.get('/accounts/:accountId/balance', controller.getBalance);
+
+/**
+ * @swagger
+ * /api/bank/accounts/{accountId}/transactions:
+ *   get:
+ *     summary: Get account transactions
+ *     description: Retrieves transactions for a specific bank account from TrueLayer
+ *     tags: [Bank Integration (TrueLayer)]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: accountId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bank account ID
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for transactions (ISO 8601)
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for transactions (ISO 8601)
+ *     responses:
+ *       200:
  *         description: Transactions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   transaction_id:
+ *                     type: string
+ *                   timestamp:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   transaction_type:
+ *                     type: string
+ *                     enum: [DEBIT, CREDIT]
+ *                   transaction_category:
+ *                     type: string
+ *                   amount:
+ *                     type: number
+ *                   currency:
+ *                     type: string
+ *                   merchant_name:
+ *                     type: string
+ *       401:
+ *         description: User not authenticated
+ *       404:
+ *         description: No bank connection found
  */
 router.get('/accounts/:accountId/transactions', controller.getTransactions);
 

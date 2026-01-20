@@ -1,24 +1,15 @@
 import type { Request, Response } from 'express';
-import TinkService from '../services/TinkService';
+import BankConnection, {
+  type IBankConnection,
+} from '../models/BankConnectionModel';
+import TrueLayerService from '../services/TrueLayerService';
 
 export const getProviders = async (
-  req: Request,
+  _req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    console.log('=== GET PROVIDERS REQUEST ===');
-    const market = (req.query.market as string) || 'ES';
-    console.log('Market:', market);
-
-    // Extract user token if provided (Tink requires USER token for this endpoint)
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      TinkService.setUserToken(token);
-    }
-
-    const providers = await TinkService.getProviders(market);
-
+    const providers = TrueLayerService.getSupportedProviders();
     res.json(providers);
   } catch (error) {
     console.error('Get providers error:', error);
@@ -36,17 +27,25 @@ export const getAuthorizationUrl = async (
   try {
     const { redirectUri, state } = req.body;
 
-    if (!redirectUri) {
+    // Use env variable as default, fall back to request body
+    const finalRedirectUri =
+      process.env.TRUELAYER_REDIRECT_URI || redirectUri;
+
+    if (!finalRedirectUri) {
       res.status(400).json({
-        error: 'Missing required field',
-        message: 'redirectUri is required',
+        error: 'Missing redirect URI',
+        message:
+          'Set TRUELAYER_REDIRECT_URI env variable or provide redirectUri in request body',
       });
       return;
     }
 
-    const authUrl = TinkService.getAuthorizationUrl(redirectUri, state);
+    const authUrl = TrueLayerService.getAuthorizationUrl(
+      finalRedirectUri,
+      state
+    );
 
-    res.json({ authorizationUrl: authUrl });
+    res.json({ authorizationUrl: authUrl, redirectUri: finalRedirectUri });
   } catch (error) {
     console.error('Get authorization URL error:', error);
     res.status(500).json({
@@ -61,7 +60,18 @@ export const handleCallback = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { code } = req.query;
+    const { code, state } = req.query;
+
+    // User ID is passed via state parameter since this is a redirect (no JWT)
+    const userId = state as string;
+
+    if (!userId) {
+      res.status(400).json({
+        error: 'Missing state parameter',
+        message: 'State parameter containing user ID is required',
+      });
+      return;
+    }
 
     if (!code || typeof code !== 'string') {
       res.status(400).json({
@@ -71,14 +81,58 @@ export const handleCallback = async (
       return;
     }
 
-    const tokenResponse = await TinkService.exchangeAuthorizationCode(code);
+    const redirectUri =
+      process.env.TRUELAYER_REDIRECT_URI ||
+      `${req.protocol}://${req.get('host')}/api/bank/callback`;
 
-    // In a real app, you'd store these tokens securely associated with the user
+    const tokenResponse = await TrueLayerService.exchangeCode(
+      code,
+      redirectUri
+    );
+
+    const accounts = await TrueLayerService.getAccounts(
+      tokenResponse.access_token
+    );
+
+    if (accounts.length === 0) {
+      res.status(400).json({
+        error: 'No accounts found',
+        message: 'No bank accounts were returned from the provider',
+      });
+      return;
+    }
+
+    // Get bank info from the first account's provider
+    const bankName = accounts[0].provider?.display_name || 'Unknown Bank';
+    // Create a normalized bank ID from the provider name
+    const bankId = bankName.toLowerCase().replace(/\s+/g, '-');
+
+    const connectedAccounts = accounts.map((account) => ({
+      accountId: account.account_id,
+      iban: account.account_number?.iban,
+      name: account.display_name,
+      type: account.account_type,
+      currency: account.currency,
+    }));
+
+    // Store connection per bank (not per provider)
+    await BankConnection.findOneAndUpdate(
+      { userId, bankId },
+      {
+        bankName,
+        accessToken: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token,
+        expiresAt: new Date(Date.now() + tokenResponse.expires_in * 1000),
+        connectedAccounts,
+      },
+      { upsert: true, new: true }
+    );
+
     res.json({
-      message: 'Authorization successful',
-      accessToken: tokenResponse.access_token,
-      expiresIn: tokenResponse.expires_in,
-      refreshToken: tokenResponse.refresh_token,
+      message: 'Bank connection successful',
+      bank: bankName,
+      accountsConnected: connectedAccounts.length,
+      accounts: connectedAccounts,
     });
   } catch (error) {
     console.error('Handle callback error:', error);
@@ -89,30 +143,166 @@ export const handleCallback = async (
   }
 };
 
+/**
+ * Helper to refresh token if needed and return valid access token
+ */
+async function getValidAccessToken(
+  connection: IBankConnection
+): Promise<string> {
+  if (new Date() >= new Date(connection.expiresAt.getTime() - 60000)) {
+    const tokenResponse = await TrueLayerService.refreshAccessToken(
+      connection.refreshToken
+    );
+
+    connection.accessToken = tokenResponse.access_token;
+    connection.refreshToken = tokenResponse.refresh_token;
+    connection.expiresAt = new Date(
+      Date.now() + tokenResponse.expires_in * 1000
+    );
+    await connection.save();
+
+    return tokenResponse.access_token;
+  }
+  return connection.accessToken;
+}
+
+/**
+ * Find the connection that owns a specific account
+ */
+async function findConnectionByAccountId(
+  userId: string,
+  accountId: string
+): Promise<IBankConnection | null> {
+  return BankConnection.findOne({
+    userId,
+    'connectedAccounts.accountId': accountId,
+  });
+}
+
+export const getConnections = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const connections = await BankConnection.find({ userId }).select(
+      'bankId bankName connectedAccounts createdAt updatedAt'
+    );
+
+    res.json(connections);
+  } catch (error) {
+    console.error('Get connections error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch connections',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
 export const getAccounts = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        error: 'Missing authorization token',
-        message: 'Please provide a Bearer token',
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    // Get all bank connections for the user
+    const connections = await BankConnection.find({ userId });
+
+    if (connections.length === 0) {
+      res.status(404).json({
+        error: 'No bank connections found',
+        message: 'Please connect your bank account first',
       });
       return;
     }
 
-    const token = authHeader.substring(7);
-    TinkService.setUserToken(token);
+    // Fetch accounts from all connected banks
+    const allAccounts = [];
 
-    const accounts = await TinkService.getAccounts();
+    for (const connection of connections) {
+      try {
+        const accessToken = await getValidAccessToken(connection);
+        const accounts = await TrueLayerService.getAccounts(accessToken);
 
-    res.json(accounts);
+        // Add bank info to each account
+        const accountsWithBank = accounts.map((account) => ({
+          ...account,
+          bankId: connection.bankId,
+          bankName: connection.bankName,
+        }));
+
+        allAccounts.push(...accountsWithBank);
+      } catch (err) {
+        console.error(
+          `Failed to fetch accounts from ${connection.bankName}:`,
+          err
+        );
+        // Continue with other banks even if one fails
+      }
+    }
+
+    res.json(allAccounts);
   } catch (error) {
     console.error('Get accounts error:', error);
     res.status(500).json({
       error: 'Failed to fetch accounts',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const getBalance = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { accountId } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    if (!accountId) {
+      res.status(400).json({
+        error: 'Missing account ID',
+        message: 'Account ID is required',
+      });
+      return;
+    }
+
+    // Find which bank connection owns this account
+    const connection = await findConnectionByAccountId(userId, accountId);
+
+    if (!connection) {
+      res.status(404).json({
+        error: 'Account not found',
+        message: 'No bank connection found for this account',
+      });
+      return;
+    }
+
+    const accessToken = await getValidAccessToken(connection);
+    const balance = await TrueLayerService.getBalance(accessToken, accountId);
+
+    res.json(balance);
+  } catch (error) {
+    console.error('Get balance error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch balance',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
@@ -124,28 +314,79 @@ export const getTransactions = async (
 ): Promise<void> => {
   try {
     const { accountId } = req.params;
-    const authHeader = req.headers.authorization;
+    const { from, to } = req.query;
+    const userId = req.user?.id;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        error: 'Missing authorization token',
-        message: 'Please provide a Bearer token',
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    if (!accountId) {
+      res.status(400).json({
+        error: 'Missing account ID',
+        message: 'Account ID is required',
       });
       return;
     }
 
-    const token = authHeader.substring(7);
-    TinkService.setUserToken(token);
+    // Find which bank connection owns this account
+    const connection = await findConnectionByAccountId(userId, accountId);
 
-    const transactions = accountId
-      ? await TinkService.getTransactions(accountId)
-      : await TinkService.getAllTransactions();
+    if (!connection) {
+      res.status(404).json({
+        error: 'Account not found',
+        message: 'No bank connection found for this account',
+      });
+      return;
+    }
+
+    const accessToken = await getValidAccessToken(connection);
+    const transactions = await TrueLayerService.getTransactions(
+      accessToken,
+      accountId,
+      from as string | undefined,
+      to as string | undefined
+    );
 
     res.json(transactions);
   } catch (error) {
     console.error('Get transactions error:', error);
     res.status(500).json({
       error: 'Failed to fetch transactions',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const deleteConnection = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { bankId } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const result = await BankConnection.findOneAndDelete({ userId, bankId });
+
+    if (!result) {
+      res.status(404).json({
+        error: 'Connection not found',
+        message: 'No bank connection found with this ID',
+      });
+      return;
+    }
+
+    res.json({ message: 'Bank connection deleted successfully' });
+  } catch (error) {
+    console.error('Delete connection error:', error);
+    res.status(500).json({
+      error: 'Failed to delete connection',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
