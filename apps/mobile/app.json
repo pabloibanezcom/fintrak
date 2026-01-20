@@ -6,7 +6,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "primaryColor": "#0066FF",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -38,11 +39,15 @@
             "./assets/fonts/PlusJakartaSans_700Bold.ttf"
           ]
         }
-      ]
+      ],
+      "expo-router"
     ],
+    "experiments": {
+      "typedRoutes": true
+    },
     "extra": {
       "googleClientIdIos": "116154499655-5oti2e4enpasnalkpvts774euhtmotnm.apps.googleusercontent.com",
-      "apiBaseUrl": "http://192.168.1.72:3000/api"
+      "apiBaseUrl": "http://192.168.1.78:3000/api"
     }
   }
 }

@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import type {
   ExpensesResponse,
@@ -42,15 +43,21 @@ export interface PeriodSummaryResponse {
   latestTransactions: Array<any>;
 }
 
-// Get the appropriate API URL based on platform and configuration
+// Get the appropriate API URL based on platform and device type
 const getApiBaseUrl = (): string => {
-  // If explicitly configured in app.json, use that
   const configuredUrl = Constants.expoConfig?.extra?.apiBaseUrl;
-  if (configuredUrl) {
-    return configuredUrl;
+
+  // Physical device: use the configured IP from app.json
+  if (Device.isDevice) {
+    if (configuredUrl) {
+      return configuredUrl;
+    }
+    // Fallback warning - physical device needs a configured URL
+    console.warn('No apiBaseUrl configured for physical device in app.json');
+    return 'http://localhost:3000/api';
   }
 
-  // Otherwise, use platform-specific localhost URLs
+  // Simulator/Emulator: use platform-specific localhost
   if (Platform.OS === 'android') {
     // Android emulator uses 10.0.2.2 to access host machine's localhost
     return 'http://10.0.2.2:3000/api';
