@@ -1,4 +1,4 @@
-export {
+export type {
   AuthResponse,
   ExpensesResponse,
   LoginRequest,
@@ -6,30 +6,30 @@ export {
   RegisterRequest,
   RegisterResponse,
 } from './Auth';
-export { BaseTransaction } from './BaseTransaction';
-export { CashAccount } from './CashAccount';
-export { Category } from './Category';
-export { Counterparty } from './Counterparty';
-export { CryptoAsset } from './CryptoAsset';
-export { Currency } from './Currency';
-export { Deposit } from './Deposit';
-export { ETC } from './ETC';
-export {
+export type { BaseTransaction } from './BaseTransaction';
+export type { CashAccount } from './CashAccount';
+export type { Category } from './Category';
+export type { Counterparty } from './Counterparty';
+export type { CryptoAsset } from './CryptoAsset';
+export type { Currency } from './Currency';
+export type { Deposit } from './Deposit';
+export type { ETC } from './ETC';
+export type {
   BaseExpense,
   CreateExpenseRequest,
   Expense,
   UpdateExpenseRequest,
 } from './Expense';
-export {
+export type {
   BaseIncome,
   CreateIncomeRequest,
   Income,
   UpdateIncomeRequest,
 } from './Income';
-export { IndexedFund } from './IndexedFund';
-export { Investment, Portfolio } from './Investment';
-export { InvestmentSummary } from './InvestmentSummary';
-export {
+export type { IndexedFund } from './IndexedFund';
+export type { Investment, Portfolio } from './Investment';
+export type { InvestmentSummary } from './InvestmentSummary';
+export type {
   MICashAccount,
   MIDeposit,
   MIETC,
@@ -38,23 +38,23 @@ export {
   MIServiceError,
   TokenData,
 } from './MI';
-export {
+export type {
   DeviceToken,
   PushNotificationPayload,
   RegisterDeviceRequest,
   StoredBankTransaction,
 } from './Notification';
-export { Periodicity } from './Periodicity';
-export { Product } from './Product';
-export {
+export type { Periodicity } from './Periodicity';
+export type { Product } from './Product';
+export type {
   BaseRecurringTransaction,
   CreateRecurringTransactionRequest,
   RecurringTransaction,
   RecurringTransactionPeriodicity,
   UpdateRecurringTransactionRequest,
 } from './RecurringTransaction';
-export { Tag } from './Tag';
-export {
+export type { Tag } from './Tag';
+export type {
   BankTransaction,
   SyncTransactionsRequest,
   SyncTransactionsResponse,
@@ -62,5 +62,5 @@ export {
   TrueLayerBalance,
   TrueLayerTransaction,
 } from './Transaction';
-export { User } from './User';
-export { ProductGroup, ProductItems, UserProducts } from './UserProducts';
+export type { User } from './User';
+export type { ProductGroup, ProductItems, UserProducts } from './UserProducts';

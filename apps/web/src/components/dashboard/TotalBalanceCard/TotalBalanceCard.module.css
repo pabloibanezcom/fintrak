@@ -1,0 +1,126 @@
+.card {
+  display: flex;
+  gap: var(--spacing-4);
+  position: relative;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+}
+
+.avatarIndicator {
+  display: flex;
+  align-items: flex-start;
+  padding-top: var(--spacing-1);
+}
+
+.avatarOuter {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.avatarInner {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral-400);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.badge {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1) var(--spacing-2);
+  background-color: var(--color-neutral-100);
+  border-radius: var(--radius-md);
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.amount {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-xs);
+}
+
+.change.positive {
+  color: var(--color-success-500);
+}
+
+.change.negative {
+  color: var(--color-error-500);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+.transferBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-5);
+  background-color: var(--color-neutral-900);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background-color var(--transition-fast);
+}
+
+.transferBtn:hover {
+  background-color: var(--color-neutral-800);
+}
+
+.requestBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-5);
+  background-color: var(--color-neutral-100);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background-color var(--transition-fast);
+}
+
+.requestBtn:hover {
+  background-color: var(--color-neutral-200);
+}

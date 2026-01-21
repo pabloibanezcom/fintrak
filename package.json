@@ -6,6 +6,7 @@
     "dev-api": "pnpm --filter api dev",
     "debug-api": "pnpm --filter api debug",
     "dev-mobile": "pnpm --filter mobile start",
+    "dev-web": "pnpm --filter @fintrak/web dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "test:watch": "pnpm --filter api test:watch",

@@ -1,0 +1,145 @@
+.panel {
+  width: var(--right-panel-width);
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  overflow-y: auto;
+  background-color: transparent;
+}
+
+.card {
+  flex-shrink: 0;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-3);
+}
+
+.title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.viewAll {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.viewAll:hover {
+  color: var(--color-text-secondary);
+}
+
+.chart {
+  height: 60px;
+  margin-bottom: var(--spacing-3);
+}
+
+.chartSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.statValue {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.statChange {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.statChange.positive {
+  color: var(--color-success-500);
+}
+
+.statChange.negative {
+  color: var(--color-error-500);
+}
+
+.profitList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.profitItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.profitIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profitInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.profitLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.profitValue {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.profitBar {
+  width: 60px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral-100);
+  overflow: hidden;
+}
+
+.profitBarFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}

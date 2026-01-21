@@ -1,0 +1,85 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-5);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+}
+
+.primary {
+  background: linear-gradient(135deg, #fb8140 0%, #ff6b35 100%);
+  color: white;
+}
+
+.default {
+  background-color: var(--color-bg-card);
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  opacity: 0.9;
+}
+
+.primary .label {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.default .label {
+  color: var(--color-text-secondary);
+}
+
+.value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  margin-top: var(--spacing-1);
+}
+
+.primary .value {
+  color: white;
+}
+
+.default .value {
+  color: var(--color-text-primary);
+}
+
+.changeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-1);
+}
+
+.change {
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-weight: var(--font-weight-medium);
+}
+
+.primary .change {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.default .change.positive {
+  color: var(--color-success-500);
+}
+
+.default .change.negative {
+  color: var(--color-error-500);
+}
+
+.period {
+  font-size: var(--font-size-xs);
+}
+
+.primary .period {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.default .period {
+  color: var(--color-text-tertiary);
+}
