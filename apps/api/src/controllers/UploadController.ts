@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { uploadFile, MediaType } from '../services/s3Service';
+import type { Request, Response } from 'express';
+import { type MediaType, uploadFile } from '../services/s3Service';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -10,7 +10,10 @@ interface AuthenticatedRequest extends Request {
 /**
  * Upload media file to S3
  */
-export async function uploadMedia(req: AuthenticatedRequest, res: Response): Promise<void> {
+export async function uploadMedia(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });
@@ -26,7 +29,13 @@ export async function uploadMedia(req: AuthenticatedRequest, res: Response): Pro
     const { type } = req.body;
 
     // Validate media type
-    const validTypes: MediaType[] = ['counterparty-logo', 'profile-picture', 'receipt', 'document', 'other'];
+    const validTypes: MediaType[] = [
+      'counterparty-logo',
+      'profile-picture',
+      'receipt',
+      'document',
+      'other',
+    ];
     const mediaType: MediaType = validTypes.includes(type) ? type : 'other';
 
     // Upload to S3

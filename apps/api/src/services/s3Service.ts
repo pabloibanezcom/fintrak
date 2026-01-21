@@ -1,4 +1,8 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import crypto from 'crypto';
 import path from 'path';
@@ -15,7 +19,12 @@ const s3Client = new S3Client({
   region: REGION,
 });
 
-export type MediaType = 'counterparty-logo' | 'profile-picture' | 'receipt' | 'document' | 'other';
+export type MediaType =
+  | 'counterparty-logo'
+  | 'profile-picture'
+  | 'receipt'
+  | 'document'
+  | 'other';
 
 export interface UploadOptions {
   userId: string;
@@ -36,13 +45,15 @@ export async function uploadFile(
 
   // Generate unique filename
   const fileExtension = path.extname(originalFileName);
-  const uniqueFileName = fileName || `${crypto.randomBytes(16).toString('hex')}${fileExtension}`;
+  const uniqueFileName =
+    fileName || `${crypto.randomBytes(16).toString('hex')}${fileExtension}`;
 
   // Organize files: users/{userId}/{mediaType}/{filename}
   const key = `users/${userId}/${mediaType}/${uniqueFileName}`;
 
   // Determine content type
-  const finalContentType = contentType || getContentTypeFromExtension(fileExtension);
+  const finalContentType =
+    contentType || getContentTypeFromExtension(fileExtension);
 
   try {
     // Use Upload for better handling of large files

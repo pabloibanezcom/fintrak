@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+
 // IMPORTANT: Load environment variables BEFORE any other imports
 dotenv.config();
 

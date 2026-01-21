@@ -3407,6 +3407,218 @@
       "description": "Bank integration via TrueLayer API for open banking. Connect multiple banks (Santander, BBVA) simultaneously. Each bank connection is stored separately, allowing you to fetch accounts and transactions from all connected banks at once."
     },
     {
+      "name": "Bank Transactions",
+      "item": [
+        {
+          "name": "Get All Bank Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions?limit=50&offset=0",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions"
+              ],
+              "query": [
+                {
+                  "key": "accountId",
+                  "value": "",
+                  "description": "Filter by account ID",
+                  "disabled": true
+                },
+                {
+                  "key": "bankId",
+                  "value": "",
+                  "description": "Filter by bank ID (e.g., 'santander', 'bbva')",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "DEBIT",
+                  "description": "Filter by type (CREDIT or DEBIT)",
+                  "disabled": true
+                },
+                {
+                  "key": "processed",
+                  "value": "false",
+                  "description": "Filter by processed status",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-01-01",
+                  "description": "Filter from date (ISO 8601)",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-01-31",
+                  "description": "Filter to date (ISO 8601)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Number of results"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Skip first N results"
+                }
+              ]
+            },
+            "description": "Retrieve all bank transactions stored locally. These are transactions synced from TrueLayer and stored in the database. Supports filtering by account, bank, type, date range, and processed status."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions/stats",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "bankId",
+                  "value": "",
+                  "description": "Filter by bank ID",
+                  "disabled": true
+                },
+                {
+                  "key": "accountId",
+                  "value": "",
+                  "description": "Filter by account ID",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-01-01",
+                  "description": "Start date for stats",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-01-31",
+                  "description": "End date for stats",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get aggregated statistics for bank transactions including total credits, debits, and counts."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions/{{transaction_id}}",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions",
+                "{{transaction_id}}"
+              ]
+            },
+            "description": "Retrieve a single bank transaction by its ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"processed\": true,\n  \"notified\": true\n}"
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions/{{transaction_id}}",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions",
+                "{{transaction_id}}"
+              ]
+            },
+            "description": "Update a bank transaction's processed or notified status."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions/{{transaction_id}}",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions",
+                "{{transaction_id}}"
+              ]
+            },
+            "description": "Delete a bank transaction from the local database."
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage locally stored bank transactions. These transactions are synced from TrueLayer and stored in MongoDB. When synced, they automatically create corresponding expenses/incomes."
+    },
+    {
       "name": "API Documentation",
       "item": [
         {
@@ -3765,6 +3977,164 @@
       "description": "Upload media files to AWS S3 organized by user ID and media type"
     },
     {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Register Device for Push Notifications",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]\",\n  \"platform\": \"ios\"\n}"
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/notifications/register",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "register"
+              ]
+            },
+            "description": "Register a device to receive push notifications. The token is an Expo Push Token obtained from the mobile app. Platform must be 'ios' or 'android'."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]\",\n  \"platform\": \"ios\"\n}"
+                },
+                "url": {
+                  "raw": "{{rootUrl}}/api/notifications/register",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "register"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Device registered successfully\",\n  \"deviceToken\": {\n    \"id\": \"60d0fe4f5311236168a109ca\",\n    \"token\": \"ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]\",\n    \"platform\": \"ios\",\n    \"active\": true\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Unregister Device from Push Notifications",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]\"\n}"
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/notifications/register",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "register"
+              ]
+            },
+            "description": "Unregister a device from push notifications. The device will no longer receive notifications until re-registered."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]\"\n}"
+                },
+                "url": {
+                  "raw": "{{rootUrl}}/api/notifications/register",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "notifications",
+                    "register"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Device unregistered successfully\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Push notification management for mobile devices. Register devices to receive transaction alerts and other notifications via Expo Push Notifications."
+    },
+    {
       "name": "Cron",
       "item": [
         {
@@ -3862,6 +4232,67 @@
               ],
               "cookie": [],
               "body": "{\n  \"error\": \"Unauthorized\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sync Bank Transactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{cron_api_key}}",
+                "description": "Internal API key for cron jobs"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/cron/sync-transactions",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "cron",
+                "sync-transactions"
+              ]
+            },
+            "description": "Sync bank transactions for all users. Fetches new transactions from TrueLayer, stores them in database, auto-creates expenses/incomes, and sends push notifications. Should be called every hour at :05 by AWS EventBridge."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "{{cron_api_key}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{rootUrl}}/api/cron/sync-transactions",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cron",
+                    "sync-transactions"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Transaction sync completed\",\n  \"results\": {\n    \"totalSynced\": 15,\n    \"totalErrors\": 0,\n    \"usersProcessed\": 2\n  }\n}"
             }
           ]
         }

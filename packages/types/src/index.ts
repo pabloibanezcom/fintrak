@@ -38,6 +38,12 @@ export {
   MIServiceError,
   TokenData,
 } from './MI';
+export {
+  DeviceToken,
+  PushNotificationPayload,
+  RegisterDeviceRequest,
+  StoredBankTransaction,
+} from './Notification';
 export { Periodicity } from './Periodicity';
 export { Product } from './Product';
 export {

@@ -28,8 +28,7 @@ export const getAuthorizationUrl = async (
     const { redirectUri, state } = req.body;
 
     // Use env variable as default, fall back to request body
-    const finalRedirectUri =
-      process.env.TRUELAYER_REDIRECT_URI || redirectUri;
+    const finalRedirectUri = process.env.TRUELAYER_REDIRECT_URI || redirectUri;
 
     if (!finalRedirectUri) {
       res.status(400).json({

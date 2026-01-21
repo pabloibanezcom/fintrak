@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { ProductSnapshot } from '../models/ProductSnapshotModel';
 import User from '../models/UserModel';
 import { saveDailySnapshot } from '../services/ProductSnapshot';
+import TransactionSyncService from '../services/TransactionSyncService';
 
 /**
  * Cron job to create daily snapshots for all users
@@ -49,5 +50,29 @@ export const createDailySnapshotsForAllUsers = async (
   } catch (error) {
     console.error('Error in daily snapshot cron job:', error);
     res.status(500).json({ error: 'Failed to create daily snapshots' });
+  }
+};
+
+/**
+ * Cron job to sync bank transactions for all users
+ * This endpoint should be called by AWS EventBridge every hour at :05
+ */
+export const syncTransactions = async (req: Request, res: Response) => {
+  try {
+    // Verify the request is from authorized source (API key)
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== process.env.CRON_API_KEY) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const results = await TransactionSyncService.syncAllUsers();
+
+    res.json({
+      message: 'Transaction sync completed',
+      results,
+    });
+  } catch (error) {
+    console.error('Error in transaction sync cron job:', error);
+    res.status(500).json({ error: 'Failed to sync transactions' });
   }
 };

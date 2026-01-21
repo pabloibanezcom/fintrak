@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { authenticate } from '../middleware/auth';
 import { uploadMedia } from '../controllers/UploadController';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
@@ -14,7 +14,9 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     // Accept image files and PDFs
     const allowedTypes = ['image/', 'application/pdf'];
-    const isAllowed = allowedTypes.some(type => file.mimetype.startsWith(type));
+    const isAllowed = allowedTypes.some((type) =>
+      file.mimetype.startsWith(type)
+    );
 
     if (isAllowed) {
       cb(null, true);
@@ -74,11 +76,6 @@ const upload = multer({
  *       500:
  *         description: Server error
  */
-router.post(
-  '/media',
-  authenticate,
-  upload.single('file'),
-  uploadMedia
-);
+router.post('/media', authenticate, upload.single('file'), uploadMedia);
 
 export default router;

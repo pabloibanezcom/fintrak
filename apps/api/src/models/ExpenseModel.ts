@@ -42,6 +42,10 @@ const ExpenseSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'RecurringTransaction',
     },
+    bankTransactionId: {
+      type: Schema.Types.ObjectId,
+      ref: 'BankTransaction',
+    },
     userId: { type: String, required: true },
   },
   {

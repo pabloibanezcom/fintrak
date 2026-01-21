@@ -3,8 +3,8 @@ import type { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import User, { type IUser } from '../models/UserModel';
+import { deleteFile, uploadFile } from '../services/s3Service';
 import { requireAuth } from '../utils/authUtils';
-import { uploadFile, deleteFile } from '../services/s3Service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'defaultsecret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -271,7 +271,10 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
     }
 
     // Delete old profile picture from S3 if it exists and is an S3 URL
-    if (currentUser.profilePicture?.includes('s3.') && currentUser.profilePicture.includes('profile-picture')) {
+    if (
+      currentUser.profilePicture?.includes('s3.') &&
+      currentUser.profilePicture.includes('profile-picture')
+    ) {
       try {
         await deleteFile(currentUser.profilePicture);
       } catch (deleteError) {
