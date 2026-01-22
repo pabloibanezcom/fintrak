@@ -1,0 +1,164 @@
+/* Container styles */
+.container {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-neutral-0);
+  box-shadow: var(--shadow-card);
+}
+
+/* Orientation variants */
+.horizontal {
+  flex-direction: row;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1);
+  border-radius: var(--radius-full);
+}
+
+.vertical {
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  border-radius: var(--radius-2xl);
+}
+
+/* Base item styles */
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  cursor: pointer;
+  position: relative;
+}
+
+/* Style variants */
+.nav .item {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.nav .item:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-text-primary);
+}
+
+.nav .item.active {
+  background-color: var(--color-neutral-900);
+  color: var(--color-text-inverse);
+}
+
+.nav .item.active:hover {
+  background-color: var(--color-neutral-800);
+}
+
+.actions .item {
+  color: var(--color-neutral-500);
+}
+
+.actions .item:hover {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+.actions .item.active {
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-900);
+}
+
+/* Display variants */
+.display-text {
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.display-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.display-both {
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+/* Action button sizing (smaller) */
+.actions .display-icon {
+  width: 36px;
+  height: 36px;
+}
+
+/* Tooltip support for icon-only mode */
+.withTooltip::after {
+  content: attr(title);
+  position: absolute;
+  background-color: var(--color-neutral-900);
+  color: var(--color-text-inverse);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--transition-fast),
+    visibility var(--transition-fast);
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+}
+
+/* Tooltip positioning based on orientation */
+.horizontal .withTooltip::after {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.vertical .withTooltip::after {
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.withTooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Animated indicator styles */
+.animated {
+  position: relative;
+}
+
+.indicator {
+  position: absolute;
+  background-color: var(--color-neutral-900);
+  border-radius: var(--radius-full);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.horizontal .indicator {
+  left: 4px;
+  top: 4px;
+}
+
+/* When animated, remove background from active item */
+.animated .item {
+  z-index: 1;
+  background-color: transparent !important;
+}
+
+.animated .item.active {
+  color: var(--color-text-inverse);
+}
+
+.animated .item:hover:not(.active) {
+  background-color: var(--color-neutral-100) !important;
+}
+

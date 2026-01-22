@@ -126,6 +126,7 @@
   box-shadow: var(--shadow-card);
   overflow: hidden;
   width: 0;
+  height: 44px;
   opacity: 0;
   pointer-events: none;
   transition:
@@ -175,8 +176,7 @@
   align-items: center;
   gap: var(--spacing-3);
   background-color: var(--color-neutral-0);
-  padding: var(--spacing-2);
-  padding-right: var(--spacing-3);
+  padding: var(--spacing-1) var(--spacing-3) var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-card);
   cursor: pointer;
