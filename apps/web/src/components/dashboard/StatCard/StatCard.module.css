@@ -8,7 +8,7 @@
 }
 
 .primary {
-  background: linear-gradient(135deg, #fb8140 0%, #ff6b35 100%);
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-500) 100%);
   color: white;
 }
 
