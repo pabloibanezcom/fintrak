@@ -13,14 +13,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ backgroundColor: '#f6f6f6' }}>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body>
+      <body style={{ backgroundColor: '#f6f6f6' }}>
         <ThemeProvider>
           <UserProvider>
             <SessionProvider>{children}</SessionProvider>

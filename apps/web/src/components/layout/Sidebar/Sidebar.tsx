@@ -2,14 +2,9 @@
 
 import { usePathname } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import {
-  ButtonGroup,
-  Icon,
-  type ButtonGroupItem,
-  type IconName,
-} from '@/components/ui';
+import { ButtonGroup, Icon, type ButtonGroupItem } from '@/components/ui';
 
-const navItems: (ButtonGroupItem & { iconName: IconName })[] = [
+const navItems: (ButtonGroupItem & { iconName: string })[] = [
   { id: 'overview', href: '/overview', label: 'Overview', iconName: 'overview' },
   { id: 'activity', href: '/activity', label: 'Activity', iconName: 'activity' },
   { id: 'manage', href: '/manage/expenses', label: 'Manage', iconName: 'manage' },

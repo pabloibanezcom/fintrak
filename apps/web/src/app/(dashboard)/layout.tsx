@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/context';
 import { Sidebar, TopNav } from '@/components/layout';
+import { Icon } from '@/components/ui';
 import styles from './layout.module.css';
 
 export default function DashboardLayout({
@@ -23,18 +24,7 @@ export default function DashboardLayout({
   if (isLoading) {
     return (
       <div className={styles.loading}>
-        <svg viewBox="0 0 24 24" fill="none" className={styles.spinner}>
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="var(--color-primary-500)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray="31.416"
-            strokeDashoffset="10"
-          />
-        </svg>
+        <Icon name="loader" size={48} />
       </div>
     );
   }

@@ -1,0 +1,12 @@
+import type { SVGProps } from 'react';
+
+export function OverviewIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 22 22" fill="none" {...props}>
+      <rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="12" y="3" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="3" y="12" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="12" y="12" width="7" height="7" rx="2" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
