@@ -35,9 +35,9 @@ export type {
   MIETC,
   MIIndexedFund,
   MILoginResponse,
-  MIServiceError,
   TokenData,
 } from './MI';
+export { MIServiceError } from './MI';
 export type {
   DeviceToken,
   PushNotificationPayload,
