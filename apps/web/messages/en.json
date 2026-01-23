@@ -60,7 +60,8 @@
   "greetings": {
     "morning": "Good morning",
     "afternoon": "Good afternoon",
-    "evening": "Good evening"
+    "evening": "Good evening",
+    "night": "Good night"
   },
   "dashboard": {
     "subtitle": "Stay on top of your tasks, monitor progress, and track status.",

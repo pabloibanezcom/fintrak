@@ -60,7 +60,8 @@
   "greetings": {
     "morning": "Buenos días",
     "afternoon": "Buenas tardes",
-    "evening": "Buenas noches"
+    "evening": "Buenas tardes",
+    "night": "Buenas noches"
   },
   "dashboard": {
     "subtitle": "Mantente al tanto de tus tareas, monitorea el progreso y rastrea el estado.",

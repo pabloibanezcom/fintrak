@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import {
   RecentActivities,
   SpendingLimitBar,
@@ -10,13 +12,14 @@ import {
 import { Card } from '@/components/ui';
 import { useUser } from '@/context';
 import { usePeriodSummary } from '@/hooks';
-import { getGreeting } from '@/utils';
+import { getGreetingPeriod } from '@/utils';
 import styles from './page.module.css';
 
 export default function OverviewPage() {
-  const { data, isLoading } = usePeriodSummary({ latestCount: 5 });
+  const t = useTranslations();
+  const { data } = usePeriodSummary({ latestCount: 5 });
   const { user } = useUser();
-  const greeting = getGreeting();
+  const greetingPeriod = getGreetingPeriod();
   const userName = user?.name || user?.email?.split('@')[0] || 'User';
 
   const totalExpenses = data?.expenses.total || 0;
@@ -27,11 +30,9 @@ export default function OverviewPage() {
     <div className={styles.page}>
       <div className={styles.greeting}>
         <h1 className={styles.greetingTitle}>
-          {greeting}, {userName}
+          {t(`greetings.${greetingPeriod}`)}, {userName}
         </h1>
-        <p className={styles.greetingSubtitle}>
-          Stay on top of your tasks, monitor progress, and track status.
-        </p>
+        <p className={styles.greetingSubtitle}>{t('dashboard.subtitle')}</p>
       </div>
 
       <div className={styles.grid}>

@@ -7,8 +7,9 @@ export {
   formatDate,
   formatDateTime,
   formatRelativeTime,
+  type GreetingPeriod,
   getEndOfMonth,
-  getGreeting,
+  getGreetingPeriod,
   getStartOfMonth,
   toISODateString,
 } from './date';

@@ -51,9 +51,12 @@ export function toISODateString(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-export function getGreeting(): string {
+export type GreetingPeriod = 'morning' | 'afternoon' | 'evening' | 'night';
+
+export function getGreetingPeriod(): GreetingPeriod {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (hour >= 5 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 18) return 'afternoon';
+  if (hour >= 18 && hour < 22) return 'evening';
+  return 'night';
 }
