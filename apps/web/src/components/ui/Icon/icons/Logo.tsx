@@ -2,7 +2,12 @@ import type { SVGProps } from 'react';
 
 export function LogoIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <title>FinTrak Logo</title>
       <rect width="40" height="40" rx="12" fill="var(--color-primary-500)" />
       <path

@@ -37,11 +37,7 @@ export default function OverviewPage() {
       <div className={styles.grid}>
         {/* Main Balance Section */}
         <div className={styles.balanceSection}>
-          <TotalBalanceCard
-            balance={balance}
-            currency="EUR"
-            change={5}
-          />
+          <TotalBalanceCard balance={balance} currency="EUR" change={5} />
 
           <Card padding="md" className={styles.walletsCard}>
             <div className={styles.walletsHeader}>

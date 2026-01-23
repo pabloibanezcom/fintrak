@@ -24,12 +24,12 @@ export function WalletCard({
 }: WalletCardProps) {
   return (
     <div className={`${styles.card} ${isActive ? styles.active : ''}`}>
-      <div className={styles.flag}>
-        {flagIcons[currency] || currency}
-      </div>
+      <div className={styles.flag}>{flagIcons[currency] || currency}</div>
       <div className={styles.info}>
         <span className={styles.currency}>{currency}</span>
-        <span className={styles.balance}>{formatCurrency(balance, currency)}</span>
+        <span className={styles.balance}>
+          {formatCurrency(balance, currency)}
+        </span>
         {label && <span className={styles.label}>{label}</span>}
       </div>
       {isActive && <span className={styles.badge}>Active</span>}

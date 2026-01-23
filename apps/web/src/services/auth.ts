@@ -1,4 +1,8 @@
-import type { AuthResponse, LoginRequest, RegisterRequest } from '@fintrak/types';
+import type {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+} from '@fintrak/types';
 import { apiClient } from './api';
 
 export interface User {

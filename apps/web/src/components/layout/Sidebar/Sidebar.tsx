@@ -5,9 +5,24 @@ import styles from './Sidebar.module.css';
 import { ButtonGroup, Icon, type ButtonGroupItem } from '@/components/ui';
 
 const navItems: (ButtonGroupItem & { iconName: string })[] = [
-  { id: 'overview', href: '/overview', label: 'Overview', iconName: 'overview' },
-  { id: 'activity', href: '/activity', label: 'Activity', iconName: 'activity' },
-  { id: 'manage', href: '/manage/expenses', label: 'Manage', iconName: 'manage' },
+  {
+    id: 'overview',
+    href: '/overview',
+    label: 'Overview',
+    iconName: 'overview',
+  },
+  {
+    id: 'activity',
+    href: '/activity',
+    label: 'Activity',
+    iconName: 'activity',
+  },
+  {
+    id: 'manage',
+    href: '/manage/expenses',
+    label: 'Manage',
+    iconName: 'manage',
+  },
   { id: 'accounts', href: '/accounts', label: 'Account', iconName: 'account' },
   { id: 'reports', href: '/reports', label: 'Reports', iconName: 'reports' },
 ];
@@ -47,4 +62,3 @@ export function Sidebar() {
     </aside>
   );
 }
-

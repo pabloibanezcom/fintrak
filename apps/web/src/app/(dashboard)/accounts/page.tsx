@@ -16,7 +16,11 @@ export default function AccountsPage() {
               stroke="var(--color-primary-500)"
               strokeWidth="3"
             />
-            <path d="M6 20h36" stroke="var(--color-primary-500)" strokeWidth="3" />
+            <path
+              d="M6 20h36"
+              stroke="var(--color-primary-500)"
+              strokeWidth="3"
+            />
           </svg>
         </div>
         <h1 className={styles.title}>Bank Accounts</h1>

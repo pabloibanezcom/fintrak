@@ -30,17 +30,21 @@ export function TotalBalanceCard({
       <div className={styles.content}>
         <div className={styles.header}>
           <span className={styles.label}>Total Balance</span>
-          <Badge variant="default" className={styles.badge}>{currency}</Badge>
+          <Badge variant="default" className={styles.badge}>
+            {currency}
+          </Badge>
         </div>
 
         <div className={styles.balance}>
-          <span className={styles.amount}>{formatCurrency(balance, currency)}</span>
+          <span className={styles.amount}>
+            {formatCurrency(balance, currency)}
+          </span>
           <span
             className={`${styles.change} ${change >= 0 ? styles.positive : styles.negative}`}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path
-                d={change >= 0 ? "M6 2v8M3 5l3-3 3 3" : "M6 10V2M3 7l3 3 3-3"}
+                d={change >= 0 ? 'M6 2v8M3 5l3-3 3 3' : 'M6 10V2M3 7l3 3 3-3'}
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
@@ -52,7 +56,11 @@ export function TotalBalanceCard({
         </div>
 
         <div className={styles.actions}>
-          <Button variant="secondary" onClick={onTransfer} className={styles.transferBtn}>
+          <Button
+            variant="secondary"
+            onClick={onTransfer}
+            className={styles.transferBtn}
+          >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
                 d="M2 8h12M10 4l4 4-4 4"
@@ -64,7 +72,11 @@ export function TotalBalanceCard({
             </svg>
             Transfer
           </Button>
-          <Button variant="outline" onClick={onRequest} className={styles.requestBtn}>
+          <Button
+            variant="outline"
+            onClick={onRequest}
+            className={styles.requestBtn}
+          >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
                 d="M14 8H2M6 4L2 8l4 4"

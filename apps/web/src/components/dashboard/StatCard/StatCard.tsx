@@ -29,7 +29,7 @@ export function StatCard({
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
               <path
-                d={change >= 0 ? "M5 1v8M2 4l3-3 3 3" : "M5 9V1M2 6l3 3 3-3"}
+                d={change >= 0 ? 'M5 1v8M2 4l3-3 3 3' : 'M5 9V1M2 6l3 3 3-3'}
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"

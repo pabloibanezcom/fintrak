@@ -25,7 +25,11 @@ export const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
     const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
     return (
-      <div ref={ref} className={`${styles.wrapper} ${className || ''}`} {...props}>
+      <div
+        ref={ref}
+        className={`${styles.wrapper} ${className || ''}`}
+        {...props}
+      >
         {(label || showValue) && (
           <div className={styles.header}>
             {label && <span className={styles.label}>{label}</span>}

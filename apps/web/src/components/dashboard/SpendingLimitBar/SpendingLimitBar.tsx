@@ -16,7 +16,8 @@ export function SpendingLimitBar({
   currency = 'EUR',
 }: SpendingLimitBarProps) {
   const percentage = limit > 0 ? (spent / limit) * 100 : 0;
-  const variant = percentage > 90 ? 'error' : percentage > 70 ? 'warning' : 'default';
+  const variant =
+    percentage > 90 ? 'error' : percentage > 70 ? 'warning' : 'default';
   const midPoint = limit / 2;
 
   return (
@@ -30,15 +31,17 @@ export function SpendingLimitBar({
         <ProgressBar value={spent} max={limit} variant={variant} />
         <div className={styles.markers}>
           <span className={styles.marker}>{formatCurrency(0, currency)}</span>
-          <span className={styles.marker}>{formatCurrency(midPoint, currency)}</span>
-          <span className={styles.marker}>{formatCurrency(limit, currency)}</span>
+          <span className={styles.marker}>
+            {formatCurrency(midPoint, currency)}
+          </span>
+          <span className={styles.marker}>
+            {formatCurrency(limit, currency)}
+          </span>
         </div>
       </div>
 
       <div className={styles.footer}>
-        <span className={styles.spent}>
-          {formatCurrency(spent, currency)}
-        </span>
+        <span className={styles.spent}>{formatCurrency(spent, currency)}</span>
         <span className={styles.spentLabel}>spent out of</span>
       </div>
     </Card>

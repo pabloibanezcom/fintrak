@@ -7,7 +7,10 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ variant = 'default', size = 'sm', className, children, ...props }, ref) => {
+  (
+    { variant = 'default', size = 'sm', className, children, ...props },
+    ref
+  ) => {
     const classes = [styles.badge, styles[variant], styles[size], className]
       .filter(Boolean)
       .join(' ');
