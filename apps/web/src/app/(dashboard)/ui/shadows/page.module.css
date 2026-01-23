@@ -1,0 +1,66 @@
+.shadowGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.shadowItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+.shadowPreview {
+  width: 100px;
+  height: 100px;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  flex-shrink: 0;
+}
+
+.shadowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.shadowName {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.shadowVariable {
+  font-size: var(--font-size-sm);
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-secondary);
+  background: none;
+  padding: 0;
+}
+
+.shadowDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* Comparison */
+.comparison {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-8);
+  justify-content: center;
+  padding: var(--spacing-6) 0;
+}
+
+.comparisonBox {
+  width: 80px;
+  height: 80px;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}

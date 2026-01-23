@@ -1,0 +1,191 @@
+/* Shared styles for component showroom pages */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  margin-bottom: var(--spacing-2);
+  transition: color var(--transition-fast);
+}
+
+.backLink:hover {
+  color: var(--color-primary-500);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 600px;
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* Showcase card */
+.showcase {
+  padding: var(--spacing-6);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-6);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-tertiary);
+}
+
+/* Examples */
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.example {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.exampleLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 120px;
+}
+
+/* Props table */
+.propsCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.propsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.propsTable th {
+  text-align: left;
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-neutral-50);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+[data-theme="dark"] .propsTable th {
+  background-color: var(--color-neutral-800);
+}
+
+.propsTable td {
+  padding: var(--spacing-3) var(--spacing-4);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: top;
+}
+
+.propsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.propsTable code {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-size-xs);
+  background-color: var(--color-neutral-100);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+[data-theme="dark"] .propsTable code {
+  background-color: var(--color-neutral-700);
+}
+
+/* Input grid */
+.inputGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  max-width: 400px;
+}
+
+/* Icon grid */
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.iconItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+  transition: background-color var(--transition-fast);
+}
+
+.iconItem:hover {
+  background-color: var(--color-neutral-50);
+}
+
+[data-theme="dark"] .iconItem:hover {
+  background-color: var(--color-neutral-800);
+}
+
+/* Progress bar stack */
+.progressStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.progressItem {
+  max-width: 400px;
+}

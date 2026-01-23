@@ -1,0 +1,57 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-6);
+}
+
+.demoBoxes {
+  display: flex;
+  gap: var(--spacing-8);
+  justify-content: center;
+  width: 100%;
+}
+
+.demoItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.demoBox {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-primary-500);
+  border-radius: var(--radius-lg);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.demoBox.fast {
+  transition:
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.demoBox.base {
+  transition:
+    transform var(--transition-base),
+    opacity var(--transition-base);
+}
+
+.demoBox.slow {
+  transition:
+    transform var(--transition-slow),
+    opacity var(--transition-slow);
+}
+
+.demoBox.active {
+  transform: translateY(-20px);
+  opacity: 0.6;
+}
+
+.demoLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}

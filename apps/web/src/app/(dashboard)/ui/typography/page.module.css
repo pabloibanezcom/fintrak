@@ -1,0 +1,244 @@
+/* Font families */
+.fontFamilies {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.fontFamily {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-4);
+}
+
+.fontFamilySample {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.fontFamilyVariable {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* Headings */
+.headings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.headingRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.h4 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.h5 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.h6 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.headingMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+/* Body text */
+.bodyTexts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.bodyRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.bodyLg {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-primary);
+}
+
+.body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.bodySm {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.bodyXs {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.bodyMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Font weights */
+.weights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-6);
+}
+
+.weightItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-width: 100px;
+}
+
+.weightSample {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-primary);
+}
+
+.weightValue {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Line heights */
+.lineHeights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.lineHeightItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.lineHeightInfo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+}
+
+.lineHeightName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.lineHeightVariable {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.lineHeightSample {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  max-width: 500px;
+  padding: var(--spacing-3);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="dark"] .lineHeightSample {
+  background-color: var(--color-neutral-800);
+}
+
+/* Money examples */
+.moneyExamples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.moneyRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-4);
+}
+
+.moneyLg {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.money {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.moneySm {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.moneyMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}

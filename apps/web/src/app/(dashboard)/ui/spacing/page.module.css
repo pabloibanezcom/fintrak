@@ -1,0 +1,97 @@
+.scaleList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.scaleItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.scaleVisual {
+  width: 120px;
+  height: 24px;
+  background-color: var(--color-neutral-100);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .scaleVisual {
+  background-color: var(--color-neutral-800);
+}
+
+.scaleBar {
+  height: 100%;
+  background-color: var(--color-primary-500);
+  border-radius: var(--radius-sm);
+  min-width: 2px;
+}
+
+.scaleInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  flex: 1;
+}
+
+.scaleName {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  min-width: 32px;
+}
+
+.scaleVariable {
+  font-size: var(--font-size-sm);
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-secondary);
+  background: none;
+  padding: 0;
+}
+
+.scaleValue {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin-left: auto;
+}
+
+/* Examples */
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.exampleItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.exampleLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.exampleBoxes {
+  display: flex;
+  align-items: center;
+}
+
+.box {
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-primary-500);
+  border-radius: var(--radius-md);
+}
+
+.exampleItem code {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-tertiary);
+}

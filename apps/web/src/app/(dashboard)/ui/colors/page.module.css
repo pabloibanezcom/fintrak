@@ -1,0 +1,110 @@
+.colorRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.colorSwatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+  min-width: 70px;
+}
+
+.swatchPreview {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+}
+
+.swatchName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.swatchValue {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-tertiary);
+}
+
+/* Semantic colors */
+.semanticDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-3);
+}
+
+.semanticGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-6);
+}
+
+.semanticGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.semanticTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.semanticList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.semanticItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.semanticPreview {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+
+.semanticInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  min-width: 0;
+}
+
+.semanticName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.semanticVariable {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-tertiary);
+  background: none;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .semanticGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .semanticGrid {
+    grid-template-columns: 1fr;
+  }
+}
