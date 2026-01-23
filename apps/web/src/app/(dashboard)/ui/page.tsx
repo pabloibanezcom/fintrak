@@ -12,20 +12,15 @@ interface ShowroomItem {
 
 const foundations: ShowroomItem[] = [
   {
+    name: 'Border Radius',
+    description: 'Rounded corner values from subtle to fully circular',
+    href: '/ui/radius',
+  },
+  {
     name: 'Colors',
     description:
       'Color palette including primary, neutral, and semantic colors',
     href: '/ui/colors',
-  },
-  {
-    name: 'Typography',
-    description: 'Font families, sizes, weights, and text styles',
-    href: '/ui/typography',
-  },
-  {
-    name: 'Spacing',
-    description: 'Consistent spacing scale for margins, padding, and gaps',
-    href: '/ui/spacing',
   },
   {
     name: 'Shadows',
@@ -33,18 +28,28 @@ const foundations: ShowroomItem[] = [
     href: '/ui/shadows',
   },
   {
-    name: 'Border Radius',
-    description: 'Rounded corner values from subtle to fully circular',
-    href: '/ui/radius',
+    name: 'Spacing',
+    description: 'Consistent spacing scale for margins, padding, and gaps',
+    href: '/ui/spacing',
   },
   {
     name: 'Transitions',
     description: 'Animation timing values for smooth interactions',
     href: '/ui/transitions',
   },
+  {
+    name: 'Typography',
+    description: 'Font families, sizes, weights, and text styles',
+    href: '/ui/typography',
+  },
 ];
 
 const components: ShowroomItem[] = [
+  {
+    name: 'Avatar',
+    description: 'User profile images with fallback support',
+    href: '/ui/avatar',
+  },
   {
     name: 'Badge',
     description: 'Status indicators and labels with multiple variants',
@@ -56,29 +61,14 @@ const components: ShowroomItem[] = [
     href: '/ui/button',
   },
   {
-    name: 'Card',
-    description: 'Container component for grouping content',
-    href: '/ui/card',
-  },
-  {
-    name: 'Input',
-    description: 'Text input fields with labels and validation states',
-    href: '/ui/input',
-  },
-  {
-    name: 'Avatar',
-    description: 'User profile images with fallback support',
-    href: '/ui/avatar',
-  },
-  {
-    name: 'ProgressBar',
-    description: 'Visual progress indicators',
-    href: '/ui/progress-bar',
-  },
-  {
     name: 'ButtonGroup',
     description: 'Grouped buttons for navigation and actions',
     href: '/ui/button-group',
+  },
+  {
+    name: 'Card',
+    description: 'Container component for grouping content',
+    href: '/ui/card',
   },
   {
     name: 'DropdownMenu',
@@ -89,6 +79,16 @@ const components: ShowroomItem[] = [
     name: 'Icon',
     description: 'SVG icon system with consistent sizing',
     href: '/ui/icon',
+  },
+  {
+    name: 'Input',
+    description: 'Text input fields with labels and validation states',
+    href: '/ui/input',
+  },
+  {
+    name: 'ProgressBar',
+    description: 'Visual progress indicators',
+    href: '/ui/progress-bar',
   },
 ];
 
