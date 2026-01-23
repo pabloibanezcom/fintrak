@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Sidebar, TopNav } from '@/components/layout';
+import { Footer, Sidebar, TopNav } from '@/components/layout';
 import { Icon } from '@/components/ui';
 import { useSession } from '@/context';
 import styles from './layout.module.css';
@@ -39,7 +39,10 @@ export default function DashboardLayout({
       <div className={styles.workspace}>
         <Sidebar />
         <main className={styles.main}>
-          <div className={styles.content}>{children}</div>
+          <div className={styles.content}>
+            {children}
+            <Footer />
+          </div>
         </main>
       </div>
     </div>

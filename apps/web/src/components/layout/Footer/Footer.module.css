@@ -1,0 +1,28 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) var(--spacing-6);
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-400);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.copyright {
+  margin: 0;
+}
+
+.separator {
+  color: var(--color-neutral-300);
+}
+
+.link {
+  color: var(--color-neutral-500);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.link:hover {
+  color: var(--color-primary-600);
+}
