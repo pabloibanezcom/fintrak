@@ -42,17 +42,17 @@ export function TopNav() {
 
   const navTabs: ButtonGroupItem[] = [
     { id: 'overview', href: '/overview', label: t('overview') },
-    { id: 'activity', href: '/activity', label: t('activity') },
-    { id: 'manage', href: '/manage/expenses', label: t('manage') },
-    { id: 'accounts', href: '/accounts', label: t('account') },
+    { id: 'budget', href: '/budget', label: t('budget') },
+    { id: 'banking', href: '/banking', label: t('banking') },
+    { id: 'investments', href: '/investments', label: t('investments') },
     { id: 'reports', href: '/reports', label: t('reports') },
   ];
 
   const getActiveTabId = () => {
     if (pathname === '/overview') return 'overview';
-    if (pathname.startsWith('/manage')) return 'manage';
-    if (pathname.startsWith('/activity')) return 'activity';
-    if (pathname.startsWith('/accounts')) return 'accounts';
+    if (pathname.startsWith('/budget')) return 'budget';
+    if (pathname.startsWith('/banking')) return 'banking';
+    if (pathname.startsWith('/investments')) return 'investments';
     if (pathname.startsWith('/reports')) return 'reports';
     return '';
   };

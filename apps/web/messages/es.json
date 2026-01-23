@@ -43,9 +43,9 @@
   },
   "nav": {
     "overview": "Resumen",
-    "activity": "Actividad",
-    "manage": "Gestionar",
-    "account": "Cuenta",
+    "budget": "Presupuesto",
+    "banking": "Banca",
+    "investments": "Inversiones",
     "reports": "Reportes",
     "searchPlaceholder": "Buscar...",
     "closeSearch": "Cerrar búsqueda",

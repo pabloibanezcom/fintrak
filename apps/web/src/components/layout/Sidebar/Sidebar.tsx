@@ -17,22 +17,22 @@ export function Sidebar() {
       iconName: 'overview',
     },
     {
-      id: 'activity',
-      href: '/activity',
-      label: t('activity'),
-      iconName: 'activity',
+      id: 'budget',
+      href: '/budget',
+      label: t('budget'),
+      iconName: 'budget',
     },
     {
-      id: 'manage',
-      href: '/manage/expenses',
-      label: t('manage'),
-      iconName: 'manage',
+      id: 'banking',
+      href: '/banking',
+      label: t('banking'),
+      iconName: 'banking',
     },
     {
-      id: 'accounts',
-      href: '/accounts',
-      label: t('account'),
-      iconName: 'account',
+      id: 'investments',
+      href: '/investments',
+      label: t('investments'),
+      iconName: 'investments',
     },
     {
       id: 'reports',
@@ -44,9 +44,9 @@ export function Sidebar() {
 
   const getActiveId = () => {
     if (pathname === '/overview') return 'overview';
-    if (pathname.startsWith('/activity')) return 'activity';
-    if (pathname.startsWith('/manage')) return 'manage';
-    if (pathname.startsWith('/accounts')) return 'accounts';
+    if (pathname.startsWith('/budget')) return 'budget';
+    if (pathname.startsWith('/banking')) return 'banking';
+    if (pathname.startsWith('/investments')) return 'investments';
     if (pathname.startsWith('/reports')) return 'reports';
     return '';
   };

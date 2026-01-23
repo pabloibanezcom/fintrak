@@ -43,9 +43,9 @@
   },
   "nav": {
     "overview": "Overview",
-    "activity": "Activity",
-    "manage": "Manage",
-    "account": "Account",
+    "budget": "Budget",
+    "banking": "Banking",
+    "investments": "Investments",
     "reports": "Reports",
     "searchPlaceholder": "Search...",
     "closeSearch": "Close search",

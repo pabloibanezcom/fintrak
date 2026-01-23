@@ -1,14 +1,14 @@
-export { AccountIcon } from './Account';
-export { ActivityIcon } from './Activity';
 export { ArrowDownIcon } from './ArrowDown';
 export { ArrowLeftIcon } from './ArrowLeft';
 export { ArrowRightIcon } from './ArrowRight';
 export { ArrowUpIcon } from './ArrowUp';
+export { BankingIcon } from './Banking';
+export { BudgetIcon } from './Budget';
 export { ChevronDownIcon } from './ChevronDown';
 export { CloseIcon } from './Close';
+export { InvestmentsIcon } from './Investments';
 export { LoaderIcon } from './Loader';
 export { LogoIcon } from './Logo';
-export { ManageIcon } from './Manage';
 export { MoonIcon } from './Moon';
 export { NotificationsIcon } from './Notifications';
 export { OverviewIcon } from './Overview';
