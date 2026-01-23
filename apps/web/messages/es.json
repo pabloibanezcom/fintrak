@@ -7,7 +7,12 @@
     "save": "Guardar",
     "delete": "Eliminar",
     "confirm": "Confirmar",
-    "comingSoon": "Esta función estará disponible próximamente."
+    "comingSoon": "Esta función estará disponible próximamente.",
+    "goHome": "Ir al inicio"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe o ha sido movida."
   },
   "auth": {
     "login": {

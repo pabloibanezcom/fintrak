@@ -7,7 +7,12 @@
     "save": "Save",
     "delete": "Delete",
     "confirm": "Confirm",
-    "comingSoon": "This feature is coming soon."
+    "comingSoon": "This feature is coming soon.",
+    "goHome": "Go to homepage"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved."
   },
   "auth": {
     "login": {
