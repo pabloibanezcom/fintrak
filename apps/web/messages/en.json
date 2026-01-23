@@ -1,0 +1,121 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "comingSoon": "This feature is coming soon."
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account to continue",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submitButton": "Sign in",
+      "divider": "or continue with",
+      "googleButton": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "errorDefault": "Login failed"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Start tracking your finances today",
+      "emailLabel": "Email",
+      "emailPlaceholder": "john@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "At least 6 characters",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "submitButton": "Create account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "errorPasswordMismatch": "Passwords do not match",
+      "errorPasswordLength": "Password must be at least 6 characters",
+      "errorDefault": "Registration failed"
+    }
+  },
+  "nav": {
+    "overview": "Overview",
+    "activity": "Activity",
+    "manage": "Manage",
+    "account": "Account",
+    "reports": "Reports",
+    "searchPlaceholder": "Search...",
+    "closeSearch": "Close search",
+    "search": "Search",
+    "notifications": "Notifications",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "language": "Language"
+  },
+  "greetings": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "dashboard": {
+    "subtitle": "Stay on top of your tasks, monitor progress, and track status.",
+    "wallets": "Wallets",
+    "walletsCount": "Total {count} wallets",
+    "totalBalance": "Total Balance",
+    "thanLastMonth": "than last month",
+    "transfer": "Transfer",
+    "request": "Request",
+    "totalEarnings": "Total Earnings",
+    "totalSpending": "Total Spending",
+    "totalIncome": "Total Income",
+    "totalRevenue": "Total Revenue",
+    "thisMonth": "This month",
+    "monthlyLimit": "Monthly Spending Limit",
+    "spentOutOf": "spent out of",
+    "myCards": "My Cards",
+    "addNew": "+ Add new",
+    "noCards": "No cards added yet"
+  },
+  "activities": {
+    "title": "Recent Activities",
+    "viewAll": "View all",
+    "orderId": "Order ID",
+    "activity": "Activity",
+    "price": "Price",
+    "status": "Status",
+    "noActivities": "No recent activities",
+    "received": "Received",
+    "paid": "Paid"
+  },
+  "pages": {
+    "activity": {
+      "title": "Activity",
+      "description": "View all your transaction history and activities."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your account settings and preferences."
+    },
+    "accounts": {
+      "title": "Bank Accounts",
+      "description": "Connect and manage your bank accounts."
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "View detailed analytics and reports."
+    },
+    "expenses": {
+      "title": "Expenses",
+      "description": "Track and manage your expenses."
+    },
+    "incomes": {
+      "title": "Incomes",
+      "description": "Track and manage your income sources."
+    }
+  }
+}

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { ThemeProvider, UserProvider, SessionProvider } from '@/context';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+import { SessionProvider, ThemeProvider, UserProvider } from '@/context';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -7,13 +9,16 @@ export const metadata: Metadata = {
   description: 'Track your finances, expenses, and investments in one place',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" style={{ backgroundColor: '#f6f6f6' }}>
+    <html lang={locale} style={{ backgroundColor: '#f6f6f6' }}>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
@@ -21,11 +26,13 @@ export default function RootLayout({
         />
       </head>
       <body style={{ backgroundColor: '#f6f6f6' }}>
-        <ThemeProvider>
-          <UserProvider>
-            <SessionProvider>{children}</SessionProvider>
-          </UserProvider>
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider>
+            <UserProvider>
+              <SessionProvider>{children}</SessionProvider>
+            </UserProvider>
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

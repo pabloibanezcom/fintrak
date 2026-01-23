@@ -1,8 +1,8 @@
 'use client';
 
-import { Card, Badge } from '@/components/ui';
-import { formatCurrency, formatDate } from '@/utils';
+import { Badge, Card } from '@/components/ui';
 import type { TransactionSummary } from '@/services/analytics';
+import { formatCurrency, formatDate } from '@/utils';
 import styles from './RecentActivities.module.css';
 
 interface RecentActivitiesProps {

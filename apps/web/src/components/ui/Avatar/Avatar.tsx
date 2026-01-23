@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes, forwardRef } from 'react';
+import { forwardRef, type ImgHTMLAttributes } from 'react';
 import styles from './Avatar.module.css';
 
 export interface AvatarProps extends ImgHTMLAttributes<HTMLImageElement> {

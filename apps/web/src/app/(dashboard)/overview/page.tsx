@@ -1,16 +1,16 @@
 'use client';
 
-import { useUser } from '@/context';
-import { getGreeting } from '@/utils';
-import { Card } from '@/components/ui';
 import {
+  RecentActivities,
+  SpendingLimitBar,
+  StatCard,
   TotalBalanceCard,
   WalletCard,
-  StatCard,
-  SpendingLimitBar,
-  RecentActivities,
 } from '@/components/dashboard';
+import { Card } from '@/components/ui';
+import { useUser } from '@/context';
 import { usePeriodSummary } from '@/hooks';
+import { getGreeting } from '@/utils';
 import styles from './page.module.css';
 
 export default function OverviewPage() {

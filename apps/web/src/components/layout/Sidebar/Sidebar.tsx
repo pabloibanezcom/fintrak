@@ -1,34 +1,46 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { ButtonGroup, type ButtonGroupItem, Icon } from '@/components/ui';
 import styles from './Sidebar.module.css';
-import { ButtonGroup, Icon, type ButtonGroupItem } from '@/components/ui';
-
-const navItems: (ButtonGroupItem & { iconName: string })[] = [
-  {
-    id: 'overview',
-    href: '/overview',
-    label: 'Overview',
-    iconName: 'overview',
-  },
-  {
-    id: 'activity',
-    href: '/activity',
-    label: 'Activity',
-    iconName: 'activity',
-  },
-  {
-    id: 'manage',
-    href: '/manage/expenses',
-    label: 'Manage',
-    iconName: 'manage',
-  },
-  { id: 'accounts', href: '/accounts', label: 'Account', iconName: 'account' },
-  { id: 'reports', href: '/reports', label: 'Reports', iconName: 'reports' },
-];
 
 export function Sidebar() {
+  const t = useTranslations('nav');
   const pathname = usePathname();
+
+  const navItems: (ButtonGroupItem & { iconName: string })[] = [
+    {
+      id: 'overview',
+      href: '/overview',
+      label: t('overview'),
+      iconName: 'overview',
+    },
+    {
+      id: 'activity',
+      href: '/activity',
+      label: t('activity'),
+      iconName: 'activity',
+    },
+    {
+      id: 'manage',
+      href: '/manage/expenses',
+      label: t('manage'),
+      iconName: 'manage',
+    },
+    {
+      id: 'accounts',
+      href: '/accounts',
+      label: t('account'),
+      iconName: 'account',
+    },
+    {
+      id: 'reports',
+      href: '/reports',
+      label: t('reports'),
+      iconName: 'reports',
+    },
+  ];
 
   const getActiveId = () => {
     if (pathname === '/overview') return 'overview';

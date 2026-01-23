@@ -1,34 +1,52 @@
 'use client';
 
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRef, useState, useTransition } from 'react';
 import {
   ButtonGroup,
-  DropdownMenu,
-  Icon,
   type ButtonGroupItem,
+  DropdownMenu,
   type DropdownMenuItem,
+  Icon,
 } from '@/components/ui';
 import { useSession, useTheme, useUser } from '@/context';
+import type { Locale } from '@/i18n/config';
+import enFlag from '../LanguageSwitcher/flags/en.png';
+import esFlag from '../LanguageSwitcher/flags/es.png';
 import styles from './TopNav.module.css';
 
-const navTabs: ButtonGroupItem[] = [
-  { id: 'overview', href: '/overview', label: 'Overview' },
-  { id: 'activity', href: '/activity', label: 'Activity' },
-  { id: 'manage', href: '/manage/expenses', label: 'Manage' },
-  { id: 'accounts', href: '/accounts', label: 'Account' },
-  { id: 'reports', href: '/reports', label: 'Reports' },
-];
+const LOCALE_COOKIE = 'NEXT_LOCALE';
 
 export function TopNav() {
+  const t = useTranslations('nav');
   const pathname = usePathname();
+  const router = useRouter();
+  const locale = useLocale() as Locale;
+  const [, startLocaleTransition] = useTransition();
   const { user } = useUser();
   const { signOut } = useSession();
   const { setTheme, resolvedTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const toggleLocale = () => {
+    const newLocale: Locale = locale === 'en' ? 'es' : 'en';
+    document.cookie = `${LOCALE_COOKIE}=${newLocale};path=/;max-age=${60 * 60 * 24 * 365}`;
+    startLocaleTransition(() => {
+      router.refresh();
+    });
+  };
+
+  const navTabs: ButtonGroupItem[] = [
+    { id: 'overview', href: '/overview', label: t('overview') },
+    { id: 'activity', href: '/activity', label: t('activity') },
+    { id: 'manage', href: '/manage/expenses', label: t('manage') },
+    { id: 'accounts', href: '/accounts', label: t('account') },
+    { id: 'reports', href: '/reports', label: t('reports') },
+  ];
 
   const getActiveTabId = () => {
     if (pathname === '/overview') return 'overview';
@@ -55,14 +73,14 @@ export function TopNav() {
   const userMenuItems: DropdownMenuItem[] = [
     {
       type: 'link',
-      label: 'Settings',
+      label: t('settings'),
       href: '/settings',
       icon: <Icon name="settings" size={18} />,
     },
     { type: 'divider' },
     {
       type: 'button',
-      label: 'Sign out',
+      label: t('signOut'),
       icon: <Icon name="signOut" size={18} />,
       onClick: signOut,
     },
@@ -99,7 +117,7 @@ export function TopNav() {
                   ref={searchInputRef}
                   type="text"
                   className={styles.searchInput}
-                  placeholder="Search..."
+                  placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -113,13 +131,13 @@ export function TopNav() {
                   icon: (
                     <Icon name={searchOpen ? 'close' : 'search'} size={20} />
                   ),
-                  title: searchOpen ? 'Close search' : 'Search',
+                  title: searchOpen ? t('closeSearch') : t('search'),
                   onClick: searchOpen ? handleSearchClose : handleSearchClick,
                 },
                 {
                   id: 'notifications',
                   icon: <Icon name="notifications" size={20} />,
-                  title: 'Notifications',
+                  title: t('notifications'),
                 },
                 {
                   id: 'theme',
@@ -129,15 +147,30 @@ export function TopNav() {
                       size={20}
                     />
                   ),
-                  title: resolvedTheme === 'dark' ? 'Light mode' : 'Dark mode',
+                  title:
+                    resolvedTheme === 'dark' ? t('lightMode') : t('darkMode'),
                   onClick: () =>
                     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark'),
+                },
+                {
+                  id: 'language',
+                  icon: (
+                    <Image
+                      src={locale === 'en' ? enFlag : esFlag}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className={styles.flagIcon}
+                    />
+                  ),
+                  title: t('language'),
+                  onClick: toggleLocale,
                 },
               ]}
               orientation="horizontal"
               display="icon"
               variant="actions"
-              className={styles.actions}
+              className={styles.actionsGroup}
             />
           </div>
 

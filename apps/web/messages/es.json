@@ -1,0 +1,121 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "comingSoon": "Esta función estará disponible próximamente."
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión en tu cuenta para continuar",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "submitButton": "Iniciar sesión",
+      "divider": "o continúa con",
+      "googleButton": "Continuar con Google",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUpLink": "Regístrate",
+      "errorDefault": "Error al iniciar sesión"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Comienza a controlar tus finanzas hoy",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "juan@ejemplo.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Al menos 6 caracteres",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite tu contraseña",
+      "submitButton": "Crear cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signInLink": "Iniciar sesión",
+      "errorPasswordMismatch": "Las contraseñas no coinciden",
+      "errorPasswordLength": "La contraseña debe tener al menos 6 caracteres",
+      "errorDefault": "Error al registrarse"
+    }
+  },
+  "nav": {
+    "overview": "Resumen",
+    "activity": "Actividad",
+    "manage": "Gestionar",
+    "account": "Cuenta",
+    "reports": "Reportes",
+    "searchPlaceholder": "Buscar...",
+    "closeSearch": "Cerrar búsqueda",
+    "search": "Buscar",
+    "notifications": "Notificaciones",
+    "lightMode": "Modo claro",
+    "darkMode": "Modo oscuro",
+    "settings": "Configuración",
+    "signOut": "Cerrar sesión",
+    "language": "Idioma"
+  },
+  "greetings": {
+    "morning": "Buenos días",
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches"
+  },
+  "dashboard": {
+    "subtitle": "Mantente al tanto de tus tareas, monitorea el progreso y rastrea el estado.",
+    "wallets": "Billeteras",
+    "walletsCount": "Total {count} billeteras",
+    "totalBalance": "Balance Total",
+    "thanLastMonth": "que el mes pasado",
+    "transfer": "Transferir",
+    "request": "Solicitar",
+    "totalEarnings": "Ganancias Totales",
+    "totalSpending": "Gastos Totales",
+    "totalIncome": "Ingresos Totales",
+    "totalRevenue": "Ingresos Netos",
+    "thisMonth": "Este mes",
+    "monthlyLimit": "Límite de Gastos Mensual",
+    "spentOutOf": "gastado de",
+    "myCards": "Mis Tarjetas",
+    "addNew": "+ Agregar nueva",
+    "noCards": "Aún no hay tarjetas agregadas"
+  },
+  "activities": {
+    "title": "Actividad Reciente",
+    "viewAll": "Ver todo",
+    "orderId": "ID de Orden",
+    "activity": "Actividad",
+    "price": "Precio",
+    "status": "Estado",
+    "noActivities": "No hay actividad reciente",
+    "received": "Recibido",
+    "paid": "Pagado"
+  },
+  "pages": {
+    "activity": {
+      "title": "Actividad",
+      "description": "Ve todo tu historial de transacciones y actividades."
+    },
+    "settings": {
+      "title": "Configuración",
+      "description": "Administra la configuración de tu cuenta y preferencias."
+    },
+    "accounts": {
+      "title": "Cuentas Bancarias",
+      "description": "Conecta y administra tus cuentas bancarias."
+    },
+    "reports": {
+      "title": "Reportes",
+      "description": "Ve análisis y reportes detallados."
+    },
+    "expenses": {
+      "title": "Gastos",
+      "description": "Rastrea y administra tus gastos."
+    },
+    "incomes": {
+      "title": "Ingresos",
+      "description": "Rastrea y administra tus fuentes de ingreso."
+    }
+  }
+}

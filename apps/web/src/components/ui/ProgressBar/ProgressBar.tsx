@@ -1,4 +1,4 @@
-import { type HTMLAttributes, forwardRef } from 'react';
+import { forwardRef, type HTMLAttributes } from 'react';
 import styles from './ProgressBar.module.css';
 
 export interface ProgressBarProps extends HTMLAttributes<HTMLDivElement> {

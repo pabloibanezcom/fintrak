@@ -1,4 +1,4 @@
-import { type HTMLAttributes, forwardRef } from 'react';
+import { forwardRef, type HTMLAttributes } from 'react';
 import styles from './Badge.module.css';
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

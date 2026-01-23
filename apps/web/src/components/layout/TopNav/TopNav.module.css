@@ -84,7 +84,7 @@
   align-items: center;
 }
 
-.actions {
+.actionsGroup {
   display: flex;
   align-items: center;
   gap: var(--spacing-1);
@@ -92,6 +92,10 @@
   padding: var(--spacing-1);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-card);
+}
+
+.flagIcon {
+  border-radius: var(--radius-full);
 }
 
 .actionBtn {

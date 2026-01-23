@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/context';
+import { useEffect } from 'react';
 import { Icon } from '@/components/ui';
+import { useSession } from '@/context';
 import styles from './page.module.css';
 
 export default function HomePage() {

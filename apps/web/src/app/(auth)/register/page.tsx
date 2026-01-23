@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { type FormEvent, useState } from 'react';
 import { Button, Card, Input } from '@/components/ui';
 import { authService } from '@/services';
 import styles from './page.module.css';
 
 export default function RegisterPage() {
+  const t = useTranslations('auth.register');
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,12 +22,12 @@ export default function RegisterPage() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('errorPasswordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('errorPasswordLength'));
       return;
     }
 
@@ -35,7 +37,7 @@ export default function RegisterPage() {
       await authService.register({ email, password });
       router.push('/login?registered=true');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : t('errorDefault'));
     } finally {
       setIsLoading(false);
     }
@@ -43,16 +45,16 @@ export default function RegisterPage() {
 
   return (
     <Card padding="lg" className={styles.card}>
-      <h1 className={styles.title}>Create account</h1>
-      <p className={styles.subtitle}>Start tracking your finances today</p>
+      <h1 className={styles.title}>{t('title')}</h1>
+      <p className={styles.subtitle}>{t('subtitle')}</p>
 
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
 
         <Input
-          label="Email"
+          label={t('emailLabel')}
           type="email"
-          placeholder="john@example.com"
+          placeholder={t('emailPlaceholder')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -60,9 +62,9 @@ export default function RegisterPage() {
         />
 
         <Input
-          label="Password"
+          label={t('passwordLabel')}
           type="password"
-          placeholder="At least 6 characters"
+          placeholder={t('passwordPlaceholder')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -70,9 +72,9 @@ export default function RegisterPage() {
         />
 
         <Input
-          label="Confirm password"
+          label={t('confirmPasswordLabel')}
           type="password"
-          placeholder="Repeat your password"
+          placeholder={t('confirmPasswordPlaceholder')}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
@@ -80,14 +82,14 @@ export default function RegisterPage() {
         />
 
         <Button type="submit" fullWidth isLoading={isLoading}>
-          Create account
+          {t('submitButton')}
         </Button>
       </form>
 
       <p className={styles.footer}>
-        Already have an account?{' '}
+        {t('hasAccount')}{' '}
         <Link href="/login" className={styles.link}>
-          Sign in
+          {t('signInLink')}
         </Link>
       </p>
     </Card>

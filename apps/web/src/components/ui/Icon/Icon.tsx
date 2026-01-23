@@ -1,27 +1,27 @@
 'use client';
 
-import type { CSSProperties, ComponentType, SVGProps } from 'react';
+import type { ComponentType, CSSProperties, SVGProps } from 'react';
 import {
-  LogoIcon,
-  SearchIcon,
-  CloseIcon,
-  NotificationsIcon,
-  SunIcon,
-  MoonIcon,
+  AccountIcon,
+  ActivityIcon,
+  ArrowDownIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
   ChevronDownIcon,
+  CloseIcon,
+  LoaderIcon,
+  LogoIcon,
+  ManageIcon,
+  MoonIcon,
+  NotificationsIcon,
+  OverviewIcon,
+  ReportsIcon,
+  SearchIcon,
   SettingsIcon,
   SignOutIcon,
-  OverviewIcon,
-  ActivityIcon,
-  ManageIcon,
-  AccountIcon,
-  ReportsIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
   SpinnerIcon,
-  LoaderIcon,
+  SunIcon,
 } from './icons';
 
 const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {

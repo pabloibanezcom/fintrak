@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Button, Badge } from '@/components/ui';
+import { Badge, Button, Card } from '@/components/ui';
 import { formatCurrency, formatPercentage } from '@/utils';
 import styles from './TotalBalanceCard.module.css';
 
