@@ -56,6 +56,8 @@
     "closeSearch": "Cerrar búsqueda",
     "search": "Buscar",
     "notifications": "Notificaciones",
+    "sync": "Sincronizar transacciones",
+    "syncing": "Sincronizando transacciones...",
     "lightMode": "Modo claro",
     "darkMode": "Modo oscuro",
     "settings": "Configuración",

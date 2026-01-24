@@ -18,3 +18,4 @@ export { SettingsIcon } from './Settings';
 export { SignOutIcon } from './SignOut';
 export { SpinnerIcon } from './Spinner';
 export { SunIcon } from './Sun';
+export { SyncIcon } from './Sync';

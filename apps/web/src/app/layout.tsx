@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { SessionProvider, ThemeProvider, UserProvider } from '@/context';
+import {
+  SessionProvider,
+  SyncProvider,
+  ThemeProvider,
+  UserProvider,
+} from '@/context';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -29,7 +34,9 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <UserProvider>
-              <SessionProvider>{children}</SessionProvider>
+              <SessionProvider>
+                <SyncProvider>{children}</SyncProvider>
+              </SessionProvider>
             </UserProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

@@ -3402,6 +3402,31 @@
             "description": "Fetch transactions for a specific bank account. The system automatically identifies which bank connection owns this account."
           },
           "response": []
+        },
+        {
+          "name": "Sync Transactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/bank/sync",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank",
+                "sync"
+              ]
+            },
+            "description": "Sync bank transactions for the authenticated user. Fetches new transactions from all connected banks, stores them locally, creates expenses/incomes automatically, and sends push notifications."
+          },
+          "response": []
         }
       ],
       "description": "Bank integration via TrueLayer API for open banking. Connect multiple banks (Santander, BBVA) simultaneously. Each bank connection is stored separately, allowing you to fetch accounts and transactions from all connected banks at once."

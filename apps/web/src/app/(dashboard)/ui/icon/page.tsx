@@ -25,6 +25,7 @@ const iconNames = [
   'signOut',
   'spinner',
   'sun',
+  'sync',
 ];
 
 export default function IconShowroomPage() {

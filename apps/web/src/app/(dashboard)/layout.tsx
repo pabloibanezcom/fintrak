@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Footer, Sidebar, TopNav } from '@/components/layout';
+import { Footer, Sidebar, SyncOverlay, TopNav } from '@/components/layout';
 import { Icon } from '@/components/ui';
-import { useSession } from '@/context';
+import { useSession, useSync } from '@/context';
 import styles from './layout.module.css';
 
 export default function DashboardLayout({
@@ -14,6 +14,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useSession();
+  const { isSyncing } = useSync();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -35,6 +36,7 @@ export default function DashboardLayout({
 
   return (
     <div className={styles.layout}>
+      {isSyncing && <SyncOverlay />}
       <TopNav />
       <div className={styles.workspace}>
         <Sidebar />

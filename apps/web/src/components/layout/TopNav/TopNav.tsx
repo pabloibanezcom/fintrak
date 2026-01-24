@@ -11,7 +11,7 @@ import {
   type DropdownMenuItem,
   Icon,
 } from '@/components/ui';
-import { useSession, useTheme, useUser } from '@/context';
+import { useSession, useSync, useTheme, useUser } from '@/context';
 import type { Locale } from '@/i18n/config';
 import enFlag from '../LanguageSwitcher/flags/en.png';
 import esFlag from '../LanguageSwitcher/flags/es.png';
@@ -27,6 +27,7 @@ export function TopNav() {
   const [, startLocaleTransition] = useTransition();
   const { user } = useUser();
   const { signOut } = useSession();
+  const { isSyncing, syncTransactions } = useSync();
   const { setTheme, resolvedTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -133,6 +134,15 @@ export function TopNav() {
                   ),
                   title: searchOpen ? t('closeSearch') : t('search'),
                   onClick: searchOpen ? handleSearchClose : handleSearchClick,
+                },
+                {
+                  id: 'sync',
+                  icon: (
+                    <Icon name={isSyncing ? 'loader' : 'sync'} size={20} />
+                  ),
+                  title: t('sync'),
+                  onClick: isSyncing ? undefined : syncTransactions,
+                  disabled: isSyncing,
                 },
                 {
                   id: 'notifications',

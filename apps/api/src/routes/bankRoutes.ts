@@ -364,4 +364,37 @@ router.get('/accounts/:accountId/balance', controller.getBalance);
  */
 router.get('/accounts/:accountId/transactions', controller.getTransactions);
 
+/**
+ * @swagger
+ * /api/bank/sync:
+ *   post:
+ *     summary: Sync bank transactions
+ *     description: Fetches new transactions from connected banks and stores them locally. Creates expenses/incomes automatically.
+ *     tags: [Bank Integration (TrueLayer)]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Transactions synced successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Transactions synced successfully
+ *                 synced:
+ *                   type: number
+ *                   description: Number of new transactions synced
+ *                 errors:
+ *                   type: number
+ *                   description: Number of errors encountered
+ *       401:
+ *         description: User not authenticated
+ *       500:
+ *         description: Failed to sync transactions
+ */
+router.post('/sync', controller.syncUserTransactions);
+
 export default router;

@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import BankConnection, {
   type IBankConnection,
 } from '../models/BankConnectionModel';
+import TransactionSyncService from '../services/TransactionSyncService';
 import TrueLayerService from '../services/TrueLayerService';
 
 export const getProviders = async (
@@ -386,6 +387,33 @@ export const deleteConnection = async (
     console.error('Delete connection error:', error);
     res.status(500).json({
       error: 'Failed to delete connection',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+export const syncUserTransactions = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const result = await TransactionSyncService.syncUserTransactions(userId);
+
+    res.json({
+      message: 'Transactions synced successfully',
+      ...result,
+    });
+  } catch (error) {
+    console.error('Sync transactions error:', error);
+    res.status(500).json({
+      error: 'Failed to sync transactions',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
   }

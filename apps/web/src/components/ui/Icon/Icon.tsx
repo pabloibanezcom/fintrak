@@ -22,6 +22,7 @@ import {
   SignOutIcon,
   SpinnerIcon,
   SunIcon,
+  SyncIcon,
 } from './icons';
 
 const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -45,6 +46,7 @@ const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   signOut: SignOutIcon,
   spinner: SpinnerIcon,
   sun: SunIcon,
+  sync: SyncIcon,
 };
 
 interface IconProps {
