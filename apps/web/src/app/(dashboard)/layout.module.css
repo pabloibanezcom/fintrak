@@ -5,6 +5,7 @@
   flex-direction: column;
   padding-top: var(--topnav-height);
   overflow: hidden;
+  background-color: var(--color-bg-body);
 }
 
 .workspace {
@@ -25,6 +26,8 @@
 
 .content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 0 var(--spacing-6) 0 var(--spacing-4);
   overflow-y: auto;
 }

@@ -43,7 +43,7 @@
   left: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-text-primary);
   color: var(--color-text-inverse);
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-lg);
@@ -70,7 +70,7 @@
 }
 
 .navItem.active {
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-text-primary);
   color: var(--color-text-inverse);
 }
 
@@ -108,7 +108,7 @@
   left: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-text-primary);
   color: var(--color-text-inverse);
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-lg);

@@ -2,7 +2,7 @@
 .container {
   display: flex;
   align-items: center;
-  background-color: var(--color-neutral-0);
+  background-color: var(--color-bg-card);
   box-shadow: var(--shadow-card);
 }
 
@@ -47,7 +47,7 @@
 }
 
 .nav .item.active {
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-text-primary);
   color: var(--color-text-inverse);
 }
 
@@ -94,7 +94,7 @@
 .withTooltip::after {
   content: attr(title);
   position: absolute;
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-text-primary);
   color: var(--color-text-inverse);
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-lg);
@@ -135,7 +135,7 @@
 
 .indicator {
   position: absolute;
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-text-primary);
   border-radius: var(--radius-full);
   transition:
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),

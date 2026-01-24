@@ -4,11 +4,12 @@ A comprehensive financial tracking monorepo built with TypeScript, featuring a r
 
 ## 🏗️ Architecture
 
-This monorepo contains three main packages:
+This monorepo contains four main packages:
 
 - **API** (`apps/api`): TypeScript Express.js server with MongoDB integration and external MI service connectivity
-- **Mobile** (`apps/mobile`): React Native Expo application for portfolio management  
-- **Types** (`packages/types`): Shared TypeScript types across API and mobile apps
+- **Web** (`apps/web`): Next.js dashboard application with internationalization support
+- **Mobile** (`apps/mobile`): React Native Expo application for portfolio management
+- **Types** (`packages/types`): Shared TypeScript types across all apps
 
 ## 🚀 Quick Start
 
@@ -61,6 +62,9 @@ AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 # Start API development server
 pnpm dev-api
 
+# Start web dashboard
+pnpm dev-web
+
 # Start mobile app with Expo
 pnpm dev-mobile
 
@@ -93,6 +97,13 @@ pnpm format-fix
 - **Documentation**: Swagger/OpenAPI 3.0 at `/api/docs`
 - **External Integration**: MI service client with retry logic
 
+### Web Dashboard
+- **Framework**: Next.js 14 with App Router
+- **Internationalization**: next-intl with English/Spanish support
+- **Styling**: CSS Modules with design tokens
+- **Charts**: Recharts for data visualization
+- **Features**: Dashboard overview, budget tracking, banking, investments, reports
+
 ### Mobile App
 - **Framework**: React Native with Expo SDK
 - **Platforms**: iOS, Android, Web
@@ -105,6 +116,7 @@ pnpm format-fix
 fintrak/
 ├── apps/
 │   ├── api/           # Express.js API server
+│   ├── web/           # Next.js dashboard app
 │   └── mobile/        # React Native Expo app
 ├── packages/
 │   └── types/         # Shared TypeScript definitions
@@ -119,6 +131,7 @@ fintrak/
 - **Monorepo**: pnpm workspaces
 - **Code Quality**: Biome (linting & formatting)
 - **Backend**: Express.js, MongoDB, JWT
+- **Web**: Next.js, React, next-intl, Recharts
 - **Mobile**: React Native, Expo
 - **Documentation**: Swagger/OpenAPI
 

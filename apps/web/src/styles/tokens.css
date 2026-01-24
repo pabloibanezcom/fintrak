@@ -142,6 +142,19 @@
 }
 
 [data-theme="dark"] {
+  /* Neutral Colors - Inverted for dark mode */
+  --color-neutral-0: #111827;
+  --color-neutral-50: #1f2937;
+  --color-neutral-100: #374151;
+  --color-neutral-200: #4b5563;
+  --color-neutral-300: #6b7280;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #d1d5db;
+  --color-neutral-600: #e5e7eb;
+  --color-neutral-700: #f3f4f6;
+  --color-neutral-800: #f9fafb;
+  --color-neutral-900: #ffffff;
+
   /* Background Colors */
   --color-bg-body: #111827;
   --color-bg-primary: #1f2937;
