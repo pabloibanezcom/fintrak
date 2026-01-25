@@ -24,6 +24,7 @@ export const getAllTransactions = async (
       processed,
       from,
       to,
+      search,
       limit = '50',
       offset = '0',
     } = req.query;
@@ -38,6 +39,13 @@ export const getAllTransactions = async (
       query.timestamp = {};
       if (from) (query.timestamp as Record<string, Date>).$gte = new Date(from as string);
       if (to) (query.timestamp as Record<string, Date>).$lte = new Date(to as string);
+    }
+    if (search) {
+      const searchRegex = new RegExp(search as string, 'i');
+      query.$or = [
+        { description: searchRegex },
+        { merchantName: searchRegex },
+      ];
     }
 
     const transactions = await BankTransaction.find(query)

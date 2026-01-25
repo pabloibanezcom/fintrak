@@ -3313,6 +3313,49 @@
           "response": []
         },
         {
+          "name": "Update Bank Connection",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "alias",
+                  "value": "My Santander",
+                  "type": "text",
+                  "description": "Custom alias for this bank connection"
+                },
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": "",
+                  "description": "Image file for bank logo (PNG, JPEG, WebP, SVG)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/bank/connections/{{bank_id}}",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank",
+                "connections",
+                "{{bank_id}}"
+              ]
+            },
+            "description": "Update a bank connection's alias or logo. Upload an image file (PNG, JPEG, WebP, SVG) for the logo. The image will be uploaded to S3 and the URL stored."
+          },
+          "response": []
+        },
+        {
           "name": "Get All Connected Accounts",
           "request": {
             "method": "GET",
@@ -3488,6 +3531,12 @@
                   "key": "to",
                   "value": "2025-01-31",
                   "description": "Filter to date (ISO 8601)",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in description and merchant name (case-insensitive)",
                   "disabled": true
                 },
                 {

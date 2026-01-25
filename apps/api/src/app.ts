@@ -5,6 +5,7 @@ import { specs, swaggerOptions, swaggerUi } from './config/swagger';
 import './config/passport'; // Initialize passport configuration
 import analyticsRoutes from './routes/analyticsRoutes';
 import authRoutes from './routes/authRoutes';
+import bankAccountRoutes from './routes/bankAccountRoutes';
 import bankRoutes from './routes/bankRoutes';
 import bankTransactionRoutes from './routes/bankTransactionRoutes';
 import categoryRoutes from './routes/categoryRoutes';
@@ -37,6 +38,7 @@ app.use('/api', cronRoutes);
 app.use('/api', analyticsRoutes);
 app.use('/api/auth/', authRoutes);
 app.use('/api/bank', bankRoutes);
+app.use('/api/bank-accounts', bankAccountRoutes);
 app.use('/api/bank-transactions', bankTransactionRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', counterpartyRoutes);

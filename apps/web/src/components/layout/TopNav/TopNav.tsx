@@ -137,9 +137,7 @@ export function TopNav() {
                 },
                 {
                   id: 'sync',
-                  icon: (
-                    <Icon name={isSyncing ? 'loader' : 'sync'} size={20} />
-                  ),
+                  icon: <Icon name={isSyncing ? 'loader' : 'sync'} size={20} />,
                   title: t('sync'),
                   onClick: isSyncing ? undefined : syncTransactions,
                   disabled: isSyncing,

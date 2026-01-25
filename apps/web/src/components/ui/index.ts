@@ -15,3 +15,7 @@ export {
 export { Icon } from './Icon';
 export { Input, type InputProps } from './Input/Input';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar/ProgressBar';
+export {
+  TransactionList,
+  type TransactionListItem,
+} from './TransactionList/TransactionList';

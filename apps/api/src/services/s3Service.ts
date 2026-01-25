@@ -20,6 +20,7 @@ const s3Client = new S3Client({
 });
 
 export type MediaType =
+  | 'bank-logo'
   | 'counterparty-logo'
   | 'profile-picture'
   | 'receipt'

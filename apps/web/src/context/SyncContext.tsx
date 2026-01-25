@@ -62,8 +62,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     if (!isAuthenticated || hasAutoSynced.current) return;
 
     const shouldSync =
-      !lastSyncTime ||
-      Date.now() - lastSyncTime.getTime() > SYNC_INTERVAL_MS;
+      !lastSyncTime || Date.now() - lastSyncTime.getTime() > SYNC_INTERVAL_MS;
 
     if (shouldSync) {
       hasAutoSynced.current = true;

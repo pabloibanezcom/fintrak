@@ -1,8 +1,25 @@
 import { Router } from 'express';
+import multer from 'multer';
 import * as controller from '../controllers/BankController';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
+
+// Configure multer for bank logo uploads
+const logoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB limit for logos
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PNG, JPEG, WebP, and SVG images are allowed'));
+    }
+  },
+});
 
 // Callback route must be BEFORE authenticate middleware (it's a redirect from TrueLayer)
 /**
@@ -214,6 +231,49 @@ router.get('/connections', controller.getConnections);
  *         description: Connection not found
  */
 router.delete('/connections/:bankId', controller.deleteConnection);
+
+/**
+ * @swagger
+ * /api/bank/connections/{bankId}:
+ *   patch:
+ *     summary: Update a bank connection
+ *     description: Update bank connection details (alias, logo). Logo can be uploaded as a file.
+ *     tags: [Bank Integration (TrueLayer)]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bankId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bank ID (e.g., santander, bbva)
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               alias:
+ *                 type: string
+ *                 description: Custom alias for this bank connection
+ *               logo:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file for bank logo (PNG, JPEG, WebP, SVG)
+ *     responses:
+ *       200:
+ *         description: Bank connection updated successfully
+ *       401:
+ *         description: User not authenticated
+ *       404:
+ *         description: Connection not found
+ */
+router.patch(
+  '/connections/:bankId',
+  logoUpload.single('logo'),
+  controller.updateConnection
+);
 
 /**
  * @swagger

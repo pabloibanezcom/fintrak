@@ -1,7 +1,9 @@
 import type { Request, Response } from 'express';
+import BankAccount from '../models/BankAccountModel';
 import BankConnection, {
   type IBankConnection,
 } from '../models/BankConnectionModel';
+import { deleteFile, uploadFile } from '../services/s3Service';
 import TransactionSyncService from '../services/TransactionSyncService';
 import TrueLayerService from '../services/TrueLayerService';
 
@@ -128,6 +130,22 @@ export const handleCallback = async (
       { upsert: true, new: true }
     );
 
+    // Create or update BankAccount records for each account
+    for (const account of connectedAccounts) {
+      await BankAccount.findOneAndUpdate(
+        { userId, accountId: account.accountId },
+        {
+          bankId,
+          bankName,
+          name: account.name || 'Unknown Account',
+          iban: account.iban,
+          type: account.type,
+          currency: account.currency || 'EUR',
+        },
+        { upsert: true, new: true }
+      );
+    }
+
     res.json({
       message: 'Bank connection successful',
       bank: bankName,
@@ -192,7 +210,7 @@ export const getConnections = async (
     }
 
     const connections = await BankConnection.find({ userId }).select(
-      'bankId bankName connectedAccounts createdAt updatedAt'
+      'bankId bankName alias logo connectedAccounts createdAt updatedAt'
     );
 
     res.json(connections);
@@ -358,6 +376,83 @@ export const getTransactions = async (
     });
   }
 };
+
+export const updateConnection = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { bankId } = req.params;
+    const { alias } = req.body;
+    const userId = req.user?.id;
+    const logoFile = req.file;
+
+    if (!userId) {
+      res.status(401).json({ error: 'User not authenticated' });
+      return;
+    }
+
+    const updateFields: Record<string, string | undefined> = {};
+    if (alias !== undefined) updateFields.alias = alias;
+
+    // Handle logo file upload
+    if (logoFile) {
+      // Get current connection to check for old logo
+      const currentConnection = await BankConnection.findOne({ userId, bankId });
+      if (
+        currentConnection?.logo?.includes('s3.') &&
+        currentConnection.logo.includes('bank-logo')
+      ) {
+        try {
+          await deleteFile(currentConnection.logo);
+        } catch (err) {
+          console.error('Failed to delete old bank logo:', err);
+        }
+      }
+
+      // Upload new logo
+      const logoUrl = await uploadFile(logoFile.buffer, logoFile.originalname, {
+        userId,
+        mediaType: 'bank-logo',
+        fileName: `${bankId}-logo${getExtensionFromMimetype(logoFile.mimetype)}`,
+      });
+
+      updateFields.logo = logoUrl;
+    }
+
+    const connection = await BankConnection.findOneAndUpdate(
+      { userId, bankId },
+      { $set: updateFields },
+      { new: true }
+    ).select('bankId bankName alias logo connectedAccounts createdAt updatedAt');
+
+    if (!connection) {
+      res.status(404).json({
+        error: 'Connection not found',
+        message: 'No bank connection found with this ID',
+      });
+      return;
+    }
+
+    res.json(connection);
+  } catch (error) {
+    console.error('Update connection error:', error);
+    res.status(500).json({
+      error: 'Failed to update connection',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+function getExtensionFromMimetype(mimetype: string): string {
+  const map: Record<string, string> = {
+    'image/png': '.png',
+    'image/jpeg': '.jpg',
+    'image/webp': '.webp',
+    'image/svg+xml': '.svg',
+  };
+  return map[mimetype] || '.png';
+}
 
 export const deleteConnection = async (
   req: Request,

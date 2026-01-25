@@ -12,6 +12,8 @@ export interface IBankConnection extends Document {
   userId: string;
   bankId: string; // e.g., 'santander', 'bbva'
   bankName: string; // e.g., 'Santander', 'BBVA'
+  alias?: string; // Custom user alias for this bank
+  logo?: string; // S3 URL for bank logo
   accessToken: string;
   refreshToken: string;
   expiresAt: Date;
@@ -36,6 +38,8 @@ const BankConnectionSchema: Schema = new Schema(
     userId: { type: String, required: true, index: true },
     bankId: { type: String, required: true }, // 'santander', 'bbva', etc.
     bankName: { type: String, required: true }, // Display name
+    alias: { type: String }, // Custom user alias
+    logo: { type: String }, // S3 URL for bank logo
     accessToken: { type: String, required: true },
     refreshToken: { type: String, required: true },
     expiresAt: { type: Date, required: true },
