@@ -37,15 +37,16 @@ export const getAllTransactions = async (
     if (processed !== undefined) query.processed = processed === 'true';
     if (from || to) {
       query.timestamp = {};
-      if (from) (query.timestamp as Record<string, Date>).$gte = new Date(from as string);
-      if (to) (query.timestamp as Record<string, Date>).$lte = new Date(to as string);
+      if (from)
+        (query.timestamp as Record<string, Date>).$gte = new Date(
+          from as string
+        );
+      if (to)
+        (query.timestamp as Record<string, Date>).$lte = new Date(to as string);
     }
     if (search) {
       const searchRegex = new RegExp(search as string, 'i');
-      query.$or = [
-        { description: searchRegex },
-        { merchantName: searchRegex },
-      ];
+      query.$or = [{ description: searchRegex }, { merchantName: searchRegex }];
     }
 
     const transactions = await BankTransaction.find(query)
@@ -196,8 +197,14 @@ export const getTransactionStats = async (
     if (accountId) matchStage.accountId = accountId;
     if (from || to) {
       matchStage.timestamp = {};
-      if (from) (matchStage.timestamp as Record<string, Date>).$gte = new Date(from as string);
-      if (to) (matchStage.timestamp as Record<string, Date>).$lte = new Date(to as string);
+      if (from)
+        (matchStage.timestamp as Record<string, Date>).$gte = new Date(
+          from as string
+        );
+      if (to)
+        (matchStage.timestamp as Record<string, Date>).$lte = new Date(
+          to as string
+        );
     }
 
     const stats = await BankTransaction.aggregate([
@@ -210,7 +217,9 @@ export const getTransactionStats = async (
             $sum: { $cond: [{ $eq: ['$type', 'CREDIT'] }, '$amount', 0] },
           },
           totalDebits: {
-            $sum: { $cond: [{ $eq: ['$type', 'DEBIT'] }, { $abs: '$amount' }, 0] },
+            $sum: {
+              $cond: [{ $eq: ['$type', 'DEBIT'] }, { $abs: '$amount' }, 0],
+            },
           },
           creditCount: {
             $sum: { $cond: [{ $eq: ['$type', 'CREDIT'] }, 1, 0] },

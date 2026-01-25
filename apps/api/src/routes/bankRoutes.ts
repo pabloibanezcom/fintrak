@@ -12,7 +12,12 @@ const logoUpload = multer({
     fileSize: 2 * 1024 * 1024, // 2MB limit for logos
   },
   fileFilter: (_req, file, cb) => {
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+    const allowedTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'image/svg+xml',
+    ];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {

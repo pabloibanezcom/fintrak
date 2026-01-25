@@ -398,7 +398,10 @@ export const updateConnection = async (
     // Handle logo file upload
     if (logoFile) {
       // Get current connection to check for old logo
-      const currentConnection = await BankConnection.findOne({ userId, bankId });
+      const currentConnection = await BankConnection.findOne({
+        userId,
+        bankId,
+      });
       if (
         currentConnection?.logo?.includes('s3.') &&
         currentConnection.logo.includes('bank-logo')
@@ -424,7 +427,9 @@ export const updateConnection = async (
       { userId, bankId },
       { $set: updateFields },
       { new: true }
-    ).select('bankId bankName alias logo connectedAccounts createdAt updatedAt');
+    ).select(
+      'bankId bankName alias logo connectedAccounts createdAt updatedAt'
+    );
 
     if (!connection) {
       res.status(404).json({

@@ -71,6 +71,11 @@ const components: ShowroomItem[] = [
     href: '/ui/card',
   },
   {
+    name: 'DateSelector',
+    description: 'Date range picker with presets and custom selection',
+    href: '/ui/date-selector',
+  },
+  {
     name: 'DropdownMenu',
     description: 'Dropdown menus with various item types',
     href: '/ui/dropdown-menu',

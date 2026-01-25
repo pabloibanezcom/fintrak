@@ -4,6 +4,8 @@ export { ArrowRightIcon } from './ArrowRight';
 export { ArrowUpIcon } from './ArrowUp';
 export { BankingIcon } from './Banking';
 export { BudgetIcon } from './Budget';
+export { CalendarIcon } from './Calendar';
+export { CheckIcon } from './Check';
 export { ChevronDownIcon } from './ChevronDown';
 export { CloseIcon } from './Close';
 export { InvestmentsIcon } from './Investments';

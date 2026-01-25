@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { Button, Card, Icon, Input } from '@/components/ui';
+import { useCallback, useMemo, useState } from 'react';
+import { Button, Card, DateSelector, Icon, Select } from '@/components/ui';
+import type { SelectOption } from '@/components/ui';
 import styles from './TransactionFilters.module.css';
 
 export interface TransactionFiltersValue {
@@ -41,30 +42,27 @@ export function TransactionFilters({
     [onChange, value]
   );
 
-  const handleDateFromChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...value, dateFrom: e.target.value });
-    },
-    [onChange, value]
-  );
-
-  const handleDateToChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...value, dateTo: e.target.value });
+  const handleDateChange = useCallback(
+    (start: string, end: string) => {
+      onChange({
+        ...value,
+        dateFrom: start,
+        dateTo: end,
+      });
     },
     [onChange, value]
   );
 
   const handleBankChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      onChange({ ...value, bankId: e.target.value, accountId: '' });
+    (newBankId: string) => {
+      onChange({ ...value, bankId: newBankId, accountId: '' });
     },
     [onChange, value]
   );
 
   const handleAccountChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      onChange({ ...value, accountId: e.target.value });
+    (newAccountId: string) => {
+      onChange({ ...value, accountId: newAccountId });
     },
     [onChange, value]
   );
@@ -86,10 +84,21 @@ export function TransactionFilters({
     value.bankId ||
     value.accountId;
 
+  // Create options with "All" option prepended
+  const bankSelectOptions: SelectOption[] = useMemo(
+    () => [{ value: '', label: 'All banks' }, ...banks],
+    [banks]
+  );
+
   // Filter accounts based on selected bank
   const filteredAccounts = value.bankId
     ? accounts.filter((acc) => acc.value.startsWith(value.bankId))
     : accounts;
+
+  const accountSelectOptions: SelectOption[] = useMemo(
+    () => [{ value: '', label: 'All accounts' }, ...filteredAccounts],
+    [filteredAccounts]
+  );
 
   return (
     <Card padding="md" className={styles.card}>
@@ -121,58 +130,29 @@ export function TransactionFilters({
 
       {isExpanded && (
         <div className={styles.expandedFilters}>
-          <div className={styles.filterGroup}>
-            <label htmlFor="bank-filter" className={styles.filterLabel}>
-              Bank
-            </label>
-            <select
-              id="bank-filter"
-              value={value.bankId}
-              onChange={handleBankChange}
-              className={styles.select}
-            >
-              <option value="">All banks</option>
-              {banks.map((bank) => (
-                <option key={bank.value} value={bank.value}>
-                  {bank.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Bank"
+            options={bankSelectOptions}
+            value={value.bankId}
+            onChange={handleBankChange}
+            placeholder="All banks"
+            className={styles.select}
+          />
 
-          <div className={styles.filterGroup}>
-            <label htmlFor="account-filter" className={styles.filterLabel}>
-              Account
-            </label>
-            <select
-              id="account-filter"
-              value={value.accountId}
-              onChange={handleAccountChange}
-              className={styles.select}
-            >
-              <option value="">All accounts</option>
-              {filteredAccounts.map((account) => (
-                <option key={account.value} value={account.value}>
-                  {account.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Account"
+            options={accountSelectOptions}
+            value={value.accountId}
+            onChange={handleAccountChange}
+            placeholder="All accounts"
+            className={styles.select}
+          />
 
-          <div className={styles.dateFilters}>
-            <Input
-              type="date"
-              label="From"
-              value={value.dateFrom}
-              onChange={handleDateFromChange}
-            />
-            <Input
-              type="date"
-              label="To"
-              value={value.dateTo}
-              onChange={handleDateToChange}
-            />
-          </div>
+          <DateSelector
+            startDate={value.dateFrom}
+            endDate={value.dateTo}
+            onChange={handleDateChange}
+          />
 
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={handleClearFilters}>
