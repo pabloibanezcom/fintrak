@@ -1,0 +1,290 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-5);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.totalBalance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-1);
+}
+
+.totalLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.totalAmount {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.listHorizontal {
+  flex-direction: row;
+  gap: var(--spacing-3);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-300) transparent;
+}
+
+.listHorizontal::-webkit-scrollbar {
+  height: 6px;
+}
+
+.listHorizontal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.listHorizontal::-webkit-scrollbar-thumb {
+  background-color: var(--color-neutral-300);
+  border-radius: var(--radius-full);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-xl);
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.account[role="button"] {
+  cursor: pointer;
+}
+
+.account[role="button"]:hover {
+  background-color: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.account[role="button"]:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.accountHorizontal {
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 180px;
+  max-width: 200px;
+  flex-shrink: 0;
+  background-color: var(--color-bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.accountHorizontal .bankLogo {
+  background-color: var(--color-bg-tertiary);
+}
+
+.accountHorizontal .accountInfo {
+  width: 100%;
+}
+
+.accountHorizontal .balance {
+  width: 100%;
+  align-items: flex-start;
+  margin-top: var(--spacing-2);
+  padding-top: var(--spacing-2);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.cardHorizontal {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.cardHorizontal .header {
+  padding: 0 0 var(--spacing-3) 0;
+}
+
+.loadingHorizontal {
+  flex-direction: row;
+  gap: var(--spacing-3);
+}
+
+.skeletonHorizontal {
+  min-width: 180px;
+  height: 140px;
+}
+
+.bankLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.logoImage {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.logoPlaceholder {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-600);
+}
+
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.bankName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accountName {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.iban {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.balanceAmount {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.currency {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.empty {
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.skeleton {
+  height: 64px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 25%,
+    var(--color-bg-secondary) 50%,
+    var(--color-bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-xl);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+
+  .totalBalance {
+    align-items: flex-start;
+  }
+
+  .account {
+    flex-wrap: wrap;
+  }
+
+  .balance {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-2);
+    border-top: 1px solid var(--color-border-light);
+    margin-top: var(--spacing-2);
+  }
+}

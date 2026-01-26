@@ -56,6 +56,11 @@ const components: ShowroomItem[] = [
     href: '/ui/badge',
   },
   {
+    name: 'BankAccountCard',
+    description: 'Display bank accounts with balances and details',
+    href: '/ui/bank-account-card',
+  },
+  {
     name: 'Button',
     description: 'Interactive buttons with various styles and states',
     href: '/ui/button',

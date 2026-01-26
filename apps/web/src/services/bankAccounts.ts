@@ -19,6 +19,14 @@ export interface GetBankAccountsParams {
   bankId?: string;
 }
 
+export interface AccountBalance {
+  currency: string;
+  available: number;
+  current: number;
+  overdraft?: number;
+  update_timestamp?: string;
+}
+
 export const bankAccountsService = {
   getAccounts: async (
     params: GetBankAccountsParams = {}
@@ -44,5 +52,11 @@ export const bankAccountsService = {
     data: { alias?: string }
   ): Promise<BankAccount> => {
     return apiClient.patch<BankAccount>(`/bank-accounts/${accountId}`, data);
+  },
+
+  getAccountBalance: async (accountId: string): Promise<AccountBalance> => {
+    return apiClient.get<AccountBalance>(
+      `/bank/accounts/${accountId}/balance`
+    );
   },
 };

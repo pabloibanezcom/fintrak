@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import {
-  TransactionFilters,
   type FilterOption,
+  TransactionFilters,
   type TransactionFiltersValue,
 } from '@/components/dashboard';
 import { TransactionList, type TransactionListItem } from '@/components/ui';

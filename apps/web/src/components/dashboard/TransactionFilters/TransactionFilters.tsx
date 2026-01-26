@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { Button, Card, DateSelector, Icon, Select } from '@/components/ui';
 import type { SelectOption } from '@/components/ui';
+import { Button, Card, DateSelector, Icon, Select } from '@/components/ui';
 import styles from './TransactionFilters.module.css';
 
 export interface TransactionFiltersValue {

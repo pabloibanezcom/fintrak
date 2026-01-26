@@ -6,11 +6,16 @@ import {
   SpendingLimitBar,
   StatCard,
   TotalBalanceCard,
-  WalletCard,
 } from '@/components/dashboard';
-import { Card, TransactionList, type TransactionListItem } from '@/components/ui';
+import {
+  BankAccountCard,
+  type BankAccountItem,
+  Card,
+  TransactionList,
+  type TransactionListItem,
+} from '@/components/ui';
 import { useUser } from '@/context';
-import { usePeriodSummary } from '@/hooks';
+import { useBankAccounts, usePeriodSummary } from '@/hooks';
 import { getGreetingPeriod } from '@/utils';
 import styles from './page.module.css';
 
@@ -18,12 +23,32 @@ export default function OverviewPage() {
   const t = useTranslations();
   const { data } = usePeriodSummary({ latestCount: 5 });
   const { user } = useUser();
+  const {
+    accounts,
+    connections,
+    getAccountBalance,
+    isLoading: isLoadingAccounts,
+  } = useBankAccounts();
   const greetingPeriod = getGreetingPeriod();
   const userName = user?.name || user?.email?.split('@')[0] || 'User';
 
   const totalExpenses = data?.expenses.total || 0;
   const totalIncomes = data?.incomes.total || 0;
   const balance = data?.balance || 0;
+
+  // Map bank accounts to BankAccountItem format
+  const bankAccounts: BankAccountItem[] = accounts.map((account) => {
+    const connection = connections.find((c) => c.bankId === account.bankId);
+    return {
+      id: account._id,
+      bankName: connection?.alias || account.bankName,
+      bankLogo: connection?.logo,
+      accountName: account.alias || account.name,
+      balance: getAccountBalance(account.accountId),
+      currency: account.currency,
+      iban: account.iban,
+    };
+  });
 
   return (
     <div className={styles.page}>
@@ -40,30 +65,14 @@ export default function OverviewPage() {
           <TotalBalanceCard balance={balance} currency="EUR" change={5} />
 
           <Card padding="md" className={styles.walletsCard}>
-            <div className={styles.walletsHeader}>
-              <span className={styles.walletsLabel}>Wallets</span>
-              <span className={styles.walletsCount}>| Total 6 wallets</span>
-            </div>
-            <div className={styles.walletsList}>
-              <WalletCard
-                currency="USD"
-                balance={22878.0}
-                label="Last 4 884 a month"
-                isActive={false}
-              />
-              <WalletCard
-                currency="EUR"
-                balance={18345.0}
-                label="Last 4 884 a month"
-                isActive={true}
-              />
-              <WalletCard
-                currency="GBP"
-                balance={15000.0}
-                label="Last 6.17 a month"
-                isActive={false}
-              />
-            </div>
+            <BankAccountCard
+              accounts={bankAccounts}
+              title="Bank Accounts"
+              layout="horizontal"
+              showHeader={true}
+              isLoading={isLoadingAccounts}
+              emptyMessage="Connect a bank to see your accounts"
+            />
           </Card>
         </div>
 
