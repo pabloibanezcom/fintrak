@@ -11,6 +11,19 @@
   flex-direction: column;
 }
 
+.tableSimple {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableSimple .tableHeader {
+  grid-template-columns: 100px 1fr 120px;
+}
+
+.tableSimple .row {
+  grid-template-columns: 100px 1fr 120px;
+}
+
 .tableHeader {
   display: grid;
   grid-template-columns: 100px 1.5fr 120px 150px 100px;

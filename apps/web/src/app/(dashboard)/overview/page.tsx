@@ -3,13 +3,12 @@
 import { useTranslations } from 'next-intl';
 
 import {
-  RecentActivities,
   SpendingLimitBar,
   StatCard,
   TotalBalanceCard,
   WalletCard,
 } from '@/components/dashboard';
-import { Card } from '@/components/ui';
+import { Card, TransactionList, type TransactionListItem } from '@/components/ui';
 import { useUser } from '@/context';
 import { usePeriodSummary } from '@/hooks';
 import { getGreetingPeriod } from '@/utils';
@@ -129,11 +128,22 @@ export default function OverviewPage() {
           </Card>
         </div>
 
-        {/* Recent Activities */}
+        {/* Recent Transactions */}
         <div className={styles.activitiesSection}>
-          <RecentActivities
-            transactions={data?.latestTransactions || []}
-            currency="EUR"
+          <TransactionList
+            transactions={
+              data?.latestTransactions.map(
+                (tx): TransactionListItem => ({
+                  id: tx.id,
+                  title: tx.title,
+                  amount: tx.amount,
+                  currency: tx.currency,
+                  date: tx.date,
+                  type: tx.type === 'income' ? 'credit' : 'debit',
+                })
+              ) || []
+            }
+            showBankInfo={false}
           />
         </div>
       </div>

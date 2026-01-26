@@ -28,6 +28,7 @@ interface TransactionListProps {
   formatAmount?: (amount: number, currency: string) => string;
   formatDate?: (date: string) => string;
   emptyMessage?: string;
+  showBankInfo?: boolean;
 }
 
 export function TransactionList({
@@ -48,6 +49,7 @@ export function TransactionList({
       year: 'numeric',
     }),
   emptyMessage = 'No transactions found',
+  showBankInfo = true,
 }: TransactionListProps) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -95,14 +97,16 @@ export function TransactionList({
     );
   }
 
+  const tableClass = showBankInfo ? styles.table : styles.tableSimple;
+
   return (
     <Card padding="md" className={styles.card}>
-      <div className={styles.table}>
+      <div className={tableClass}>
         <div className={styles.tableHeader}>
           <span>Date</span>
           <span>Description</span>
-          <span>Bank</span>
-          <span>Account</span>
+          {showBankInfo && <span>Bank</span>}
+          {showBankInfo && <span>Account</span>}
           <span>Amount</span>
         </div>
 
@@ -120,19 +124,23 @@ export function TransactionList({
                       <span className={styles.subtitle}>{tx.description}</span>
                     )}
                   </div>
-                  <span className={styles.bank}>
-                    {tx.bankLogo && (
-                      <Image
-                        src={tx.bankLogo}
-                        alt={tx.bank || 'Bank'}
-                        width={20}
-                        height={20}
-                        className={styles.bankLogo}
-                      />
-                    )}
-                    {tx.bank || '-'}
-                  </span>
-                  <span className={styles.account}>{tx.account || '-'}</span>
+                  {showBankInfo && (
+                    <span className={styles.bank}>
+                      {tx.bankLogo && (
+                        <Image
+                          src={tx.bankLogo}
+                          alt={tx.bank || 'Bank'}
+                          width={20}
+                          height={20}
+                          className={styles.bankLogo}
+                        />
+                      )}
+                      {tx.bank || '-'}
+                    </span>
+                  )}
+                  {showBankInfo && (
+                    <span className={styles.account}>{tx.account || '-'}</span>
+                  )}
                   <span
                     className={`${styles.amount} ${tx.type === 'credit' ? styles.credit : styles.debit}`}
                   >
