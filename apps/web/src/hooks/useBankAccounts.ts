@@ -121,7 +121,12 @@ export function useBankAccounts(): UseBankAccountsReturn {
   const getAccountBalance = useCallback(
     (accountId: string): number => {
       const balance = balances.get(accountId);
-      return balance?.available ?? 0;
+      if (!balance) return 0;
+      // Use current if available is 0 but current is negative (overdrawn account)
+      if (balance.available === 0 && balance.current < 0) {
+        return balance.current;
+      }
+      return balance.available ?? 0;
     },
     [balances],
   );

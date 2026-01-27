@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import {
   SpendingLimitBar,
   StatCard,
-  TotalBalanceCard,
 } from '@/components/dashboard';
 import {
   BankAccountCard,
@@ -34,7 +33,6 @@ export default function OverviewPage() {
 
   const totalExpenses = data?.expenses.total || 0;
   const totalIncomes = data?.incomes.total || 0;
-  const balance = data?.balance || 0;
 
   // Map bank accounts to BankAccountItem format
   const bankAccounts: BankAccountItem[] = accounts.map((account) => {
@@ -62,18 +60,13 @@ export default function OverviewPage() {
       <div className={styles.grid}>
         {/* Main Balance Section */}
         <div className={styles.balanceSection}>
-          <TotalBalanceCard balance={balance} currency="EUR" change={5} />
-
-          <Card padding="md" className={styles.walletsCard}>
-            <BankAccountCard
-              accounts={bankAccounts}
-              title="Bank Accounts"
-              layout="horizontal"
-              showHeader={true}
-              isLoading={isLoadingAccounts}
-              emptyMessage="Connect a bank to see your accounts"
-            />
-          </Card>
+          <BankAccountCard
+            accounts={bankAccounts}
+            title="Bank Accounts"
+            layout="horizontal"
+            isLoading={isLoadingAccounts}
+            emptyMessage="Connect a bank to see your accounts"
+          />
         </div>
 
         {/* Stats Cards Row */}

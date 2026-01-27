@@ -1,173 +1,110 @@
-.card {
+.container {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-4);
+  width: 100%;
   background-color: var(--color-bg-card);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-card);
   padding: var(--spacing-5);
 }
 
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-4);
-}
-
-.headerLeft {
+.totalSection {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-1);
-}
-
-.title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.count {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-tertiary);
-}
-
-.totalBalance {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--spacing-1);
+  padding-bottom: var(--spacing-2);
 }
 
 .totalLabel {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-medium);
 }
 
 .totalAmount {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
-.list {
+.accountsList {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
+  gap: var(--spacing-4);
+  width: 100%;
 }
 
-.listHorizontal {
+.accountsList.vertical {
+  flex-direction: column;
+}
+
+.accountsList.horizontal {
   flex-direction: row;
-  gap: var(--spacing-3);
   overflow-x: auto;
   padding-bottom: var(--spacing-2);
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-neutral-300) transparent;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  gap: var(--spacing-4);
+  /* Removed negative margin hack to prevent clipping issues */
+  width: 100%;
 }
 
-.listHorizontal::-webkit-scrollbar {
-  height: 6px;
+.accountsList.horizontal::-webkit-scrollbar {
+  display: none;
 }
 
-.listHorizontal::-webkit-scrollbar-track {
-  background: transparent;
+/* Account Card Styling */
+.accountCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--spacing-4); /* Reduced padding */
+  border-radius: var(--radius-xl); /* Slightly smaller radius relative to size */
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  min-width: 200px; /* Reduced min-width */
+  flex-shrink: 0;
 }
 
-.listHorizontal::-webkit-scrollbar-thumb {
-  background-color: var(--color-neutral-300);
-  border-radius: var(--radius-full);
+/* Specific styling for vertical list items to look more like rows if desired, 
+   but user asked for cards similar to screenshot which implies horizontal cards usually.
+   If vertical layout is requested, we might want them to stretch. */
+.accountsList.vertical .accountCard {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
 }
 
-.account {
+.header {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
-  padding: var(--spacing-3) var(--spacing-4);
-  background-color: var(--color-bg-tertiary);
-  border-radius: var(--radius-xl);
-  transition:
-    background-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+  margin-bottom: var(--spacing-4);
 }
 
-.account[role="button"] {
-  cursor: pointer;
-}
-
-.account[role="button"]:hover {
-  background-color: var(--color-bg-secondary);
-  box-shadow: var(--shadow-sm);
-}
-
-.account[role="button"]:focus-visible {
-  outline: 2px solid var(--color-primary-500);
-  outline-offset: 2px;
-}
-
-.accountHorizontal {
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 180px;
-  max-width: 200px;
-  flex-shrink: 0;
-  background-color: var(--color-bg-card);
-  box-shadow: var(--shadow-card);
-}
-
-.accountHorizontal .bankLogo {
-  background-color: var(--color-bg-tertiary);
-}
-
-.accountHorizontal .accountInfo {
-  width: 100%;
-}
-
-.accountHorizontal .balance {
-  width: 100%;
-  align-items: flex-start;
-  margin-top: var(--spacing-2);
-  padding-top: var(--spacing-2);
-  border-top: 1px solid var(--color-border-light);
-}
-
-.cardHorizontal {
-  background-color: transparent;
-  box-shadow: none;
-  padding: 0;
-}
-
-.cardHorizontal .header {
-  padding: 0 0 var(--spacing-3) 0;
-}
-
-.loadingHorizontal {
-  flex-direction: row;
-  gap: var(--spacing-3);
-}
-
-.skeletonHorizontal {
-  min-width: 180px;
-  height: 140px;
+.accountsList.vertical .accountCard .header {
+  margin-bottom: 0;
+  flex: 1;
 }
 
 .bankLogo {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-lg);
-  background-color: var(--color-bg-card);
+  background-color: var(--color-bg-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .logoImage {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
@@ -177,11 +114,9 @@
   color: var(--color-primary-600);
 }
 
-.accountInfo {
+.bankInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  flex: 1;
   min-width: 0;
 }
 
@@ -195,55 +130,57 @@
 }
 
 .accountName {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.iban {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
-}
-
-.balance {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  flex-shrink: 0;
+.balanceSection {
+  text-align: left;
 }
 
 .balanceAmount {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 
-.currency {
+.balanceAmount.negative {
+  color: var(--color-error-500, #ef4444);
+}
+
+.totalAmount.negative {
+  color: var(--color-error-500, #ef4444);
+}
+
+.accountNumber {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+  margin-top: var(--spacing-1);
 }
 
-.empty {
-  padding: var(--spacing-8);
-  text-align: center;
-  color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
+/* Loading State */
+.skeletonText {
+  height: 32px;
+  width: 150px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  animation: shimmer 1.5s infinite;
 }
 
-.loading {
+.skeletonList {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
+  gap: var(--spacing-4);
+  overflow: hidden;
 }
 
-.skeleton {
-  height: 64px;
+.skeletonCard {
+  width: 240px;
+  height: 140px;
   background: linear-gradient(
     90deg,
     var(--color-bg-tertiary) 25%,
@@ -251,8 +188,9 @@
     var(--color-bg-tertiary) 75%
   );
   background-size: 200% 100%;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   animation: shimmer 1.5s infinite;
+  flex-shrink: 0;
 }
 
 @keyframes shimmer {
@@ -264,27 +202,9 @@
   }
 }
 
+/* Responsive Adjustments */
 @media (max-width: 640px) {
-  .header {
-    flex-direction: column;
-    gap: var(--spacing-3);
-  }
-
-  .totalBalance {
-    align-items: flex-start;
-  }
-
-  .account {
-    flex-wrap: wrap;
-  }
-
-  .balance {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: var(--spacing-2);
-    border-top: 1px solid var(--color-border-light);
-    margin-top: var(--spacing-2);
+  .totalAmount {
+    font-size: var(--font-size-2xl);
   }
 }

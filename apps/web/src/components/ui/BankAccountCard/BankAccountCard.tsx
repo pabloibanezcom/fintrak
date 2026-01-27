@@ -21,7 +21,6 @@ export interface BankAccountCardProps {
   emptyMessage?: string;
   onAccountClick?: (account: BankAccountItem) => void;
   layout?: 'vertical' | 'horizontal';
-  showHeader?: boolean;
 }
 
 export function BankAccountCard({
@@ -31,79 +30,74 @@ export function BankAccountCard({
   emptyMessage = 'No bank accounts connected',
   onAccountClick,
   layout = 'vertical',
-  showHeader = true,
 }: BankAccountCardProps) {
   const isHorizontal = layout === 'horizontal';
 
   if (isLoading) {
     return (
-      <div
-        className={`${styles.card} ${isHorizontal ? styles.cardHorizontal : ''}`}
-      >
-        {showHeader && (
-          <div className={styles.header}>
-            <h3 className={styles.title}>{title}</h3>
-          </div>
-        )}
-        <div
-          className={`${styles.loading} ${isHorizontal ? styles.loadingHorizontal : ''}`}
-        >
-          <div
-            className={`${styles.skeleton} ${isHorizontal ? styles.skeletonHorizontal : ''}`}
-          />
-          <div
-            className={`${styles.skeleton} ${isHorizontal ? styles.skeletonHorizontal : ''}`}
-          />
+      <div className={styles.container}>
+        <div className={styles.skeletonText} />
+        <div className={styles.skeletonList}>
+          <div className={styles.skeletonCard} />
+          <div className={styles.skeletonCard} />
+          <div className={styles.skeletonCard} />
         </div>
       </div>
     );
   }
 
+  // Calculate total balance
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
   const mainCurrency = accounts[0]?.currency || 'EUR';
 
-  return (
-    <div
-      className={`${styles.card} ${isHorizontal ? styles.cardHorizontal : ''}`}
-    >
-      {showHeader && (
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <h3 className={styles.title}>{title}</h3>
-            <span className={styles.count}>{accounts.length} accounts</span>
-          </div>
-          {accounts.length > 0 && (
-            <div className={styles.totalBalance}>
-              <span className={styles.totalLabel}>Total</span>
-              <span className={styles.totalAmount}>
-                {formatCurrency(totalBalance, mainCurrency)}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+  if (accounts.length === 0) {
+    return (
+      <div
+        className={styles.accountCard}
+        style={{
+          width: '100%',
+          textAlign: 'center',
+          color: 'var(--color-text-tertiary)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '140px',
+        }}
+      >
+        {emptyMessage}
+      </div>
+    );
+  }
 
-      {accounts.length === 0 ? (
-        <div className={styles.empty}>{emptyMessage}</div>
-      ) : (
-        <div
-          className={`${styles.list} ${isHorizontal ? styles.listHorizontal : ''}`}
-        >
-          {accounts.map((account) => (
-            <div
-              key={account.id}
-              className={`${styles.account} ${isHorizontal ? styles.accountHorizontal : ''}`}
-              onClick={() => onAccountClick?.(account)}
-              role={onAccountClick ? 'button' : undefined}
-              tabIndex={onAccountClick ? 0 : undefined}
-            >
+  return (
+    <div className={styles.container}>
+      {/* Total Balance Section */}
+      <div className={styles.totalSection}>
+        <span className={styles.totalLabel}>Bank accounts balance</span>
+        <span className={`${styles.totalAmount} ${totalBalance < 0 ? styles.negative : ''}`}>
+          {formatCurrency(totalBalance, mainCurrency)}
+        </span>
+      </div>
+
+      {/* Account Cards */}
+      <div
+        className={`${styles.accountsList} ${isHorizontal ? styles.horizontal : styles.vertical}`}
+      >
+        {accounts.map((account) => (
+          <div
+            key={account.id}
+            className={styles.accountCard}
+            onClick={() => onAccountClick?.(account)}
+            role={onAccountClick ? 'button' : undefined}
+            tabIndex={onAccountClick ? 0 : undefined}
+          >
+            <div className={styles.header}>
               <div className={styles.bankLogo}>
                 {account.bankLogo ? (
                   <Image
                     src={account.bankLogo}
                     alt={account.bankName}
-                    width={32}
-                    height={32}
+                    width={24}
+                    height={24}
                     className={styles.logoImage}
                   />
                 ) : (
@@ -112,31 +106,27 @@ export function BankAccountCard({
                   </span>
                 )}
               </div>
-
-              <div className={styles.accountInfo}>
+              <div className={styles.bankInfo}>
                 <span className={styles.bankName}>{account.bankName}</span>
                 <span className={styles.accountName}>
                   {account.accountName}
                 </span>
-                {!isHorizontal && account.iban && (
-                  <span className={styles.iban}>
-                    {account.iban.replace(/(.{4})/g, '$1 ').trim()}
-                  </span>
-                )}
-              </div>
-
-              <div className={styles.balance}>
-                <span className={styles.balanceAmount}>
-                  {formatCurrency(account.balance, account.currency)}
-                </span>
-                {!isHorizontal && (
-                  <span className={styles.currency}>{account.currency}</span>
-                )}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+
+            <div className={styles.balanceSection}>
+              <div className={`${styles.balanceAmount} ${account.balance < 0 ? styles.negative : ''}`}>
+                {formatCurrency(account.balance, account.currency)}
+              </div>
+              {account.iban && (
+                <div className={styles.accountNumber}>
+                  •••• {account.iban.replace(/\s/g, '').slice(-4)}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
