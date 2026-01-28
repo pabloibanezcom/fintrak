@@ -223,21 +223,21 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
             <View style={componentStyles.homeSection}>
               <Text style={componentStyles.homeSectionTitle}>Holdings</Text>
 
-              {/* Cash Accounts */}
-              {products.items.cashAccounts.items.length > 0 && (
+              {/* Bank Accounts */}
+              {products.items.bankAccounts.items.length > 0 && (
                 <View style={componentStyles.homeCard}>
-                  <Text style={componentStyles.homeCardTitle}>Cash Accounts</Text>
+                  <Text style={componentStyles.homeCardTitle}>Bank Accounts</Text>
                   <Text style={componentStyles.homeCardAmount}>
-                    {formatCurrency(products.items.cashAccounts.value, 'EUR')}
+                    {formatCurrency(products.items.bankAccounts.value, 'EUR')}
                   </Text>
-                  {(products.items.cashAccounts as any).comparison && (
+                  {(products.items.bankAccounts as any).comparison && (
                     <ComparisonBadge
-                      value={(products.items.cashAccounts as any).comparison.valueDifference}
-                      percentage={(products.items.cashAccounts as any).comparison.percentageDifference}
+                      value={(products.items.bankAccounts as any).comparison.valueDifference}
+                      percentage={(products.items.bankAccounts as any).comparison.percentageDifference}
                     />
                   )}
                   <Text style={componentStyles.homeCardSubtext}>
-                    {products.items.cashAccounts.percentage}% of portfolio
+                    {products.items.bankAccounts.percentage}% of portfolio
                   </Text>
                 </View>
               )}

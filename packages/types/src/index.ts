@@ -6,6 +6,7 @@ export type {
   RegisterRequest,
   RegisterResponse,
 } from './Auth';
+export type { BankAccount } from './BankAccount';
 export type { BaseTransaction } from './BaseTransaction';
 export type { CashAccount } from './CashAccount';
 export type { Category } from './Category';

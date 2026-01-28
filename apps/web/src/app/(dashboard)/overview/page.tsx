@@ -38,10 +38,10 @@ export default function OverviewPage() {
   const bankAccounts: BankAccountItem[] = accounts.map((account) => {
     const connection = connections.find((c) => c.bankId === account.bankId);
     return {
-      id: account._id,
+      id: account.accountId,
       bankName: connection?.alias || account.bankName,
-      bankLogo: connection?.logo,
-      accountName: account.alias || account.name,
+      bankLogo: account.logo || connection?.logo,
+      accountName: account.displayName,
       balance: getAccountBalance(account.accountId),
       currency: account.currency,
       iban: account.iban,

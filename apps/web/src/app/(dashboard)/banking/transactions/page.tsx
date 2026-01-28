@@ -54,7 +54,7 @@ export default function BankTransactionsPage() {
     () =>
       accounts.map((acc) => ({
         value: acc.accountId,
-        label: acc.alias || acc.name,
+        label: acc.displayName,
       })),
     [accounts]
   );
@@ -66,7 +66,7 @@ export default function BankTransactionsPage() {
       .filter((acc) => acc.bankId === filters.bankId)
       .map((acc) => ({
         value: acc.accountId,
-        label: acc.alias || acc.name,
+        label: acc.displayName,
       }));
   }, [accounts, accountOptions, filters.bankId]);
 

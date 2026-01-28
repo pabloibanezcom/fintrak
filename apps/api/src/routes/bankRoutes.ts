@@ -280,50 +280,9 @@ router.patch(
   controller.updateConnection
 );
 
-/**
- * @swagger
- * /api/bank/accounts:
- *   get:
- *     summary: Get connected bank accounts
- *     description: Retrieves user's connected bank accounts from TrueLayer
- *     tags: [Bank Integration (TrueLayer)]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Connected accounts retrieved
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   account_id:
- *                     type: string
- *                   account_type:
- *                     type: string
- *                     enum: [TRANSACTION, SAVINGS, BUSINESS, OTHER]
- *                   display_name:
- *                     type: string
- *                   currency:
- *                     type: string
- *                   account_number:
- *                     type: object
- *                     properties:
- *                       iban:
- *                         type: string
- *                   provider:
- *                     type: object
- *                     properties:
- *                       display_name:
- *                         type: string
- *       401:
- *         description: User not authenticated
- *       404:
- *         description: No bank connection found
- */
-router.get('/accounts', controller.getAccounts);
+// Note: GET /api/bank/accounts has been deprecated.
+// Bank accounts are now fetched via GET /api/products which includes
+// accounts from all sources (MyInvestor and TrueLayer).
 
 /**
  * @swagger

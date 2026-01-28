@@ -1,7 +1,7 @@
-import type { CashAccount } from "./CashAccount";
-import type { CryptoAsset } from "./CryptoAsset";
-import type { Deposit } from "./Deposit";
-import type { InvestmentSummary } from "./InvestmentSummary";
+import type { BankAccount } from './BankAccount';
+import type { CryptoAsset } from './CryptoAsset';
+import type { Deposit } from './Deposit';
+import type { InvestmentSummary } from './InvestmentSummary';
 
 /**
  * Generic product group with items and total value.
@@ -25,8 +25,8 @@ export interface ProductGroup<T> {
  * @group Financial Types
  */
 export interface ProductItems {
-  /** Bank cash accounts with current balances */
-  cashAccounts: ProductGroup<CashAccount>;
+  /** Bank accounts from all sources (MyInvestor, TrueLayer) */
+  bankAccounts: ProductGroup<BankAccount>;
 
   /** Term deposits and savings accounts */
   deposits: ProductGroup<Deposit>;

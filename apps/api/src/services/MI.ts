@@ -1,4 +1,5 @@
 import type {
+  BankAccount,
   CashAccount,
   CryptoAsset,
   Deposit,
@@ -10,6 +11,7 @@ import type {
 import { MIServiceError } from '@fintrak/types';
 import axios, { type AxiosError } from 'axios';
 import CryptoAssetModel from '../models/CryptoAssetModel';
+import { aggregateBankAccounts } from './BankAccountAggregator';
 import { fetchCryptoPrices } from './CoinGecko';
 import {
   MICashAccountsToUserCashAccounts,
@@ -320,7 +322,7 @@ export const fetchUserProducts = async (
       ]);
 
     const depositItems = deposits.status === 'fulfilled' ? deposits.value : [];
-    const cashAccountItems =
+    const miCashAccountItems =
       cashAccounts.status === 'fulfilled' ? cashAccounts.value : [];
     const indexedFundItems =
       securities.status === 'fulfilled' ? securities.value.indexedFunds : [];
@@ -329,9 +331,38 @@ export const fetchUserProducts = async (
     const cryptoAssetItems =
       cryptoAssets.status === 'fulfilled' ? cryptoAssets.value : [];
 
+    // Aggregate bank accounts from all sources (MyInvestor + TrueLayer)
+    let bankAccountItems: BankAccount[] = [];
+    if (userId) {
+      const aggregatorResult = await aggregateBankAccounts(
+        userId,
+        miCashAccountItems
+      );
+      bankAccountItems = aggregatorResult.accounts;
+      if (aggregatorResult.errors.length > 0) {
+        console.warn('Bank account aggregation errors:', aggregatorResult.errors);
+      }
+    } else {
+      // If no userId, just transform MI cash accounts
+      const MYINVESTOR_LOGO =
+        'https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/assets/bank-logos/myinvestor.png';
+      bankAccountItems = miCashAccountItems.map((account) => ({
+        accountId: account.accountId,
+        source: 'myinvestor' as const,
+        bankName: 'MyInvestor',
+        bankId: 'myinvestor',
+        logo: MYINVESTOR_LOGO,
+        displayName: account.alias,
+        iban: account.iban,
+        accountType: 'CASH' as const,
+        currency: account.currency,
+        balance: account.balance,
+      }));
+    }
+
     // Calculate totals for each group
     const depositsTotal = depositItems.reduce((sum, d) => sum + d.amount, 0);
-    const cashAccountsTotal = cashAccountItems.reduce(
+    const bankAccountsTotal = bankAccountItems.reduce(
       (sum, c) => sum + c.balance,
       0
     );
@@ -348,7 +379,7 @@ export const fetchUserProducts = async (
     // Calculate total value across all groups
     const totalValue =
       depositsTotal +
-      cashAccountsTotal +
+      bankAccountsTotal +
       indexedFundsTotal +
       etcsTotal +
       cryptoAssetsTotal;
@@ -367,10 +398,10 @@ export const fetchUserProducts = async (
           value: depositsTotal,
           percentage: calculatePercentage(depositsTotal),
         },
-        cashAccounts: {
-          items: cashAccountItems,
-          value: cashAccountsTotal,
-          percentage: calculatePercentage(cashAccountsTotal),
+        bankAccounts: {
+          items: bankAccountItems,
+          value: bankAccountsTotal,
+          percentage: calculatePercentage(bankAccountsTotal),
         },
         indexedFunds: {
           items: indexedFundItems,

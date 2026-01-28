@@ -1,11 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  type AccountBalance,
-  type BankAccount,
-  bankAccountsService,
-} from "@/services/bankAccounts";
+import type { BankAccount } from "@fintrak/types";
+import { productsService } from "@/services/products";
 import {
   type BankConnection,
   bankConnectionsService,
@@ -14,7 +11,6 @@ import {
 interface UseBankAccountsReturn {
   accounts: BankAccount[];
   connections: BankConnection[];
-  balances: Map<string, AccountBalance>;
   accountsMap: Map<string, BankAccount>;
   connectionsMap: Map<string, BankConnection>;
   isLoading: boolean;
@@ -29,9 +25,6 @@ interface UseBankAccountsReturn {
 export function useBankAccounts(): UseBankAccountsReturn {
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [connections, setConnections] = useState<BankConnection[]>([]);
-  const [balances, setBalances] = useState<Map<string, AccountBalance>>(
-    new Map(),
-  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -40,29 +33,14 @@ export function useBankAccounts(): UseBankAccountsReturn {
     setError(null);
 
     try {
+      // Fetch bank accounts from unified /api/products endpoint
+      // and connections for TrueLayer bank metadata (alias, logo)
       const [accountsRes, connectionsRes] = await Promise.all([
-        bankAccountsService.getAccounts(),
+        productsService.getBankAccounts(),
         bankConnectionsService.getConnections(),
       ]);
       setAccounts(accountsRes);
       setConnections(connectionsRes);
-
-      // Fetch balances for all accounts
-      const balancePromises = accountsRes.map((account) =>
-        bankAccountsService
-          .getAccountBalance(account.accountId)
-          .then((balance) => ({ accountId: account.accountId, balance }))
-          .catch(() => null),
-      );
-      const balanceResults = await Promise.all(balancePromises);
-
-      const balancesMap = new Map<string, AccountBalance>();
-      balanceResults.forEach((result) => {
-        if (result) {
-          balancesMap.set(result.accountId, result.balance);
-        }
-      });
-      setBalances(balancesMap);
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error("Failed to fetch accounts"),
@@ -91,6 +69,7 @@ export function useBankAccounts(): UseBankAccountsReturn {
       const account = accountsMap.get(accountId);
       if (!account) return "-";
 
+      // For TrueLayer accounts, check if there's a custom alias in connections
       const connection = connectionsMap.get(account.bankId);
       return connection?.alias || account.bankName;
     },
@@ -102,7 +81,7 @@ export function useBankAccounts(): UseBankAccountsReturn {
       const account = accountsMap.get(accountId);
       if (!account) return "-";
 
-      return account.alias || account.name;
+      return account.displayName;
     },
     [accountsMap],
   );
@@ -112,6 +91,9 @@ export function useBankAccounts(): UseBankAccountsReturn {
       const account = accountsMap.get(accountId);
       if (!account) return undefined;
 
+      // First check account's logo (set by aggregator), then connection's logo
+      if (account.logo) return account.logo;
+
       const connection = connectionsMap.get(account.bankId);
       return connection?.logo;
     },
@@ -120,21 +102,26 @@ export function useBankAccounts(): UseBankAccountsReturn {
 
   const getAccountBalance = useCallback(
     (accountId: string): number => {
-      const balance = balances.get(accountId);
-      if (!balance) return 0;
-      // Use current if available is 0 but current is negative (overdrawn account)
-      if (balance.available === 0 && balance.current < 0) {
-        return balance.current;
+      const account = accountsMap.get(accountId);
+      if (!account) return 0;
+
+      // Balance is already included in the unified BankAccount type
+      // For TrueLayer accounts, prefer availableBalance if set
+      if (account.availableBalance !== undefined) {
+        // Use balance if available is 0 but balance is negative (overdrawn)
+        if (account.availableBalance === 0 && account.balance < 0) {
+          return account.balance;
+        }
+        return account.availableBalance;
       }
-      return balance.available ?? 0;
+      return account.balance;
     },
-    [balances],
+    [accountsMap],
   );
 
   return {
     accounts,
     connections,
-    balances,
     accountsMap,
     connectionsMap,
     isLoading,

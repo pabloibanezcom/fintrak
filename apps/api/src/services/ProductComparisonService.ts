@@ -133,7 +133,7 @@ export class ProductComparisonService {
     ProductGroupConfig
   > = {
     deposits: { identifierKey: 'depositId', valueKey: 'amount' },
-    cashAccounts: { identifierKey: 'accountId', valueKey: 'balance' },
+    bankAccounts: { identifierKey: 'accountId', valueKey: 'balance' },
     indexedFunds: { identifierKey: 'isin', valueKey: 'marketValue' },
     etcs: { identifierKey: 'isin', valueKey: 'marketValue' },
     cryptoAssets: { identifierKey: 'code', valueKey: 'value.EUR' },
