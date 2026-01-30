@@ -130,3 +130,11 @@
     transform: rotate(360deg);
   }
 }
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  width: 100%;
+}

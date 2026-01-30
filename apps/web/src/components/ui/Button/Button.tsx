@@ -56,7 +56,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             </svg>
           </span>
         )}
-        <span className={isLoading ? styles.hiddenText : undefined}>
+        <span className={isLoading ? styles.hiddenText : styles.content}>
           {children}
         </span>
       </button>

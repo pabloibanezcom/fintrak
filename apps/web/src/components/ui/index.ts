@@ -23,6 +23,11 @@ export {
 } from './DropdownMenu/DropdownMenu';
 export { Icon } from './Icon';
 export { Input, type InputProps } from './Input/Input';
+export {
+  InvestmentCard,
+  type InvestmentCardProps,
+  type InvestmentItem,
+} from './InvestmentCard/InvestmentCard';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar/ProgressBar';
 export { Select, type SelectOption, type SelectProps } from './Select/Select';
 export {

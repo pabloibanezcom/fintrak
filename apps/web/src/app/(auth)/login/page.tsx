@@ -71,7 +71,7 @@ export default function LoginPage() {
         <span>{t('divider')}</span>
       </div>
 
-      <Button variant="outline" fullWidth disabled>
+      <Button variant="outline" fullWidth>
         <svg width="20" height="20" viewBox="0 0 24 24">
           <path
             fill="#4285F4"

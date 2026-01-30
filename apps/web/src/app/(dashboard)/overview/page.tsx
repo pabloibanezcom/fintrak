@@ -10,11 +10,12 @@ import {
   BankAccountCard,
   type BankAccountItem,
   Card,
+  InvestmentCard,
   TransactionList,
   type TransactionListItem,
 } from '@/components/ui';
 import { useUser } from '@/context';
-import { useBankAccounts, usePeriodSummary } from '@/hooks';
+import { useBankAccounts, useInvestmentProducts, usePeriodSummary } from '@/hooks';
 import { getGreetingPeriod } from '@/utils';
 import styles from './page.module.css';
 
@@ -28,6 +29,8 @@ export default function OverviewPage() {
     getAccountBalance,
     isLoading: isLoadingAccounts,
   } = useBankAccounts();
+  const { data: investmentData, isLoading: isLoadingInvestments } =
+    useInvestmentProducts();
   const greetingPeriod = getGreetingPeriod();
   const userName = user?.name || user?.email?.split('@')[0] || 'User';
 
@@ -66,6 +69,14 @@ export default function OverviewPage() {
             layout="horizontal"
             isLoading={isLoadingAccounts}
             emptyMessage="Connect a bank to see your accounts"
+          />
+          <InvestmentCard
+            indexedFunds={investmentData?.indexedFunds}
+            etcs={investmentData?.etcs}
+            cryptoAssets={investmentData?.cryptoAssets}
+            totalValue={investmentData?.totals.all}
+            isLoading={isLoadingInvestments}
+            emptyMessage="No investments found"
           />
         </div>
 
