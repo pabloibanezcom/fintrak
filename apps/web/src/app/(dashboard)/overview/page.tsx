@@ -61,55 +61,64 @@ export default function OverviewPage() {
       </div>
 
       <div className={styles.grid}>
-        {/* Main Balance Section */}
-        <div className={styles.balanceSection}>
-          <BankAccountCard
-            accounts={bankAccounts}
-            title="Bank Accounts"
-            layout="horizontal"
-            isLoading={isLoadingAccounts}
-            emptyMessage="Connect a bank to see your accounts"
-          />
-          <InvestmentCard
-            indexedFunds={investmentData?.indexedFunds}
-            etcs={investmentData?.etcs}
-            cryptoAssets={investmentData?.cryptoAssets}
-            totalValue={investmentData?.totals.all}
-            isLoading={isLoadingInvestments}
-            emptyMessage="No investments found"
-          />
-        </div>
+        {/* Main Dashboard Grid */}
+        <div className={styles.dashboardGrid}>
+          {/* Left Column */}
+          <div className={styles.column}>
+            <BankAccountCard
+              accounts={bankAccounts}
+              title="Bank Accounts"
+              layout="grid"
+              isLoading={isLoadingAccounts}
+              emptyMessage="Connect a bank to see your accounts"
+            />
+            {/* Stats: Earnings & Spending */}
+            <div className={styles.biStatRow}>
+              <StatCard
+                label="Total Earnings"
+                value={totalIncomes || 950}
+                currency="EUR"
+                change={7}
+                variant="primary"
+              />
+              <StatCard
+                label="Total Spending"
+                value={totalExpenses || 700}
+                currency="EUR"
+                change={-5}
+                variant="default"
+              />
+            </div>
+          </div>
 
-        {/* Stats Cards Row */}
-        <div className={styles.statsRow}>
-          <StatCard
-            label="Total Earnings"
-            value={totalIncomes || 950}
-            currency="EUR"
-            change={7}
-            variant="primary"
-          />
-          <StatCard
-            label="Total Spending"
-            value={totalExpenses || 700}
-            currency="EUR"
-            change={-5}
-            variant="default"
-          />
-          <StatCard
-            label="Total Income"
-            value={1050}
-            currency="EUR"
-            change={8}
-            variant="default"
-          />
-          <StatCard
-            label="Total Revenue"
-            value={850}
-            currency="EUR"
-            change={4}
-            variant="default"
-          />
+          {/* Right Column */}
+          <div className={styles.column}>
+            <InvestmentCard
+              funds={investmentData?.funds}
+              etcs={investmentData?.etcs}
+              cryptoAssets={investmentData?.cryptoAssets}
+              totalValue={investmentData?.totals.all}
+              isLoading={isLoadingInvestments}
+              emptyMessage="No investments found"
+            />
+            {/* Stats: Income & Revenue */}
+            <div className={styles.biStatRow}>
+              <StatCard
+                label="Total Income"
+                value={1050}
+                currency="EUR"
+                change={8}
+                variant="default"
+              />
+              <StatCard
+                label="Total Revenue"
+                value={850}
+                currency="EUR"
+                change={4}
+                variant="default"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Bottom Section */}

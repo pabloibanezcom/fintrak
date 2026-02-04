@@ -31,8 +31,8 @@ export interface ProductItems {
   /** Term deposits and savings accounts */
   deposits: ProductGroup<Deposit>;
 
-  /** Index fund investments */
-  indexedFunds: ProductGroup<InvestmentSummary>;
+  /** Fund investments (index funds and other funds) */
+  funds: ProductGroup<InvestmentSummary>;
 
   /** Exchange Traded Commodities */
   etcs: ProductGroup<InvestmentSummary>;

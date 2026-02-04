@@ -262,20 +262,20 @@ export default function InvestmentsScreen({ onLogout, onNavigateToProfile }: Inv
               )}
 
               {/* Indexed Funds */}
-              {products.items.indexedFunds.items.length > 0 && (
+              {products.items.funds.items.length > 0 && (
                 <View style={componentStyles.homeCard}>
                   <Text style={componentStyles.homeCardTitle}>Indexed Funds</Text>
                   <Text style={componentStyles.homeCardAmount}>
-                    {formatCurrency(products.items.indexedFunds.value, 'EUR')}
+                    {formatCurrency(products.items.funds.value, 'EUR')}
                   </Text>
-                  {(products.items.indexedFunds as any).comparison && (
+                  {(products.items.funds as any).comparison && (
                     <ComparisonBadge
-                      value={(products.items.indexedFunds as any).comparison.valueDifference}
-                      percentage={(products.items.indexedFunds as any).comparison.percentageDifference}
+                      value={(products.items.funds as any).comparison.valueDifference}
+                      percentage={(products.items.funds as any).comparison.percentageDifference}
                     />
                   )}
                   <Text style={componentStyles.homeCardSubtext}>
-                    {products.items.indexedFunds.percentage}% of portfolio
+                    {products.items.funds.percentage}% of portfolio
                   </Text>
                 </View>
               )}

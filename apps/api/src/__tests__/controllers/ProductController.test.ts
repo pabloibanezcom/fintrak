@@ -68,7 +68,7 @@ describe('ProductController', () => {
           },
         ],
       },
-      indexedFunds: {
+      funds: {
         value: 4000,
         percentage: 40,
         items: [
@@ -133,7 +133,7 @@ describe('ProductController', () => {
             },
           ],
         },
-        indexedFunds: {
+        funds: {
           value: 3500,
           percentage: 43.75,
           items: [

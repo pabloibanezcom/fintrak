@@ -42,7 +42,7 @@ router.use(authenticate); // all routes require auth
  *                   balance: 5000
  *                   currency: "EUR"
  *                   accountType: "CHECKING"
- *               indexedFunds:
+ *               funds:
  *                 - id: "fund_789"
  *                   name: "Global Index Fund"
  *                   value: 15000

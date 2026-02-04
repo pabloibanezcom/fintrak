@@ -146,7 +146,7 @@ describe('MI Service - User Products Caching', () => {
     expect(result).toHaveProperty('items');
     expect(result.items).toHaveProperty('deposits');
     expect(result.items).toHaveProperty('cashAccounts');
-    expect(result.items).toHaveProperty('indexedFunds');
+    expect(result.items).toHaveProperty('funds');
     expect(result.items).toHaveProperty('etcs');
     expect(result.items).toHaveProperty('cryptoAssets');
   });
@@ -200,12 +200,12 @@ describe('MI Service - User Products Caching', () => {
   it('should calculate percentages correctly', async () => {
     const result = await fetchUserProducts('user123');
 
-    // Expected totals: deposits=10000, cash=5000, indexedFunds=1200, etcs=0, crypto=0
+    // Expected totals: deposits=10000, cash=5000, funds=1200, etcs=0, crypto=0
     // Total = 16200
     expect(result.totalValue).toBe(16200);
     expect(result.items.deposits.percentage).toBe(61.7); // 10000/16200 * 100
     expect(result.items.cashAccounts.percentage).toBe(30.9); // 5000/16200 * 100
-    expect(result.items.indexedFunds.percentage).toBe(7.4); // 1200/16200 * 100
+    expect(result.items.funds.percentage).toBe(7.4); // 1200/16200 * 100
     expect(result.items.etcs.percentage).toBe(0);
     expect(result.items.cryptoAssets.percentage).toBe(0);
   });
@@ -265,7 +265,7 @@ describe('MI Service - User Products Caching', () => {
 
     const result = await fetchUserProducts('user123');
 
-    // Expected: deposits=10000 + cash=5000 + indexedFunds=1200 + crypto=4500 (0.1 * 45000)
+    // Expected: deposits=10000 + cash=5000 + funds=1200 + crypto=4500 (0.1 * 45000)
     expect(result.totalValue).toBe(20700);
     expect(result.items.cryptoAssets.value).toBe(4500);
     expect(result.items.cryptoAssets.percentage).toBeCloseTo(21.7, 1);

@@ -3036,7 +3036,7 @@
                       "accountType": "CHECKING"
                     }
                   ],
-                  "indexedFunds": [
+                  "funds": [
                     {
                       "id": "fund_789",
                       "name": "Global Index Fund",

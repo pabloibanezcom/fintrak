@@ -134,7 +134,7 @@ export class ProductComparisonService {
   > = {
     deposits: { identifierKey: 'depositId', valueKey: 'amount' },
     bankAccounts: { identifierKey: 'accountId', valueKey: 'balance' },
-    indexedFunds: { identifierKey: 'isin', valueKey: 'marketValue' },
+    funds: { identifierKey: 'isin', valueKey: 'marketValue' },
     etcs: { identifierKey: 'isin', valueKey: 'marketValue' },
     cryptoAssets: { identifierKey: 'code', valueKey: 'value.EUR' },
   };

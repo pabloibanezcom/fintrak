@@ -209,7 +209,7 @@ async function fetchCashAccounts(): Promise<CashAccount[]> {
 }
 
 async function fetchSecuritiesData(): Promise<{
-  indexedFunds: InvestmentSummary[];
+  funds: InvestmentSummary[];
   etcs: InvestmentSummary[];
 }> {
   return withRetry(async () => {
@@ -233,7 +233,7 @@ async function fetchSecuritiesData(): Promise<{
         "MI API returned non-array securities data:",
         securitiesData
       );
-      return { indexedFunds: [], etcs: [] };
+      return { funds: [], etcs: [] };
     }
 
     // Filter out non-securities accounts
@@ -241,9 +241,11 @@ async function fetchSecuritiesData(): Promise<{
       (account: any) => account.accountType === "SECURITIES_ACCOUNT"
     );
 
-    const indexedFundsList = securitiesAccounts.flatMap(
-      (account: any) =>
-        account.securitiesAccountInvestments?.INDEXED_FUND?.investmentList || []
+    const fundsList = securitiesAccounts.flatMap(
+      (account: any) => [
+        ...(account.securitiesAccountInvestments?.INDEXED_FUND?.investmentList || []),
+        ...(account.securitiesAccountInvestments?.FUND?.investmentList || []),
+      ]
     );
     const etcsList = securitiesAccounts.flatMap(
       (account: any) =>
@@ -251,7 +253,7 @@ async function fetchSecuritiesData(): Promise<{
     );
 
     return {
-      indexedFunds: MIIndexedFundsToIndexedFundsSummary(indexedFundsList),
+      funds: MIIndexedFundsToIndexedFundsSummary(fundsList),
       etcs: MIETCsToETCsSummary(etcsList),
     };
   });
@@ -327,8 +329,8 @@ export const fetchUserProducts = async (
     const depositItems = deposits.status === "fulfilled" ? deposits.value : [];
     const miCashAccountItems =
       cashAccounts.status === "fulfilled" ? cashAccounts.value : [];
-    const indexedFundItems =
-      securities.status === "fulfilled" ? securities.value.indexedFunds : [];
+    const fundItems =
+      securities.status === "fulfilled" ? securities.value.funds : [];
     const etcItems =
       securities.status === "fulfilled" ? securities.value.etcs : [];
     const cryptoAssetItems =
@@ -372,7 +374,7 @@ export const fetchUserProducts = async (
       (sum, c) => sum + c.balance,
       0
     );
-    const indexedFundsTotal = indexedFundItems.reduce(
+    const fundsTotal = fundItems.reduce(
       (sum, i) => sum + i.marketValue,
       0
     );
@@ -386,7 +388,7 @@ export const fetchUserProducts = async (
     const totalValue =
       depositsTotal +
       bankAccountsTotal +
-      indexedFundsTotal +
+      fundsTotal +
       etcsTotal +
       cryptoAssetsTotal;
 
@@ -409,10 +411,10 @@ export const fetchUserProducts = async (
           value: bankAccountsTotal,
           percentage: calculatePercentage(bankAccountsTotal),
         },
-        indexedFunds: {
-          items: indexedFundItems,
-          value: indexedFundsTotal,
-          percentage: calculatePercentage(indexedFundsTotal),
+        funds: {
+          items: fundItems,
+          value: fundsTotal,
+          percentage: calculatePercentage(fundsTotal),
         },
         etcs: {
           items: etcItems,

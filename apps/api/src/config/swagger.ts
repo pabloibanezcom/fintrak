@@ -187,7 +187,7 @@ const options = {
                 $ref: '#/components/schemas/CashAccount',
               },
             },
-            indexedFunds: {
+            funds: {
               type: 'array',
               items: {
                 $ref: '#/components/schemas/IndexedFund',

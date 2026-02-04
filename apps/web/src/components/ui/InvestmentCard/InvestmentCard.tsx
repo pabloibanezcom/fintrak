@@ -16,7 +16,7 @@ export interface InvestmentItem {
 }
 
 export interface InvestmentCardProps {
-  indexedFunds?: InvestmentSummary[];
+  funds?: InvestmentSummary[];
   etcs?: InvestmentSummary[];
   cryptoAssets?: CryptoAsset[];
   totalValue?: number;
@@ -121,7 +121,7 @@ function getGroupIcon(type: 'fund' | 'etc' | 'crypto'): React.ReactNode {
 }
 
 export function InvestmentCard({
-  indexedFunds = [],
+  funds = [],
   etcs = [],
   cryptoAssets = [],
   totalValue,
@@ -141,7 +141,7 @@ export function InvestmentCard({
     );
   }
 
-  const fundItems = indexedFunds
+  const fundItems = funds
     .map((f) => mapFundToItem(f, 'fund'))
     .sort((a, b) => b.marketValue - a.marketValue);
   const etcItems = etcs
@@ -153,21 +153,21 @@ export function InvestmentCard({
 
   const groups: InvestmentGroup[] = [
     {
-      type: 'fund',
-      label: 'Index Funds',
+      type: 'fund' as const,
+      label: 'Funds',
       items: fundItems,
       totalValue: fundItems.reduce((sum, item) => sum + item.marketValue, 0),
       totalProfit: fundItems.reduce((sum, item) => sum + item.profit, 0),
     },
     {
-      type: 'etc',
+      type: 'etc' as const,
       label: 'ETCs',
       items: etcItems,
       totalValue: etcItems.reduce((sum, item) => sum + item.marketValue, 0),
       totalProfit: etcItems.reduce((sum, item) => sum + item.profit, 0),
     },
     {
-      type: 'crypto',
+      type: 'crypto' as const,
       label: 'Crypto',
       items: cryptoItems,
       totalValue: cryptoItems.reduce((sum, item) => sum + item.marketValue, 0),
@@ -238,7 +238,6 @@ export function InvestmentCard({
                         <span
                           className={`${styles.itemProfit} ${item.profit >= 0 ? styles.positive : styles.negative}`}
                         >
-                          {item.profit >= 0 ? '+' : ''}
                           {formatPercentage(item.profitPercentage)}
                         </span>
                       )}

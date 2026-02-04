@@ -5,17 +5,17 @@ import type { CryptoAsset, InvestmentSummary } from '@fintrak/types';
 import { productsService } from '@/services/products';
 
 export interface InvestmentData {
-  indexedFunds: InvestmentSummary[];
+  funds: InvestmentSummary[];
   etcs: InvestmentSummary[];
   cryptoAssets: CryptoAsset[];
   totals: {
-    indexedFunds: number;
+    funds: number;
     etcs: number;
     cryptoAssets: number;
     all: number;
   };
   percentages: {
-    indexedFunds: number;
+    funds: number;
     etcs: number;
     cryptoAssets: number;
   };
@@ -41,20 +41,20 @@ export function useInvestmentProducts(): UseInvestmentProductsReturn {
       const products = await productsService.getProducts();
 
       const investmentData: InvestmentData = {
-        indexedFunds: products.items.indexedFunds.items,
+        funds: products.items.funds.items,
         etcs: products.items.etcs.items,
         cryptoAssets: products.items.cryptoAssets.items,
         totals: {
-          indexedFunds: products.items.indexedFunds.value,
+          funds: products.items.funds.value,
           etcs: products.items.etcs.value,
           cryptoAssets: products.items.cryptoAssets.value,
           all:
-            products.items.indexedFunds.value +
+            products.items.funds.value +
             products.items.etcs.value +
             products.items.cryptoAssets.value,
         },
         percentages: {
-          indexedFunds: products.items.indexedFunds.percentage,
+          funds: products.items.funds.percentage,
           etcs: products.items.etcs.percentage,
           cryptoAssets: products.items.cryptoAssets.percentage,
         },
