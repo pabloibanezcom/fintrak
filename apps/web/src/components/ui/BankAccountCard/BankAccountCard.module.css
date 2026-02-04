@@ -55,6 +55,12 @@
   display: none;
 }
 
+.accountsList.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+}
+
 /* Account Card Styling */
 .accountCard {
   display: flex;

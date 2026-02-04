@@ -20,7 +20,7 @@ export interface BankAccountCardProps {
   isLoading?: boolean;
   emptyMessage?: string;
   onAccountClick?: (account: BankAccountItem) => void;
-  layout?: 'vertical' | 'horizontal';
+  layout?: 'vertical' | 'horizontal' | 'grid';
 }
 
 export function BankAccountCard({
@@ -32,6 +32,7 @@ export function BankAccountCard({
   layout = 'vertical',
 }: BankAccountCardProps) {
   const isHorizontal = layout === 'horizontal';
+  const isGrid = layout === 'grid';
 
   if (isLoading) {
     return (
@@ -72,15 +73,17 @@ export function BankAccountCard({
     <div className={styles.container}>
       {/* Total Balance Section */}
       <div className={styles.totalSection}>
-        <span className={styles.totalLabel}>Bank accounts balance</span>
-        <span className={`${styles.totalAmount} ${totalBalance < 0 ? styles.negative : ''}`}>
+        <span className={styles.totalLabel}>{title}</span>
+        <span
+          className={`${styles.totalAmount} ${totalBalance < 0 ? styles.negative : ''}`}
+        >
           {formatCurrency(totalBalance, mainCurrency)}
         </span>
       </div>
 
       {/* Account Cards */}
       <div
-        className={`${styles.accountsList} ${isHorizontal ? styles.horizontal : styles.vertical}`}
+        className={`${styles.accountsList} ${isHorizontal ? styles.horizontal : isGrid ? styles.grid : styles.vertical}`}
       >
         {accounts.map((account) => (
           <div
@@ -115,7 +118,9 @@ export function BankAccountCard({
             </div>
 
             <div className={styles.balanceSection}>
-              <div className={`${styles.balanceAmount} ${account.balance < 0 ? styles.negative : ''}`}>
+              <div
+                className={`${styles.balanceAmount} ${account.balance < 0 ? styles.negative : ''}`}
+              >
                 {formatCurrency(account.balance, account.currency)}
               </div>
               {account.iban && (

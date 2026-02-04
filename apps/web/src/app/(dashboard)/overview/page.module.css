@@ -30,10 +30,24 @@
 }
 
 /* Balance Section */
-.balanceSection {
+/* Main Dashboard Grid */
+.dashboardGrid {
   display: grid;
-  grid-template-columns: 1fr 1.8fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--spacing-5);
+  align-items: start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.biStatRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
 }
 
 .walletsCard {
@@ -68,12 +82,7 @@
   gap: var(--spacing-3);
 }
 
-/* Stats Row */
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-4);
-}
+
 
 /* Bottom Section */
 .bottomSection {
@@ -140,7 +149,7 @@
 
 /* Responsive */
 @media (max-width: 1400px) {
-  .balanceSection {
+  .dashboardGrid {
     grid-template-columns: 1fr;
   }
 
@@ -162,7 +171,5 @@
     grid-template-columns: 1fr;
   }
 
-  .statsRow {
-    grid-template-columns: 1fr;
-  }
+
 }
