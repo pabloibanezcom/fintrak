@@ -4,6 +4,7 @@ import type {
   TrueLayerAccount,
   TrueLayerBalance,
 } from "@fintrak/types";
+import BankAccountModel from "../models/BankAccountModel";
 import BankConnection, {
   type IBankConnection,
 } from "../models/BankConnectionModel";
@@ -81,7 +82,7 @@ function mapAccountType(
 function transformTrueLayerAccount(
   account: TrueLayerAccount,
   balance: TrueLayerBalance,
-  connection: { bankId: string; bankName: string; logo?: string },
+  connection: { bankId: string; bankName: string; logo?: string; alias?: string },
 ): BankAccount {
   return {
     accountId: account.account_id,
@@ -89,7 +90,7 @@ function transformTrueLayerAccount(
     bankName: connection.bankName,
     bankId: connection.bankId,
     logo: connection.logo,
-    displayName: account.display_name || "Bank Account",
+    displayName: connection.alias || account.display_name || "Bank Account",
     iban: account.account_number?.iban,
     accountType: mapAccountType(account.account_type),
     currency: account.currency,
@@ -109,6 +110,12 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
   const accounts: BankAccount[] = [];
   const errors: { source: string; message: string }[] = [];
 
+  // Fetch stored account aliases from BankAccount model
+  const storedAccounts = await BankAccountModel.find({ userId });
+  const accountAliasMap = new Map(
+    storedAccounts.map((acc) => [acc.accountId, acc.alias])
+  );
+
   for (const connection of connections) {
     try {
       const accessToken = await getValidAccessToken(connection);
@@ -117,6 +124,7 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
       // Fetch balances for each account in parallel
       const accountsWithBalances = await Promise.all(
         trueLayerAccounts.map(async (account) => {
+          const accountAlias = accountAliasMap.get(account.account_id);
           try {
             const balance = await TrueLayerService.getBalance(
               accessToken,
@@ -126,6 +134,7 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
               bankId: connection.bankId,
               bankName: connection.bankName,
               logo: connection.logo,
+              alias: accountAlias,
             });
           } catch (err) {
             console.error(
@@ -140,6 +149,7 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
                 bankId: connection.bankId,
                 bankName: connection.bankName,
                 logo: connection.logo,
+                alias: accountAlias,
               },
             );
           }
