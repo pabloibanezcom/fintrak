@@ -90,6 +90,7 @@ export function BankAccountCard({
             key={account.id}
             className={styles.accountCard}
             onClick={() => onAccountClick?.(account)}
+            onKeyDown={(e) => e.key === 'Enter' && onAccountClick?.(account)}
             role={onAccountClick ? 'button' : undefined}
             tabIndex={onAccountClick ? 0 : undefined}
           >

@@ -2,10 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-import {
-  SpendingLimitBar,
-  StatCard,
-} from '@/components/dashboard';
+import { SpendingLimitBar, StatCard } from '@/components/dashboard';
 import {
   BankAccountCard,
   type BankAccountItem,
@@ -15,7 +12,11 @@ import {
   type TransactionListItem,
 } from '@/components/ui';
 import { useUser } from '@/context';
-import { useBankAccounts, useInvestmentProducts, usePeriodSummary } from '@/hooks';
+import {
+  useBankAccounts,
+  useInvestmentProducts,
+  usePeriodSummary,
+} from '@/hooks';
 import { getGreetingPeriod } from '@/utils';
 import styles from './page.module.css';
 
@@ -76,16 +77,14 @@ export default function OverviewPage() {
             <div className={styles.biStatRow}>
               <StatCard
                 label="Total Earnings"
-                value={totalIncomes || 950}
+                value={totalIncomes}
                 currency="EUR"
-                change={7}
                 variant="primary"
               />
               <StatCard
                 label="Total Spending"
-                value={totalExpenses || 700}
+                value={totalExpenses}
                 currency="EUR"
-                change={-5}
                 variant="default"
               />
             </div>
@@ -101,20 +100,20 @@ export default function OverviewPage() {
               isLoading={isLoadingInvestments}
               emptyMessage="No investments found"
             />
-            {/* Stats: Income & Revenue */}
+            {/* Stats: Savings & Investments */}
             <div className={styles.biStatRow}>
               <StatCard
-                label="Total Income"
-                value={1050}
+                label="Monthly Savings"
+                value={totalIncomes - totalExpenses}
                 currency="EUR"
-                change={8}
-                variant="default"
+                variant={
+                  totalIncomes - totalExpenses >= 0 ? 'primary' : 'default'
+                }
               />
               <StatCard
-                label="Total Revenue"
-                value={850}
+                label="Investments"
+                value={investmentData?.totals.all || 0}
                 currency="EUR"
-                change={4}
                 variant="default"
               />
             </div>

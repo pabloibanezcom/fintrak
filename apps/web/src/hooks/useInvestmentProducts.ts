@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CryptoAsset, InvestmentSummary } from '@fintrak/types';
+import { useCallback, useEffect, useState } from 'react';
 import { productsService } from '@/services/products';
 
 export interface InvestmentData {
