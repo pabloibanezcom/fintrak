@@ -1,8 +1,11 @@
 'use client';
 
 import type { CryptoAsset, InvestmentSummary } from '@fintrak/types';
+import { useEffect, useState } from 'react';
 import { formatCurrency, formatPercentage } from '@/utils';
 import styles from './InvestmentCard.module.css';
+
+const STORAGE_KEY = 'fintrak-investment-card-visible';
 
 export interface InvestmentItem {
   id: string;
@@ -24,6 +27,7 @@ export interface InvestmentCardProps {
   isLoading?: boolean;
   emptyMessage?: string;
   onItemClick?: (item: InvestmentItem) => void;
+  defaultVisible?: boolean;
 }
 
 interface InvestmentGroup {
@@ -120,6 +124,55 @@ function getGroupIcon(type: 'fund' | 'etc' | 'crypto'): React.ReactNode {
   }
 }
 
+function VisibilityToggle({
+  isVisible,
+  onToggle,
+}: {
+  isVisible: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={styles.visibilityToggle}
+      onClick={onToggle}
+      aria-label={isVisible ? 'Hide investment details' : 'Show investment details'}
+    >
+      {isVisible ? (
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      ) : (
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+          <line x1="1" y1="1" x2="23" y2="23" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 export function InvestmentCard({
   funds = [],
   etcs = [],
@@ -128,7 +181,26 @@ export function InvestmentCard({
   isLoading = false,
   emptyMessage = 'No investments found',
   onItemClick,
+  defaultVisible = true,
 }: InvestmentCardProps) {
+  const [isVisible, setIsVisible] = useState<boolean | null>(null);
+
+  // Load persisted visibility state from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    setIsVisible(stored !== null ? stored === 'true' : defaultVisible);
+  }, [defaultVisible]);
+
+  // Persist visibility state to localStorage
+  useEffect(() => {
+    if (isVisible !== null) {
+      localStorage.setItem(STORAGE_KEY, String(isVisible));
+    }
+  }, [isVisible]);
+
+  // Derive the actual visibility, defaulting to hidden until hydrated
+  const showContent = isVisible ?? false;
+
   if (isLoading) {
     return (
       <div className={styles.container}>
@@ -190,24 +262,38 @@ export function InvestmentCard({
 
   return (
     <div className={styles.container}>
-      <div className={styles.totalSection}>
-        <span className={styles.totalLabel}>Investment portfolio</span>
-        <div className={styles.totalRow}>
-          <span className={styles.totalAmount}>
-            {formatCurrency(calculatedTotal, 'EUR')}
-          </span>
-          {totalProfit !== 0 && (
-            <span
-              className={`${styles.totalProfit} ${totalProfit >= 0 ? styles.positive : styles.negative}`}
-            >
-              {totalProfit >= 0 ? '+' : ''}
-              {formatCurrency(totalProfit, 'EUR')}
-            </span>
-          )}
+      <div className={styles.header}>
+        <div className={styles.totalSection}>
+          <span className={styles.totalLabel}>Investment portfolio</span>
+          <div className={styles.totalRow}>
+            {showContent ? (
+              <>
+                <span className={styles.totalAmount}>
+                  {formatCurrency(calculatedTotal, 'EUR')}
+                </span>
+                {totalProfit !== 0 && (
+                  <span
+                    className={`${styles.totalProfit} ${totalProfit >= 0 ? styles.positive : styles.negative}`}
+                  >
+                    {totalProfit >= 0 ? '+' : ''}
+                    {formatCurrency(totalProfit, 'EUR')}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className={styles.totalAmount}>€ ******</span>
+            )}
+          </div>
         </div>
+        <VisibilityToggle
+          isVisible={showContent}
+          onToggle={() => setIsVisible(!showContent)}
+        />
       </div>
 
-      <div className={styles.groupsList}>
+      <div
+        className={`${styles.groupsList} ${showContent ? styles.visible : styles.hidden}`}
+      >
         {groups.map((group) => (
           <div key={group.type} className={styles.group}>
             <div className={styles.groupHeader}>
