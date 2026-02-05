@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && pnpm lint-fix --quiet 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -q 'packages/types'; then cd \"$CLAUDE_PROJECT_DIR\" && pnpm --filter @fintrak/types build 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT\" | grep -qE 'git\\s+push.*--force|git\\s+push.*-f'; then echo 'BLOCKED: Force push detected. Use regular push or confirm with user.' >&2; exit 1; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
