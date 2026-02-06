@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import {
   type BankTransaction,
@@ -22,6 +23,9 @@ export interface CreateFromTransactionModalProps {
   onClose: () => void;
   transaction: BankTransaction | null;
   isLinked?: boolean;
+  bankLogo?: string;
+  bankName?: string;
+  accountName?: string;
   onSuccess?: () => void;
   onDismissChange?: (transactionId: string, dismissed: boolean) => void;
 }
@@ -31,6 +35,9 @@ export function CreateFromTransactionModal({
   onClose,
   transaction,
   isLinked = false,
+  bankLogo,
+  bankName,
+  accountName,
   onSuccess,
   onDismissChange,
 }: CreateFromTransactionModalProps) {
@@ -195,6 +202,23 @@ export function CreateFromTransactionModal({
               <span className={styles.infoLabel}>Merchant</span>
               <span className={styles.infoValue}>
                 {transaction.merchantName}
+              </span>
+            </div>
+          )}
+          {(bankLogo || accountName) && (
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Account</span>
+              <span className={`${styles.infoValue} ${styles.accountValue}`}>
+                {bankLogo && (
+                  <Image
+                    src={bankLogo}
+                    alt={bankName || 'Bank'}
+                    width={18}
+                    height={18}
+                    className={styles.bankLogo}
+                  />
+                )}
+                {accountName}
               </span>
             </div>
           )}

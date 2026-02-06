@@ -33,6 +33,17 @@
   word-break: break-word;
 }
 
+.accountValue {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.bankLogo {
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
 .credit {
   color: var(--color-success);
   font-weight: 600;

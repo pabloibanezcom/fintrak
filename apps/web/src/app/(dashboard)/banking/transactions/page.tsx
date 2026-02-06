@@ -180,6 +180,21 @@ export default function BankTransactionsPage() {
             ? linkedTransactionIds.has(selectedTransaction._id)
             : false
         }
+        bankLogo={
+          selectedTransaction
+            ? getBankLogo(selectedTransaction.accountId)
+            : undefined
+        }
+        bankName={
+          selectedTransaction
+            ? getBankDisplayName(selectedTransaction.accountId)
+            : undefined
+        }
+        accountName={
+          selectedTransaction
+            ? getAccountDisplayName(selectedTransaction.accountId)
+            : undefined
+        }
         onSuccess={handleModalSuccess}
         onDismissChange={handleDismissChange}
       />
