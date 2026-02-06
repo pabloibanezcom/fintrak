@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { BankAccount } from "@fintrak/types";
-import { productsService } from "@/services/products";
+import type { BankAccount } from '@fintrak/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   type BankConnection,
   bankConnectionsService,
-} from "@/services/bankConnections";
+} from '@/services/bankConnections';
+import { productsService } from '@/services/products';
 
 interface UseBankAccountsReturn {
   accounts: BankAccount[];
@@ -43,7 +43,7 @@ export function useBankAccounts(): UseBankAccountsReturn {
       setConnections(connectionsRes);
     } catch (err) {
       setError(
-        err instanceof Error ? err : new Error("Failed to fetch accounts"),
+        err instanceof Error ? err : new Error('Failed to fetch accounts')
       );
     } finally {
       setIsLoading(false);
@@ -56,34 +56,34 @@ export function useBankAccounts(): UseBankAccountsReturn {
 
   const accountsMap = useMemo(
     () => new Map(accounts.map((acc) => [acc.accountId, acc])),
-    [accounts],
+    [accounts]
   );
 
   const connectionsMap = useMemo(
     () => new Map(connections.map((conn) => [conn.bankId, conn])),
-    [connections],
+    [connections]
   );
 
   const getBankDisplayName = useCallback(
     (accountId: string): string => {
       const account = accountsMap.get(accountId);
-      if (!account) return "-";
+      if (!account) return '-';
 
       // For TrueLayer accounts, check if there's a custom alias in connections
       const connection = connectionsMap.get(account.bankId);
       return connection?.alias || account.bankName;
     },
-    [accountsMap, connectionsMap],
+    [accountsMap, connectionsMap]
   );
 
   const getAccountDisplayName = useCallback(
     (accountId: string): string => {
       const account = accountsMap.get(accountId);
-      if (!account) return "-";
+      if (!account) return '-';
 
       return account.displayName;
     },
-    [accountsMap],
+    [accountsMap]
   );
 
   const getBankLogo = useCallback(
@@ -97,7 +97,7 @@ export function useBankAccounts(): UseBankAccountsReturn {
       const connection = connectionsMap.get(account.bankId);
       return connection?.logo;
     },
-    [accountsMap, connectionsMap],
+    [accountsMap, connectionsMap]
   );
 
   const getAccountBalance = useCallback(
@@ -116,7 +116,7 @@ export function useBankAccounts(): UseBankAccountsReturn {
       }
       return account.balance;
     },
-    [accountsMap],
+    [accountsMap]
   );
 
   return {

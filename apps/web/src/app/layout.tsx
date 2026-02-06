@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { Toaster } from '@/components/ui';
 import {
   SessionProvider,
   SyncProvider,
@@ -33,6 +34,7 @@ export default async function RootLayout({
       <body style={{ backgroundColor: '#f6f6f6' }}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
+            <Toaster />
             <UserProvider>
               <SessionProvider>
                 <SyncProvider>{children}</SyncProvider>

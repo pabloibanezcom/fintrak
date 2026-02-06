@@ -87,14 +87,10 @@ export default function BankAccountCardShowroomPage() {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Horizontal Without Header</h2>
+        <h2 className={styles.sectionTitle}>Horizontal Compact</h2>
         <Card className={styles.showcase}>
           <div style={{ maxWidth: '600px' }}>
-            <BankAccountCard
-              accounts={sampleAccounts}
-              layout="horizontal"
-              showHeader={false}
-            />
+            <BankAccountCard accounts={sampleAccounts} layout="horizontal" />
           </div>
         </Card>
       </section>
@@ -237,20 +233,13 @@ export default function BankAccountCardShowroomPage() {
                   <code>layout</code>
                 </td>
                 <td>
-                  <code>&quot;vertical&quot; | &quot;horizontal&quot;</code>
+                  <code>
+                    &quot;vertical&quot; | &quot;horizontal&quot; |
+                    &quot;grid&quot;
+                  </code>
                 </td>
                 <td>&quot;vertical&quot;</td>
                 <td>Layout direction for account cards</td>
-              </tr>
-              <tr>
-                <td>
-                  <code>showHeader</code>
-                </td>
-                <td>
-                  <code>boolean</code>
-                </td>
-                <td>true</td>
-                <td>Show/hide header with title and total</td>
               </tr>
             </tbody>
           </table>

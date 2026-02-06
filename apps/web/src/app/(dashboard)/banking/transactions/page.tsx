@@ -1,16 +1,21 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   type FilterOption,
   TransactionFilters,
   type TransactionFiltersValue,
 } from '@/components/dashboard';
-import { TransactionList, type TransactionListItem } from '@/components/ui';
+import {
+  CreateFromTransactionModal,
+  TransactionList,
+  type TransactionListItem,
+} from '@/components/ui';
 import { useBankAccounts } from '@/hooks/useBankAccounts';
 import { useBankTransactions } from '@/hooks/useBankTransactions';
+import type { BankTransaction } from '@/services';
 import { formatCurrency, formatDate } from '@/utils';
 import styles from './page.module.css';
 
@@ -23,6 +28,9 @@ export default function BankTransactionsPage() {
     bankId: '',
     accountId: '',
   });
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<BankTransaction | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     accounts,
@@ -32,14 +40,22 @@ export default function BankTransactionsPage() {
     getBankLogo,
   } = useBankAccounts();
 
-  const { transactions, isLoading, isLoadingMore, hasMore, total, loadMore } =
-    useBankTransactions({
-      from: filters.dateFrom || undefined,
-      to: filters.dateTo || undefined,
-      search: filters.search || undefined,
-      bankId: filters.bankId || undefined,
-      accountId: filters.accountId || undefined,
-    });
+  const {
+    transactions,
+    linkedTransactionIds,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    total,
+    loadMore,
+    refetch,
+  } = useBankTransactions({
+    from: filters.dateFrom || undefined,
+    to: filters.dateTo || undefined,
+    search: filters.search || undefined,
+    bankId: filters.bankId || undefined,
+    accountId: filters.accountId || undefined,
+  });
 
   const bankOptions: FilterOption[] = useMemo(
     () =>
@@ -83,9 +99,31 @@ export default function BankTransactionsPage() {
         bank: getBankDisplayName(tx.accountId),
         bankLogo: getBankLogo(tx.accountId),
         account: getAccountDisplayName(tx.accountId),
+        isLinked: linkedTransactionIds.has(tx._id),
+        linkedTransactionId: linkedTransactionIds.get(tx._id),
       })),
-    [transactions, getBankDisplayName, getBankLogo, getAccountDisplayName]
+    [transactions, linkedTransactionIds, getBankDisplayName, getBankLogo, getAccountDisplayName]
   );
+
+  const handleTransactionClick = useCallback(
+    (item: TransactionListItem) => {
+      const transaction = transactions.find((tx) => tx._id === item.id);
+      if (transaction) {
+        setSelectedTransaction(transaction);
+        setIsModalOpen(true);
+      }
+    },
+    [transactions]
+  );
+
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
+  }, []);
+
+  const handleModalSuccess = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   return (
     <div className={styles.page}>
@@ -110,9 +148,17 @@ export default function BankTransactionsPage() {
         isLoadingMore={isLoadingMore}
         hasMore={hasMore}
         onLoadMore={loadMore}
+        onTransactionClick={handleTransactionClick}
         formatAmount={(amount, currency) => formatCurrency(amount, currency)}
         formatDate={(date) => formatDate(date)}
         emptyMessage="No transactions found"
+      />
+
+      <CreateFromTransactionModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        transaction={selectedTransaction}
+        onSuccess={handleModalSuccess}
       />
     </div>
   );

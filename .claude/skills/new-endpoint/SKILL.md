@@ -194,3 +194,80 @@ export default router;
 2. Verify Swagger docs at `http://localhost:3000/api/docs`
 
 3. Run `pnpm lint-fix` in the api package
+
+## ⚠️ CRITICAL: Update Postman Collection
+
+**MANDATORY STEP**: Whenever you create, modify, or delete ANY API endpoint, you **MUST** update the Postman collection file:
+
+**File Location**: `apps/api/Fintrak-API.postman_collection.json`
+
+### What to Update
+
+For **new endpoints**:
+- Add a new request item to the appropriate folder/category
+- Include request method, URL, headers, and body examples
+- Add response examples with status codes
+- Include descriptions for the endpoint
+
+For **modified endpoints**:
+- Update request parameters, body schema, or headers
+- Update response examples if the response structure changed
+- Update descriptions if functionality changed
+
+For **deleted endpoints**:
+- Remove the corresponding request item from the collection
+
+### Postman Request Template
+
+```json
+{
+  "name": "Endpoint Name",
+  "request": {
+    "method": "GET|POST|PUT|DELETE",
+    "header": [
+      {
+        "key": "Authorization",
+        "value": "Bearer {{auth_token}}"
+      },
+      {
+        "key": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "body": {
+      "mode": "raw",
+      "raw": "{\"example\": \"data\"}"
+    },
+    "url": {
+      "raw": "{{rootUrl}}/api/endpoint",
+      "host": ["{{rootUrl}}"],
+      "path": ["api", "endpoint"]
+    },
+    "description": "Description of what this endpoint does"
+  },
+  "response": [
+    {
+      "name": "Success",
+      "originalRequest": { /* same as request */ },
+      "status": "OK",
+      "code": 200,
+      "_postman_previewlanguage": "json",
+      "header": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "cookie": [],
+      "body": "{\"example\": \"response\"}"
+    }
+  ]
+}
+```
+
+### Important Notes
+
+- The Postman collection serves as the **primary API documentation** for external consumers
+- Keeping it updated ensures developers and testers have accurate API references
+- Always test the updated Postman requests to verify they work correctly
+- Use environment variables like `{{rootUrl}}` and `{{auth_token}}` for flexibility

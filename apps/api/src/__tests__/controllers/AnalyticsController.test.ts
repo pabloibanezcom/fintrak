@@ -1,13 +1,12 @@
 import type { Request, Response } from 'express';
 import { getPeriodSummary } from '../../controllers/AnalyticsController';
-import ExpenseModel from '../../models/ExpenseModel';
-import IncomeModel from '../../models/IncomeModel';
+import UserTransactionModel from '../../models/UserTransactionModel';
 
-jest.mock('../../models/ExpenseModel');
-jest.mock('../../models/IncomeModel');
+jest.mock('../../models/UserTransactionModel');
 
-const mockExpenseModel = ExpenseModel as jest.Mocked<typeof ExpenseModel>;
-const mockIncomeModel = IncomeModel as jest.Mocked<typeof IncomeModel>;
+const mockUserTransactionModel = UserTransactionModel as jest.Mocked<
+  typeof UserTransactionModel
+>;
 
 describe('AnalyticsController', () => {
   let req: Partial<Request>;
@@ -48,48 +47,10 @@ describe('AnalyticsController', () => {
     },
   ];
 
-  const mockExpenses = [
-    {
-      _id: 'exp1',
-      title: 'Grocery Shopping',
-      amount: 85.5,
-      date: new Date('2024-01-15'),
-      category: {
-        key: 'groceries',
-        name: 'Groceries',
-        color: '#4CAF50',
-        icon: 'cart',
-      },
-      payee: {
-        key: 'supermarket',
-        name: 'Supermarket',
-        type: 'merchant',
-        logo: null,
-      },
-    },
-    {
-      _id: 'exp2',
-      title: 'Gas Station',
-      amount: 45.2,
-      date: new Date('2024-01-14'),
-      category: {
-        key: 'transport',
-        name: 'Transport',
-        color: '#2196F3',
-        icon: 'car',
-      },
-      payee: {
-        key: 'gas-station',
-        name: 'Gas Station',
-        type: 'merchant',
-        logo: null,
-      },
-    },
-  ];
-
-  const mockIncomes = [
+  const mockTransactions = [
     {
       _id: 'inc1',
+      type: 'income',
       title: 'Monthly Salary',
       amount: 3000,
       date: new Date('2024-01-16'),
@@ -99,10 +60,48 @@ describe('AnalyticsController', () => {
         color: '#FF9800',
         icon: 'money',
       },
-      source: {
+      counterparty: {
         key: 'employer',
         name: 'Company Ltd',
         type: 'employer',
+        logo: null,
+      },
+    },
+    {
+      _id: 'exp1',
+      type: 'expense',
+      title: 'Grocery Shopping',
+      amount: 85.5,
+      date: new Date('2024-01-15'),
+      category: {
+        key: 'groceries',
+        name: 'Groceries',
+        color: '#4CAF50',
+        icon: 'cart',
+      },
+      counterparty: {
+        key: 'supermarket',
+        name: 'Supermarket',
+        type: 'merchant',
+        logo: null,
+      },
+    },
+    {
+      _id: 'exp2',
+      type: 'expense',
+      title: 'Gas Station',
+      amount: 45.2,
+      date: new Date('2024-01-14'),
+      category: {
+        key: 'transport',
+        name: 'Transport',
+        color: '#2196F3',
+        icon: 'car',
+      },
+      counterparty: {
+        key: 'gas-station',
+        name: 'Gas Station',
+        type: 'merchant',
         logo: null,
       },
     },
@@ -126,26 +125,17 @@ describe('AnalyticsController', () => {
     jest.clearAllMocks();
     console.error = jest.fn();
 
-    // Setup default mocks
-    mockExpenseModel.aggregate = jest
+    // Setup default mocks - aggregate is called twice (expenses, then incomes)
+    mockUserTransactionModel.aggregate = jest
       .fn()
-      .mockResolvedValue(mockExpenseAggregation);
-    mockIncomeModel.aggregate = jest
-      .fn()
-      .mockResolvedValue(mockIncomeAggregation);
+      .mockResolvedValueOnce(mockExpenseAggregation)
+      .mockResolvedValueOnce(mockIncomeAggregation);
 
-    mockExpenseModel.find = jest.fn().mockReturnValue({
+    mockUserTransactionModel.find = jest.fn().mockReturnValue({
       populate: jest.fn().mockReturnThis(),
       sort: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
-      lean: jest.fn().mockResolvedValue(mockExpenses),
-    } as any);
-
-    mockIncomeModel.find = jest.fn().mockReturnValue({
-      populate: jest.fn().mockReturnThis(),
-      sort: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      lean: jest.fn().mockResolvedValue(mockIncomes),
+      lean: jest.fn().mockResolvedValue(mockTransactions),
     } as any);
   });
 
@@ -158,8 +148,7 @@ describe('AnalyticsController', () => {
 
       await getPeriodSummary(req as Request, res as Response);
 
-      expect(mockExpenseModel.aggregate).toHaveBeenCalled();
-      expect(mockIncomeModel.aggregate).toHaveBeenCalled();
+      expect(mockUserTransactionModel.aggregate).toHaveBeenCalledTimes(2);
       expect(jsonMock).toHaveBeenCalledWith({
         period: {
           from: '2024-01-01',
@@ -175,10 +164,7 @@ describe('AnalyticsController', () => {
           byCategory: mockIncomeAggregation,
         },
         balance: 2430, // 3000 - 570
-        latestTransactions: expect.arrayContaining([
-          expect.objectContaining({ type: 'income' }),
-          expect.objectContaining({ type: 'expense' }),
-        ]),
+        latestTransactions: mockTransactions,
       });
     });
 
@@ -232,7 +218,7 @@ describe('AnalyticsController', () => {
 
       await getPeriodSummary(req as Request, res as Response);
 
-      expect(mockExpenseModel.aggregate).toHaveBeenCalledWith(
+      expect(mockUserTransactionModel.aggregate).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
             $match: expect.objectContaining({ currency: 'EUR' }),
@@ -257,11 +243,8 @@ describe('AnalyticsController', () => {
 
       await getPeriodSummary(req as Request, res as Response);
 
-      const expenseFindChain = mockExpenseModel.find();
-      const incomeFindChain = mockIncomeModel.find();
-
-      expect(expenseFindChain.limit).toHaveBeenCalledWith(10);
-      expect(incomeFindChain.limit).toHaveBeenCalledWith(10);
+      const findChain = mockUserTransactionModel.find();
+      expect(findChain.limit).toHaveBeenCalledWith(10);
     });
 
     it('should default to 5 latest transactions when latestCount not provided', async () => {
@@ -272,15 +255,16 @@ describe('AnalyticsController', () => {
 
       await getPeriodSummary(req as Request, res as Response);
 
-      const expenseFindChain = mockExpenseModel.find();
-      const incomeFindChain = mockIncomeModel.find();
-
-      expect(expenseFindChain.limit).toHaveBeenCalledWith(5);
-      expect(incomeFindChain.limit).toHaveBeenCalledWith(5);
+      const findChain = mockUserTransactionModel.find();
+      expect(findChain.limit).toHaveBeenCalledWith(5);
     });
 
     it('should handle zero expenses correctly', async () => {
-      mockExpenseModel.aggregate = jest.fn().mockResolvedValue([]);
+      mockUserTransactionModel.aggregate = jest
+        .fn()
+        .mockResolvedValueOnce([]) // expenses
+        .mockResolvedValueOnce(mockIncomeAggregation); // incomes
+
       req.query = {
         dateFrom: '2024-01-01',
         dateTo: '2024-01-31',
@@ -300,7 +284,11 @@ describe('AnalyticsController', () => {
     });
 
     it('should handle zero incomes correctly', async () => {
-      mockIncomeModel.aggregate = jest.fn().mockResolvedValue([]);
+      mockUserTransactionModel.aggregate = jest
+        .fn()
+        .mockResolvedValueOnce(mockExpenseAggregation) // expenses
+        .mockResolvedValueOnce([]); // incomes
+
       req.query = {
         dateFrom: '2024-01-01',
         dateTo: '2024-01-31',
@@ -319,30 +307,12 @@ describe('AnalyticsController', () => {
       );
     });
 
-    it('should combine and sort latest transactions by date', async () => {
-      req.query = {
-        dateFrom: '2024-01-01',
-        dateTo: '2024-01-31',
-        latestCount: '5',
-      };
-
-      await getPeriodSummary(req as Request, res as Response);
-
-      const response = jsonMock.mock.calls[0][0];
-      const transactions = response.latestTransactions;
-
-      // Should be sorted by date descending (most recent first)
-      expect(transactions[0].type).toBe('income'); // 2024-01-16
-      expect(transactions[1].type).toBe('expense'); // 2024-01-15
-      expect(transactions[2].type).toBe('expense'); // 2024-01-14
-    });
-
     it('should handle errors gracefully', async () => {
       req.query = {
         dateFrom: '2024-01-01',
         dateTo: '2024-01-31',
       };
-      mockExpenseModel.aggregate = jest
+      mockUserTransactionModel.aggregate = jest
         .fn()
         .mockRejectedValue(new Error('Database error'));
 

@@ -9,10 +9,9 @@ import * as XLSX from 'xlsx';
 import CategoryModel from '../models/CategoryModel';
 import CounterpartyModel from '../models/CounterpartyModel';
 import CryptoAssetModel from '../models/CryptoAssetModel';
-import ExpenseModel from '../models/ExpenseModel';
-import IncomeModel from '../models/IncomeModel';
 import RecurringTransactionModel from '../models/RecurringTransactionModel';
 import TagModel from '../models/TagModel';
+import UserTransactionModel from '../models/UserTransactionModel';
 import { GenericImportService } from '../services/GenericImportService';
 import { requireAuth } from '../utils/authUtils';
 
@@ -309,31 +308,27 @@ export const importTransactions = async (req: Request, res: Response) => {
         // Update transaction data with generated title
         transactionData.title = transactionTitle;
 
-        // Add counterparty reference to transaction
-        if (isExpense) {
-          transactionData.payee = counterparty._id;
-        } else {
-          transactionData.source = counterparty._id;
-        }
+        // Add type and counterparty to transaction
+        transactionData.type = isExpense ? 'expense' : 'income';
+        transactionData.counterparty = counterparty._id;
 
-        // Check for duplicate transactions (same user, date, amount, and original description)
+        // Check for duplicate transactions (same user, date, amount, type, and original description)
         const duplicateQuery = {
           userId,
           date: transactionDate,
           amount: absAmount,
+          type: transactionData.type,
           // Use original description for duplicate detection, not generated title
           title: cleanDescription,
         };
 
+        // Remove existing duplicate and create new transaction
+        await UserTransactionModel.deleteMany(duplicateQuery);
+        await UserTransactionModel.create(transactionData);
+
         if (isExpense) {
-          // Remove existing duplicate expense if exists
-          await ExpenseModel.deleteMany(duplicateQuery);
-          await ExpenseModel.create(transactionData);
           results.expenses++;
         } else {
-          // Remove existing duplicate income if exists
-          await IncomeModel.deleteMany(duplicateQuery);
-          await IncomeModel.create(transactionData);
           results.income++;
         }
 

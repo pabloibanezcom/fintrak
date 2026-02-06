@@ -13,3 +13,4 @@ export {
   getStartOfMonth,
   toISODateString,
 } from './date';
+export { toast } from './toast';

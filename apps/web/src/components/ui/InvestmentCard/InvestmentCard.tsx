@@ -136,7 +136,9 @@ function VisibilityToggle({
       type="button"
       className={styles.visibilityToggle}
       onClick={onToggle}
-      aria-label={isVisible ? 'Hide investment details' : 'Show investment details'}
+      aria-label={
+        isVisible ? 'Hide investment details' : 'Show investment details'
+      }
     >
       {isVisible ? (
         <svg

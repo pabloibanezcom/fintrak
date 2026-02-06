@@ -7,3 +7,23 @@ export {
 } from './analytics';
 export { apiClient } from './api';
 export { authService, type User } from './auth';
+export {
+  type BankTransaction,
+  type BankTransactionsResponse,
+  bankTransactionsService,
+  type CreateTransactionFromBankRequest,
+  type GetBankTransactionsParams,
+  type LinkedTransactionResponse,
+} from './bankTransactions';
+export { type Category, categoriesService } from './categories';
+export {
+  type CounterpartiesResponse,
+  type Counterparty,
+  counterpartiesService,
+  type SearchCounterpartiesParams,
+} from './counterparties';
+export {
+  type UserTransaction,
+  type UserTransactionsResponse,
+  userTransactionsService,
+} from './userTransactions';

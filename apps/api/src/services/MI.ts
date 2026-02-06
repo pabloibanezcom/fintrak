@@ -7,18 +7,18 @@ import type {
   MILoginResponse,
   TokenData,
   UserProducts,
-} from "@fintrak/types";
-import { MIServiceError } from "@fintrak/types";
-import axios, { type AxiosError } from "axios";
-import CryptoAssetModel from "../models/CryptoAssetModel";
-import { aggregateBankAccounts } from "./BankAccountAggregator";
-import { fetchCryptoPrices } from "./CoinGecko";
+} from '@fintrak/types';
+import { MIServiceError } from '@fintrak/types';
+import axios, { type AxiosError } from 'axios';
+import CryptoAssetModel from '../models/CryptoAssetModel';
+import { aggregateBankAccounts } from './BankAccountAggregator';
+import { fetchCryptoPrices } from './CoinGecko';
 import {
   MICashAccountsToUserCashAccounts,
   MIDepositsToUserDeposits,
   MIETCsToETCsSummary,
   MIIndexedFundsToIndexedFundsSummary,
-} from "./MICast";
+} from './MICast';
 
 let tokenData: TokenData | null = null;
 
@@ -32,12 +32,12 @@ const CACHE_TTL = 60 * 1000; // 60 seconds
 
 // Environment validation
 const validateEnvironment = (): void => {
-  const requiredVars = ["MI_AUTH_UI", "MI_API", "MI_USER", "MI_PASS"];
+  const requiredVars = ['MI_AUTH_UI', 'MI_API', 'MI_USER', 'MI_PASS'];
   const missing = requiredVars.filter((varName) => !process.env[varName]);
 
   if (missing.length > 0) {
     throw new Error(
-      `Missing required environment variables: ${missing.join(", ")}`
+      `Missing required environment variables: ${missing.join(', ')}`
     );
   }
 };
@@ -46,7 +46,7 @@ const validateEnvironment = (): void => {
 const axiosConfig = {
   timeout: 30000, // 30 seconds
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 };
 
@@ -62,7 +62,7 @@ async function loginToMI(): Promise<TokenData> {
     const response = await axios.post<MILoginResponse>(
       process.env.MI_AUTH_UI as string,
       {
-        accessType: "USERNAME",
+        accessType: 'USERNAME',
         customerId: process.env.MI_USER,
         password: process.env.MI_PASS,
       },
@@ -106,7 +106,7 @@ async function getToken(): Promise<string> {
     try {
       tokenData = await loginToMI();
     } catch (error) {
-      console.error("Failed to login to MI service:", error);
+      console.error('Failed to login to MI service:', error);
       throw error;
     }
   }
@@ -149,7 +149,7 @@ async function withRetry<T>(
     }
   }
 
-  throw lastError || new Error("Unknown error occurred during retry");
+  throw lastError || new Error('Unknown error occurred during retry');
 }
 
 // Generic fetch function for MI endpoints
@@ -180,7 +180,7 @@ async function fetchFromMI<TInput, TOutput>(
 
     if (!Array.isArray(rawData)) {
       console.warn(
-        `MI API returned non-array ${dataTypeName || "data"}:`,
+        `MI API returned non-array ${dataTypeName || 'data'}:`,
         rawData
       );
       return [];
@@ -192,19 +192,19 @@ async function fetchFromMI<TInput, TOutput>(
 
 async function fetchDeposits(): Promise<Deposit[]> {
   return fetchFromMI(
-    "/deposits/self",
+    '/deposits/self',
     MIDepositsToUserDeposits,
     undefined,
-    "deposits data"
+    'deposits data'
   );
 }
 
 async function fetchCashAccounts(): Promise<CashAccount[]> {
   return fetchFromMI(
-    "/cash-accounts/self",
+    '/cash-accounts/self',
     MICashAccountsToUserCashAccounts,
     undefined,
-    "cash accounts data"
+    'cash accounts data'
   );
 }
 
@@ -214,7 +214,7 @@ async function fetchSecuritiesData(): Promise<{
 }> {
   return withRetry(async () => {
     const accessToken = await getToken();
-    console.log("[MI API] GET /securities-accounts/self");
+    console.log('[MI API] GET /securities-accounts/self');
     const response = await axios.get(
       `${process.env.MI_API as string}/securities-accounts/self`,
       {
@@ -230,7 +230,7 @@ async function fetchSecuritiesData(): Promise<{
 
     if (!Array.isArray(securitiesData)) {
       console.warn(
-        "MI API returned non-array securities data:",
+        'MI API returned non-array securities data:',
         securitiesData
       );
       return { funds: [], etcs: [] };
@@ -238,15 +238,14 @@ async function fetchSecuritiesData(): Promise<{
 
     // Filter out non-securities accounts
     const securitiesAccounts = securitiesData.filter(
-      (account: any) => account.accountType === "SECURITIES_ACCOUNT"
+      (account: any) => account.accountType === 'SECURITIES_ACCOUNT'
     );
 
-    const fundsList = securitiesAccounts.flatMap(
-      (account: any) => [
-        ...(account.securitiesAccountInvestments?.INDEXED_FUND?.investmentList || []),
-        ...(account.securitiesAccountInvestments?.FUND?.investmentList || []),
-      ]
-    );
+    const fundsList = securitiesAccounts.flatMap((account: any) => [
+      ...(account.securitiesAccountInvestments?.INDEXED_FUND?.investmentList ||
+        []),
+      ...(account.securitiesAccountInvestments?.FUND?.investmentList || []),
+    ]);
     const etcsList = securitiesAccounts.flatMap(
       (account: any) =>
         account.securitiesAccountInvestments?.BROKER?.investmentList || []
@@ -295,7 +294,7 @@ async function fetchCryptoAssets(userId: string): Promise<CryptoAsset[]> {
       };
     });
   } catch (error) {
-    console.error("Error fetching crypto assets:", error);
+    console.error('Error fetching crypto assets:', error);
     return [];
   }
 }
@@ -305,17 +304,17 @@ export const fetchUserProducts = async (
 ): Promise<UserProducts> => {
   try {
     // Use userId or 'default' as cache key
-    const cacheKey = userId || "default";
+    const cacheKey = userId || 'default';
     const now = Date.now();
 
     // Check if we have a valid cached entry
     const cachedEntry = userProductsCache.get(cacheKey);
     if (cachedEntry && now < cachedEntry.expiresAt) {
-      console.log("Returning cached user products");
+      console.log('Returning cached user products');
       return cachedEntry.data;
     }
 
-    console.log("Fetching user products from MI API...");
+    console.log('Fetching user products from MI API...');
 
     // Fetch all products in parallel for better performance
     const [deposits, cashAccounts, securities, cryptoAssets] =
@@ -326,15 +325,15 @@ export const fetchUserProducts = async (
         userId ? fetchCryptoAssets(userId) : Promise.resolve([]),
       ]);
 
-    const depositItems = deposits.status === "fulfilled" ? deposits.value : [];
+    const depositItems = deposits.status === 'fulfilled' ? deposits.value : [];
     const miCashAccountItems =
-      cashAccounts.status === "fulfilled" ? cashAccounts.value : [];
+      cashAccounts.status === 'fulfilled' ? cashAccounts.value : [];
     const fundItems =
-      securities.status === "fulfilled" ? securities.value.funds : [];
+      securities.status === 'fulfilled' ? securities.value.funds : [];
     const etcItems =
-      securities.status === "fulfilled" ? securities.value.etcs : [];
+      securities.status === 'fulfilled' ? securities.value.etcs : [];
     const cryptoAssetItems =
-      cryptoAssets.status === "fulfilled" ? cryptoAssets.value : [];
+      cryptoAssets.status === 'fulfilled' ? cryptoAssets.value : [];
 
     // Aggregate bank accounts from all sources (MyInvestor + TrueLayer)
     let bankAccountItems: BankAccount[] = [];
@@ -346,23 +345,23 @@ export const fetchUserProducts = async (
       bankAccountItems = aggregatorResult.accounts;
       if (aggregatorResult.errors.length > 0) {
         console.warn(
-          "Bank account aggregation errors:",
+          'Bank account aggregation errors:',
           aggregatorResult.errors
         );
       }
     } else {
       // If no userId, just transform MI cash accounts
       const MYINVESTOR_LOGO =
-        "https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/assets/bank-logos/myinvestor.png";
+        'https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/assets/bank-logos/myinvestor.png';
       bankAccountItems = miCashAccountItems.map((account) => ({
         accountId: account.accountId,
-        source: "myinvestor" as const,
-        bankName: "MyInvestor",
-        bankId: "myinvestor",
+        source: 'myinvestor' as const,
+        bankName: 'MyInvestor',
+        bankId: 'myinvestor',
         logo: MYINVESTOR_LOGO,
         displayName: account.alias,
         iban: account.iban,
-        accountType: "CASH" as const,
+        accountType: 'CASH' as const,
         currency: account.currency,
         balance: account.balance,
       }));
@@ -374,10 +373,7 @@ export const fetchUserProducts = async (
       (sum, c) => sum + c.balance,
       0
     );
-    const fundsTotal = fundItems.reduce(
-      (sum, i) => sum + i.marketValue,
-      0
-    );
+    const fundsTotal = fundItems.reduce((sum, i) => sum + i.marketValue, 0);
     const etcsTotal = etcItems.reduce((sum, e) => sum + e.marketValue, 0);
     const cryptoAssetsTotal = cryptoAssetItems.reduce((sum, crypto) => {
       // Use EUR value if available, otherwise 0
@@ -437,9 +433,9 @@ export const fetchUserProducts = async (
 
     return result;
   } catch (error) {
-    console.error("Unexpected error fetching user products:", error);
+    console.error('Unexpected error fetching user products:', error);
     throw new MIServiceError(
-      "Failed to fetch user products",
+      'Failed to fetch user products',
       500,
       error as Error
     );
@@ -452,7 +448,7 @@ export const checkMIServiceHealth = async (): Promise<boolean> => {
     await getToken();
     return true;
   } catch (error) {
-    console.error("MI service health check failed:", error);
+    console.error('MI service health check failed:', error);
     return false;
   }
 };

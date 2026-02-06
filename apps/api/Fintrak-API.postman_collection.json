@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "fintrak-api-collection",
     "name": "Fintrak API",
-    "description": "Complete API collection for Fintrak financial tracking application including authentication, expense management with advanced search, income tracking with filtering, categories, tags, counterparties with search capabilities, and product endpoints.",
+    "description": "Complete API collection for Fintrak financial tracking application including authentication, user transactions (unified expenses/incomes), categories, tags, counterparties with search capabilities, and product endpoints.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "fintrak"
   },
@@ -406,10 +406,10 @@
       "description": "Analytics endpoints for financial summaries and insights"
     },
     {
-      "name": "Expenses",
+      "name": "User Transactions",
       "item": [
         {
-          "name": "Search Expenses",
+          "name": "Search Transactions",
           "request": {
             "method": "GET",
             "header": [
@@ -419,211 +419,88 @@
               }
             ],
             "url": {
-              "raw": "{{rootUrl}}/api/expenses/search?limit=20&offset=0&sortBy=date&sortOrder=desc&dateFrom=2024-01-01&dateTo=2024-12-31",
+              "raw": "{{rootUrl}}/api/transactions/search?limit=20&offset=0&sortBy=date&sortOrder=desc",
               "host": [
                 "{{rootUrl}}"
               ],
               "path": [
                 "api",
-                "expenses",
+                "transactions",
                 "search"
               ],
               "query": [
                 {
-                  "key": "title",
-                  "value": "grocery",
-                  "description": "Search in expense titles (case-insensitive)",
-                  "disabled": true
-                },
-                {
-                  "key": "description",
-                  "value": "weekly",
-                  "description": "Search in expense descriptions (case-insensitive)",
-                  "disabled": true
-                },
-                {
-                  "key": "dateFrom",
-                  "value": "2024-01-01",
-                  "description": "Filter expenses from this date (YYYY-MM-DD)"
-                },
-                {
-                  "key": "dateTo",
-                  "value": "2024-12-31",
-                  "description": "Filter expenses until this date (YYYY-MM-DD)"
-                },
-                {
-                  "key": "amountMin",
-                  "value": "10",
-                  "description": "Minimum amount filter",
-                  "disabled": true
-                },
-                {
-                  "key": "amountMax",
-                  "value": "500",
-                  "description": "Maximum amount filter",
-                  "disabled": true
-                },
-                {
-                  "key": "currency",
-                  "value": "EUR",
-                  "description": "Currency filter (EUR, GBP, USD)",
+                  "key": "type",
+                  "value": "expense",
+                  "description": "Filter by type (expense or income)",
                   "disabled": true
                 },
                 {
                   "key": "category",
-                  "value": "{{category_id}}",
-                  "description": "Category ID filter",
+                  "value": "groceries",
+                  "description": "Filter by category key",
                   "disabled": true
                 },
                 {
-                  "key": "payee",
-                  "value": "{{counterparty_id}}",
-                  "description": "Payee/Counterparty ID filter",
+                  "key": "counterparty",
+                  "value": "supermarket",
+                  "description": "Filter by counterparty key",
                   "disabled": true
                 },
                 {
-                  "key": "periodicity",
-                  "value": "NOT_RECURRING",
-                  "description": "Periodicity filter",
+                  "key": "from",
+                  "value": "2024-01-01",
+                  "description": "Filter from date",
                   "disabled": true
                 },
                 {
-                  "key": "tags",
-                  "value": "weekly,vacation",
-                  "description": "Tag keys filter (comma-separated, matches any)",
+                  "key": "to",
+                  "value": "2024-12-31",
+                  "description": "Filter to date",
+                  "disabled": true
+                },
+                {
+                  "key": "minAmount",
+                  "value": "10",
+                  "description": "Minimum amount",
+                  "disabled": true
+                },
+                {
+                  "key": "maxAmount",
+                  "value": "1000",
+                  "description": "Maximum amount",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search in title/description",
                   "disabled": true
                 },
                 {
                   "key": "limit",
-                  "value": "20",
-                  "description": "Number of results to return (1-100, default: 50)"
+                  "value": "20"
                 },
                 {
                   "key": "offset",
-                  "value": "0",
-                  "description": "Number of results to skip (default: 0)"
+                  "value": "0"
                 },
                 {
                   "key": "sortBy",
-                  "value": "date",
-                  "description": "Field to sort by (date, amount, title, createdAt)"
+                  "value": "date"
                 },
                 {
                   "key": "sortOrder",
-                  "value": "desc",
-                  "description": "Sort order (asc, desc)"
-                },
-                {
-                  "key": "includeTotal",
-                  "value": "false",
-                  "description": "Whether to include total amount in response (true/false, default: false)",
-                  "disabled": true
+                  "value": "desc"
                 }
               ]
             },
-            "description": "Search and filter expenses with pagination and sorting. All filters are optional and can be combined."
+            "description": "Search and filter user transactions (both expenses and incomes) with pagination and sorting."
           },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{rootUrl}}/api/expenses/search?title=grocery&amountMin=50&limit=10",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "expenses",
-                    "search"
-                  ],
-                  "query": [
-                    {
-                      "key": "title",
-                      "value": "grocery"
-                    },
-                    {
-                      "key": "amountMin",
-                      "value": "50"
-                    },
-                    {
-                      "key": "limit",
-                      "value": "10"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"expenses\": [\n    {\n      \"_id\": \"60d0fe4f5311236168a109cb\",\n      \"title\": \"Compra en Mercadona\",\n      \"amount\": 85.50,\n      \"currency\": \"EUR\",\n      \"category\": {\n        \"_id\": \"60d0fe4f5311236168a109cc\",\n        \"key\": \"groceries\",\n        \"name\": \"Groceries\",\n        \"color\": \"#4CAF50\",\n        \"icon\": \"shopping-cart\"\n      },\n      \"payee\": {\n        \"_id\": \"60d0fe4f5311236168a109cd\",\n        \"key\": \"mercadona\",\n        \"name\": \"Mercadona\",\n        \"type\": \"company\"\n      },\n      \"date\": \"2024-01-15T00:00:00.000Z\",\n      \"periodicity\": \"NOT_RECURRING\",\n      \"tags\": [],\n      \"userId\": \"60d0fe4f5311236168a109ca\",\n      \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n      \"updatedAt\": \"2024-01-15T10:00:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 15,\n    \"limit\": 10,\n    \"offset\": 0,\n    \"hasMore\": true\n  },\n  \"filters\": {\n    \"title\": \"grocery\",\n    \"amountMin\": \"50\"\n  },\n  \"sort\": {\n    \"sortBy\": \"date\",\n    \"sortOrder\": \"desc\"\n  },\n  \"totalAmount\": 1275.85\n}"
-            },
-            {
-              "name": "Success with Total",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{rootUrl}}/api/expenses/search?title=grocery&includeTotal=true&limit=10",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "expenses",
-                    "search"
-                  ],
-                  "query": [
-                    {
-                      "key": "title",
-                      "value": "grocery"
-                    },
-                    {
-                      "key": "includeTotal",
-                      "value": "true"
-                    },
-                    {
-                      "key": "limit",
-                      "value": "10"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"expenses\": [\n    {\n      \"_id\": \"60d0fe4f5311236168a109cb\",\n      \"title\": \"Compra en Mercadona\",\n      \"amount\": 85.50,\n      \"currency\": \"EUR\",\n      \"category\": {\n        \"_id\": \"60d0fe4f5311236168a109cc\",\n        \"key\": \"groceries\",\n        \"name\": \"Groceries\",\n        \"color\": \"#4CAF50\",\n        \"icon\": \"shopping-cart\"\n      },\n      \"payee\": {\n        \"_id\": \"60d0fe4f5311236168a109cd\",\n        \"key\": \"mercadona\",\n        \"name\": \"Mercadona\",\n        \"type\": \"company\"\n      },\n      \"date\": \"2024-01-15T00:00:00.000Z\",\n      \"periodicity\": \"NOT_RECURRING\",\n      \"tags\": [],\n      \"userId\": \"60d0fe4f5311236168a109ca\",\n      \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n      \"updatedAt\": \"2024-01-15T10:00:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 15,\n    \"limit\": 10,\n    \"offset\": 0,\n    \"hasMore\": true\n  },\n  \"filters\": {\n    \"title\": \"grocery\"\n  },\n  \"sort\": {\n    \"sortBy\": \"date\",\n    \"sortOrder\": \"desc\"\n  },\n  \"totalAmount\": 1275.85\n}"
-            }
-          ]
+          "response": []
         },
         {
-          "name": "Get Expense by ID",
+          "name": "Get Transaction by ID",
           "request": {
             "method": "GET",
             "header": [
@@ -633,71 +510,48 @@
               }
             ],
             "url": {
-              "raw": "{{rootUrl}}/api/expenses/{{expense_id}}",
+              "raw": "{{rootUrl}}/api/transactions/{{transaction_id}}",
               "host": [
                 "{{rootUrl}}"
               ],
               "path": [
                 "api",
-                "expenses",
-                "{{expense_id}}"
+                "transactions",
+                "{{transaction_id}}"
               ]
             },
-            "description": "Retrieve a specific expense by ID"
+            "description": "Retrieve a specific user transaction by ID"
           },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{rootUrl}}/api/expenses/60d0fe4f5311236168a109cb",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "expenses",
-                    "60d0fe4f5311236168a109cb"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"_id\": \"60d0fe4f5311236168a109cb\",\n  \"title\": \"Grocery Shopping\",\n  \"amount\": 85.50,\n  \"category\": \"food\",\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"description\": \"Weekly groceries\",\n  \"userId\": \"60d0fe4f5311236168a109ca\",\n  \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-15T10:00:00.000Z\"\n}"
-            }
-          ]
+          "response": []
         },
         {
-          "name": "Create Expense",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.environment.set(\"expense_id\", jsonData._id);",
-                  "}"
-                ],
-                "type": "text/javascript"
+          "name": "Get Linked Transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
               }
-            }
-          ],
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/transactions/linked/{{bank_transaction_id}}",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "transactions",
+                "linked",
+                "{{bank_transaction_id}}"
+              ]
+            },
+            "description": "Check if a bank transaction has a linked user transaction"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction",
           "request": {
             "method": "POST",
             "header": [
@@ -712,66 +566,24 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Grocery Shopping\",\n  \"amount\": 85.50,\n  \"category\": {\n    \"id\": \"groceries\",\n    \"name\": \"Groceries\",\n    \"color\": \"#4CAF50\",\n    \"icon\": \"shopping-cart\"\n  },\n  \"payee\": {\n    \"id\": \"supermarket\",\n    \"name\": \"Local Supermarket\",\n    \"type\": \"company\"\n  },\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"description\": \"Weekly groceries\",\n  \"tags\": [\n    {\n      \"id\": \"weekly\",\n      \"name\": \"Weekly\",\n      \"color\": \"#2196F3\",\n      \"icon\": \"calendar\"\n    }\n  ]\n}"
+              "raw": "{\n  \"type\": \"expense\",\n  \"title\": \"Grocery Shopping\",\n  \"amount\": 85.5,\n  \"currency\": \"EUR\",\n  \"category\": \"groceries\",\n  \"counterparty\": \"supermarket\",\n  \"date\": \"2024-01-15\",\n  \"periodicity\": \"NOT_RECURRING\",\n  \"description\": \"Weekly groceries\",\n  \"tags\": []\n}"
             },
             "url": {
-              "raw": "{{rootUrl}}/api/expenses",
+              "raw": "{{rootUrl}}/api/transactions",
               "host": [
                 "{{rootUrl}}"
               ],
               "path": [
                 "api",
-                "expenses"
+                "transactions"
               ]
             },
-            "description": "Create a new expense (automatically saves expense ID to environment)"
+            "description": "Create a new user transaction (expense or income). Type, title, amount, currency, category, and date are required."
           },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  },
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"title\": \"Grocery Shopping\",\n  \"amount\": 85.50,\n  \"category\": \"food\",\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"description\": \"Weekly groceries\"\n}"
-                },
-                "url": {
-                  "raw": "{{rootUrl}}/api/expenses",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "expenses"
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"_id\": \"60d0fe4f5311236168a109cb\",\n  \"title\": \"Grocery Shopping\",\n  \"amount\": 85.50,\n  \"category\": \"food\",\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"description\": \"Weekly groceries\",\n  \"userId\": \"60d0fe4f5311236168a109ca\",\n  \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-15T10:00:00.000Z\"\n}"
-            }
-          ]
+          "response": []
         },
         {
-          "name": "Update Expense",
+          "name": "Update Transaction",
           "request": {
             "method": "PUT",
             "header": [
@@ -786,68 +598,25 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Grocery Shopping\",\n  \"amount\": 95.75,\n  \"description\": \"Weekly groceries with extra items\"\n}"
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"category\": \"food\",\n  \"description\": \"Updated description\"\n}"
             },
             "url": {
-              "raw": "{{rootUrl}}/api/expenses/{{expense_id}}",
+              "raw": "{{rootUrl}}/api/transactions/{{transaction_id}}",
               "host": [
                 "{{rootUrl}}"
               ],
               "path": [
                 "api",
-                "expenses",
-                "{{expense_id}}"
+                "transactions",
+                "{{transaction_id}}"
               ]
             },
-            "description": "Update an existing expense"
+            "description": "Update an existing user transaction"
           },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  },
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"title\": \"Updated Grocery Shopping\",\n  \"amount\": 95.75,\n  \"description\": \"Weekly groceries with extra items\"\n}"
-                },
-                "url": {
-                  "raw": "{{rootUrl}}/api/expenses/60d0fe4f5311236168a109cb",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "expenses",
-                    "60d0fe4f5311236168a109cb"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"_id\": \"60d0fe4f5311236168a109cb\",\n  \"title\": \"Updated Grocery Shopping\",\n  \"amount\": 95.75,\n  \"category\": \"food\",\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"description\": \"Weekly groceries with extra items\",\n  \"userId\": \"60d0fe4f5311236168a109ca\",\n  \"createdAt\": \"2024-01-15T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-15T10:05:00.000Z\"\n}"
-            }
-          ]
+          "response": []
         },
         {
-          "name": "Delete Expense",
+          "name": "Delete Transaction",
           "request": {
             "method": "DELETE",
             "header": [
@@ -857,57 +626,22 @@
               }
             ],
             "url": {
-              "raw": "{{rootUrl}}/api/expenses/{{expense_id}}",
+              "raw": "{{rootUrl}}/api/transactions/{{transaction_id}}",
               "host": [
                 "{{rootUrl}}"
               ],
               "path": [
                 "api",
-                "expenses",
-                "{{expense_id}}"
+                "transactions",
+                "{{transaction_id}}"
               ]
             },
-            "description": "Delete an existing expense"
+            "description": "Delete a user transaction"
           },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{rootUrl}}/api/expenses/60d0fe4f5311236168a109cb",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "expenses",
-                    "60d0fe4f5311236168a109cb"
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"message\": \"Expense deleted successfully\"\n}"
-            }
-          ]
+          "response": []
         }
       ],
-      "description": "Complete CRUD operations for expense management with advanced search and filtering capabilities"
+      "description": "CRUD operations for user transactions (unified expenses and incomes). Each transaction has a type (expense or income), category, and optional counterparty."
     },
     {
       "name": "Import",
@@ -944,7 +678,7 @@
                 "transactions"
               ]
             },
-            "description": "Import transactions from Excel file. Automatically detects BBVA format or processes standard format. Negative amounts are treated as expenses, positive as income."
+            "description": "Import transactions from Excel file. Automatically detects BBVA format or processes standard format. Negative amounts are treated as expenses, positive as incomes."
           },
           "response": [
             {
@@ -1520,327 +1254,6 @@
         }
       ],
       "description": "Import data from external files. Supports Excel transactions (BBVA format), JSON categories with smart keywords, JSON tags, JSON counterparties, and JSON recurring transactions. All imports prevent duplicates by replacing existing items with same keys."
-    },
-    {
-      "name": "Incomes",
-      "item": [
-        {
-          "name": "Search Incomes",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{rootUrl}}/api/incomes/search?limit=20&offset=0&sortBy=date&sortOrder=desc&dateFrom=2024-01-01&dateTo=2024-12-31",
-              "host": [
-                "{{rootUrl}}"
-              ],
-              "path": [
-                "api",
-                "incomes",
-                "search"
-              ],
-              "query": [
-                {
-                  "key": "title",
-                  "value": "freelance",
-                  "description": "Search in income titles (case-insensitive)",
-                  "disabled": true
-                },
-                {
-                  "key": "description",
-                  "value": "project",
-                  "description": "Search in income descriptions (case-insensitive)",
-                  "disabled": true
-                },
-                {
-                  "key": "dateFrom",
-                  "value": "2024-01-01",
-                  "description": "Filter incomes from this date (YYYY-MM-DD)"
-                },
-                {
-                  "key": "dateTo",
-                  "value": "2024-12-31",
-                  "description": "Filter incomes until this date (YYYY-MM-DD)"
-                },
-                {
-                  "key": "amountMin",
-                  "value": "100",
-                  "description": "Minimum amount filter",
-                  "disabled": true
-                },
-                {
-                  "key": "amountMax",
-                  "value": "5000",
-                  "description": "Maximum amount filter",
-                  "disabled": true
-                },
-                {
-                  "key": "currency",
-                  "value": "EUR",
-                  "description": "Currency filter (EUR, GBP, USD)",
-                  "disabled": true
-                },
-                {
-                  "key": "category",
-                  "value": "{{category_id}}",
-                  "description": "Category ID filter",
-                  "disabled": true
-                },
-                {
-                  "key": "source",
-                  "value": "{{counterparty_id}}",
-                  "description": "Source/Counterparty ID filter",
-                  "disabled": true
-                },
-                {
-                  "key": "periodicity",
-                  "value": "NOT_RECURRING",
-                  "description": "Periodicity filter",
-                  "disabled": true
-                },
-                {
-                  "key": "tags",
-                  "value": "project,work",
-                  "description": "Tag keys filter (comma-separated, matches any)",
-                  "disabled": true
-                },
-                {
-                  "key": "limit",
-                  "value": "20",
-                  "description": "Number of results to return (1-100, default: 50)"
-                },
-                {
-                  "key": "offset",
-                  "value": "0",
-                  "description": "Number of results to skip (default: 0)"
-                },
-                {
-                  "key": "sortBy",
-                  "value": "date",
-                  "description": "Field to sort by (date, amount, title, createdAt)"
-                },
-                {
-                  "key": "sortOrder",
-                  "value": "desc",
-                  "description": "Sort order (asc, desc)"
-                },
-                {
-                  "key": "includeTotal",
-                  "value": "false",
-                  "description": "Whether to include total amount in response (true/false, default: false)",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "Search and filter incomes with pagination and sorting. All filters are optional and can be combined."
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{rootUrl}}/api/incomes/search?title=freelance&amountMin=1000&limit=10",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "incomes",
-                    "search"
-                  ],
-                  "query": [
-                    {
-                      "key": "title",
-                      "value": "freelance"
-                    },
-                    {
-                      "key": "amountMin",
-                      "value": "1000"
-                    },
-                    {
-                      "key": "limit",
-                      "value": "10"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"incomes\": [\n    {\n      \"_id\": \"60d0fe4f5311236168a109ce\",\n      \"title\": \"Ingreso Empresa XYZ\",\n      \"amount\": 2500.00,\n      \"currency\": \"EUR\",\n      \"category\": {\n        \"_id\": \"60d0fe4f5311236168a109cf\",\n        \"key\": \"salary\",\n        \"name\": \"Salary\",\n        \"color\": \"#4CAF50\",\n        \"icon\": \"money\"\n      },\n      \"source\": {\n        \"_id\": \"60d0fe4f5311236168a109d0\",\n        \"key\": \"empresa_xyz\",\n        \"name\": \"Empresa XYZ\",\n        \"type\": \"company\"\n      },\n      \"date\": \"2024-01-30T00:00:00.000Z\",\n      \"periodicity\": \"RECURRING_FIXED_AMOUNT\",\n      \"tags\": [],\n      \"userId\": \"60d0fe4f5311236168a109ca\",\n      \"createdAt\": \"2024-01-30T09:00:00.000Z\",\n      \"updatedAt\": \"2024-01-30T09:00:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 8,\n    \"limit\": 10,\n    \"offset\": 0,\n    \"hasMore\": false\n  },\n  \"filters\": {\n    \"title\": \"freelance\",\n    \"amountMin\": \"1000\"\n  },\n  \"sort\": {\n    \"sortBy\": \"date\",\n    \"sortOrder\": \"desc\"\n  },\n  \"totalAmount\": 18750.00\n}"
-            },
-            {
-              "name": "Success with Total",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{auth_token}}"
-                  }
-                ],
-                "url": {
-                  "raw": "{{rootUrl}}/api/incomes/search?title=freelance&includeTotal=true&limit=10",
-                  "host": [
-                    "{{rootUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "incomes",
-                    "search"
-                  ],
-                  "query": [
-                    {
-                      "key": "title",
-                      "value": "freelance"
-                    },
-                    {
-                      "key": "includeTotal",
-                      "value": "true"
-                    },
-                    {
-                      "key": "limit",
-                      "value": "10"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"incomes\": [\n    {\n      \"_id\": \"60d0fe4f5311236168a109ce\",\n      \"title\": \"Freelance Project Q1\",\n      \"amount\": 2500.00,\n      \"currency\": \"EUR\",\n      \"category\": {\n        \"_id\": \"60d0fe4f5311236168a109cf\",\n        \"key\": \"freelance\",\n        \"name\": \"Freelance Work\",\n        \"color\": \"#4CAF50\",\n        \"icon\": \"briefcase\"\n      },\n      \"source\": {\n        \"_id\": \"60d0fe4f5311236168a109d0\",\n        \"key\": \"client_abc\",\n        \"name\": \"ABC Company\",\n        \"type\": \"company\"\n      },\n      \"date\": \"2024-03-15T00:00:00.000Z\",\n      \"periodicity\": \"NOT_RECURRING\",\n      \"tags\": [],\n      \"userId\": \"60d0fe4f5311236168a109ca\",\n      \"createdAt\": \"2024-03-15T09:00:00.000Z\",\n      \"updatedAt\": \"2024-03-15T09:00:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 5,\n    \"limit\": 10,\n    \"offset\": 0,\n    \"hasMore\": false\n  },\n  \"filters\": {\n    \"title\": \"freelance\"\n  },\n  \"sort\": {\n    \"sortBy\": \"date\",\n    \"sortOrder\": \"desc\"\n  },\n  \"totalAmount\": 8750.00\n}"
-            }
-          ]
-        },
-        {
-          "name": "Create Income",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.environment.set(\"income_id\", jsonData._id);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Freelance Project\",\n  \"amount\": 1500.00,\n  \"category\": {\n    \"id\": \"freelance\",\n    \"name\": \"Freelance Work\",\n    \"color\": \"#4CAF50\",\n    \"icon\": \"briefcase\"\n  },\n  \"source\": {\n    \"id\": \"client-abc\",\n    \"name\": \"ABC Company\",\n    \"type\": \"company\",\n    \"email\": \"projects@abc.com\"\n  },\n  \"date\": \"2024-01-15T00:00:00.000Z\",\n  \"description\": \"Web development project\",\n  \"tags\": [\n    {\n      \"id\": \"project\",\n      \"name\": \"Project Work\",\n      \"color\": \"#FF9800\",\n      \"icon\": \"code\"\n    }\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{rootUrl}}/api/incomes",
-              "host": [
-                "{{rootUrl}}"
-              ],
-              "path": [
-                "api",
-                "incomes"
-              ]
-            },
-            "description": "Create a new income"
-          }
-        },
-        {
-          "name": "Update Income",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Freelance Project\",\n  \"amount\": 1750.00,\n  \"description\": \"Extended web development project\"\n}"
-            },
-            "url": {
-              "raw": "{{rootUrl}}/api/incomes/{{income_id}}",
-              "host": [
-                "{{rootUrl}}"
-              ],
-              "path": [
-                "api",
-                "incomes",
-                "{{income_id}}"
-              ]
-            },
-            "description": "Update an existing income"
-          }
-        },
-        {
-          "name": "Delete Income",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{auth_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{rootUrl}}/api/incomes/{{income_id}}",
-              "host": [
-                "{{rootUrl}}"
-              ],
-              "path": [
-                "api",
-                "incomes",
-                "{{income_id}}"
-              ]
-            },
-            "description": "Delete an existing income"
-          }
-        }
-      ],
-      "description": "Complete CRUD operations for income tracking with advanced search and filtering capabilities"
     },
     {
       "name": "Recurring Transactions",
@@ -3467,7 +2880,7 @@
                 "sync"
               ]
             },
-            "description": "Sync bank transactions for the authenticated user. Fetches new transactions from all connected banks, stores them locally, creates expenses/incomes automatically, and sends push notifications."
+            "description": "Sync bank transactions for the authenticated user. Fetches new transactions from all connected banks, stores them locally, stores them locally, and sends push notifications."
           },
           "response": []
         }
@@ -3688,9 +3101,69 @@
             "description": "Delete a bank transaction from the local database."
           },
           "response": []
+        },
+        {
+          "name": "Get Linked Transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions/{{transaction_id}}/linked",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions",
+                "{{transaction_id}}",
+                "linked"
+              ]
+            },
+            "description": "Check if a bank transaction has a linked user transaction. Returns { linked: boolean, transaction: UserTransaction | null }."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction from Bank Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"groceries\",\n  \"counterparty\": \"supermarket\",\n  \"title\": \"Custom title (optional)\",\n  \"description\": \"Additional notes (optional)\",\n  \"tags\": []\n}"
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/bank-transactions/{{transaction_id}}/create-transaction",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "bank-transactions",
+                "{{transaction_id}}",
+                "create-transaction"
+              ]
+            },
+            "description": "Create a user transaction from a bank transaction. The transaction type (expense/income) is automatically determined from the bank transaction type (DEBIT -> expense, CREDIT -> income). Category key is required, counterparty key is optional."
+          },
+          "response": []
         }
       ],
-      "description": "Manage locally stored bank transactions. These transactions are synced from TrueLayer and stored in MongoDB. When synced, they automatically create corresponding expenses/incomes."
+      "description": "Manage locally stored bank transactions. These transactions are synced from TrueLayer and stored in MongoDB. You can manually create user transactions (expenses/incomes) from bank transactions using the create-transaction endpoint."
     },
     {
       "name": "API Documentation",
@@ -4331,7 +3804,7 @@
                 "sync-transactions"
               ]
             },
-            "description": "Sync bank transactions for all users. Fetches new transactions from TrueLayer, stores them in database, auto-creates expenses/incomes, and sends push notifications. Should be called every hour at :05 by AWS EventBridge."
+            "description": "Sync bank transactions for all users. Fetches new transactions from TrueLayer, stores them in database, stores transactions, and sends push notifications. Should be called every hour at :05 by AWS EventBridge."
           },
           "response": [
             {

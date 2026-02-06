@@ -19,6 +19,7 @@ interface UseBankTransactionsOptions {
 
 interface UseBankTransactionsReturn {
   transactions: BankTransaction[];
+  linkedTransactionIds: Map<string, string>;
   isLoading: boolean;
   isLoadingMore: boolean;
   error: Error | null;
@@ -32,6 +33,9 @@ export function useBankTransactions(
   options: UseBankTransactionsOptions = {}
 ): UseBankTransactionsReturn {
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
+  const [linkedTransactionIds, setLinkedTransactionIds] = useState<Map<string, string>>(
+    new Map()
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -74,6 +78,42 @@ export function useBankTransactions(
         setTotal(response.pagination.total);
         offsetRef.current += response.transactions.length;
         setHasMore(offsetRef.current < response.pagination.total);
+
+        // Fetch linked status for all transactions
+        // Use the response transactions to avoid stale closure
+        const fetchedTxIds = response.transactions.map((tx) => tx._id);
+
+        // For simplicity, just check linked status for newly fetched transactions
+        // and merge with existing linked IDs
+        const newLinkedMap = new Map<string, string>();
+        
+        await Promise.all(
+          fetchedTxIds.map(async (id) => {
+            try {
+              const linkedResponse =
+                await bankTransactionsService.getLinkedTransaction(id);
+              if (linkedResponse.linked && linkedResponse.transaction) {
+                // API returns 'id', not '_id'
+                const txId = linkedResponse.transaction.id || linkedResponse.transaction._id;
+                if (txId) {
+                  newLinkedMap.set(id, txId);
+                }
+              }
+            } catch {
+              // Ignore errors for individual linked checks
+            }
+          })
+        );
+        
+        if (isLoadMore) {
+          setLinkedTransactionIds((prev) => {
+            const updated = new Map(prev);
+            newLinkedMap.forEach((txId, bankTxId) => updated.set(bankTxId, txId));
+            return updated;
+          });
+        } else {
+          setLinkedTransactionIds(newLinkedMap);
+        }
       } catch (err) {
         setError(
           err instanceof Error ? err : new Error('Failed to fetch transactions')
@@ -102,6 +142,7 @@ export function useBankTransactions(
 
   return {
     transactions,
+    linkedTransactionIds,
     isLoading,
     isLoadingMore,
     error,

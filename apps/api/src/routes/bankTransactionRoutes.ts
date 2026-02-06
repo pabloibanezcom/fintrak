@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import {
+  createTransactionFromBankTransaction,
   deleteTransaction,
   getAllTransactions,
+  getLinkedTransaction,
   getTransactionById,
   getTransactionStats,
   updateTransaction,
@@ -254,5 +256,103 @@ router.patch('/:id', updateTransaction);
  *         description: Unauthorized
  */
 router.delete('/:id', deleteTransaction);
+
+/**
+ * @swagger
+ * /api/bank-transactions/{id}/linked:
+ *   get:
+ *     summary: Get linked user transaction for a bank transaction
+ *     tags: [Bank Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bank transaction ID
+ *     responses:
+ *       200:
+ *         description: Linked user transaction (or null if not linked)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 linked:
+ *                   type: boolean
+ *                 transaction:
+ *                   $ref: '#/components/schemas/UserTransaction'
+ *       404:
+ *         description: Bank transaction not found
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/:id/linked', getLinkedTransaction);
+
+/**
+ * @swagger
+ * /api/bank-transactions/{id}/create-transaction:
+ *   post:
+ *     summary: Create a user transaction (expense/income) from a bank transaction
+ *     description: |
+ *       Creates a user transaction linked to the bank transaction.
+ *       The transaction type is automatically determined:
+ *       - DEBIT bank transactions become expenses
+ *       - CREDIT bank transactions become incomes
+ *     tags: [Bank Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bank transaction ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - category
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 description: Category key (required)
+ *               counterparty:
+ *                 type: string
+ *                 description: Counterparty key (optional)
+ *               title:
+ *                 type: string
+ *                 description: Override title (defaults to merchant name or description)
+ *               description:
+ *                 type: string
+ *                 description: Additional description
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                 description: Tags to apply
+ *     responses:
+ *       201:
+ *         description: User transaction created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserTransaction'
+ *       400:
+ *         description: Invalid request (missing or invalid category/counterparty)
+ *       404:
+ *         description: Bank transaction not found
+ *       409:
+ *         description: Bank transaction already linked to a user transaction
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/:id/create-transaction', createTransactionFromBankTransaction);
 
 export default router;

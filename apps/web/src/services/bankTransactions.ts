@@ -41,6 +41,52 @@ export interface GetBankTransactionsParams {
   search?: string;
 }
 
+export interface Category {
+  _id: string;
+  key: string;
+  name: string;
+  icon?: string;
+  color?: string;
+}
+
+export interface Counterparty {
+  _id: string;
+  key: string;
+  name: string;
+}
+
+export interface UserTransaction {
+  _id: string;
+  id?: string; // API sometimes returns 'id' instead of '_id'
+  type: 'expense' | 'income';
+  title: string;
+  amount: number;
+  currency: string;
+  category: Category;
+  counterparty?: Counterparty;
+  date: string;
+  periodicity: string;
+  description?: string;
+  tags: object[];
+  bankTransactionId?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LinkedTransactionResponse {
+  linked: boolean;
+  transaction: UserTransaction | null;
+}
+
+export interface CreateTransactionFromBankRequest {
+  category: string;
+  counterparty?: string;
+  title?: string;
+  description?: string;
+  tags?: object[];
+}
+
 export const bankTransactionsService = {
   getTransactions: async (
     params: GetBankTransactionsParams = {}
@@ -68,5 +114,23 @@ export const bankTransactionsService = {
 
   getTransaction: async (id: string): Promise<BankTransaction> => {
     return apiClient.get<BankTransaction>(`/bank-transactions/${id}`);
+  },
+
+  getLinkedTransaction: async (
+    id: string
+  ): Promise<LinkedTransactionResponse> => {
+    return apiClient.get<LinkedTransactionResponse>(
+      `/bank-transactions/${id}/linked`
+    );
+  },
+
+  createTransaction: async (
+    id: string,
+    data: CreateTransactionFromBankRequest
+  ): Promise<UserTransaction> => {
+    return apiClient.post<UserTransaction>(
+      `/bank-transactions/${id}/create-transaction`,
+      data
+    );
   },
 };

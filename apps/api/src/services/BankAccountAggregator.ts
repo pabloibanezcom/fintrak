@@ -3,16 +3,16 @@ import type {
   CashAccount,
   TrueLayerAccount,
   TrueLayerBalance,
-} from "@fintrak/types";
-import BankAccountModel from "../models/BankAccountModel";
+} from '@fintrak/types';
+import BankAccountModel from '../models/BankAccountModel';
 import BankConnection, {
   type IBankConnection,
-} from "../models/BankConnectionModel";
-import TrueLayerService from "./TrueLayerService";
+} from '../models/BankConnectionModel';
+import TrueLayerService from './TrueLayerService';
 
 // Bank logo URLs stored in public assets path
 const MYINVESTOR_LOGO =
-  "https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/assets/bank-logos/myinvestor.png";
+  'https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/assets/bank-logos/myinvestor.png';
 
 interface AggregatorResult {
   accounts: BankAccount[];
@@ -23,17 +23,17 @@ interface AggregatorResult {
  * Helper to refresh token if needed and return valid access token
  */
 async function getValidAccessToken(
-  connection: IBankConnection,
+  connection: IBankConnection
 ): Promise<string> {
   if (new Date() >= new Date(connection.expiresAt.getTime() - 60000)) {
     const tokenResponse = await TrueLayerService.refreshAccessToken(
-      connection.refreshToken,
+      connection.refreshToken
     );
 
     connection.accessToken = tokenResponse.access_token;
     connection.refreshToken = tokenResponse.refresh_token;
     connection.expiresAt = new Date(
-      Date.now() + tokenResponse.expires_in * 1000,
+      Date.now() + tokenResponse.expires_in * 1000
     );
     await connection.save();
 
@@ -48,13 +48,13 @@ async function getValidAccessToken(
 function transformMICashAccount(account: CashAccount): BankAccount {
   return {
     accountId: account.accountId,
-    source: "myinvestor",
-    bankName: "MyInvestor",
-    bankId: "myinvestor",
+    source: 'myinvestor',
+    bankName: 'MyInvestor',
+    bankId: 'myinvestor',
     logo: MYINVESTOR_LOGO,
     displayName: account.alias,
     iban: account.iban,
-    accountType: "CASH",
+    accountType: 'CASH',
     currency: account.currency,
     balance: account.balance,
   };
@@ -64,15 +64,15 @@ function transformMICashAccount(account: CashAccount): BankAccount {
  * Map TrueLayer account type to unified account type
  */
 function mapAccountType(
-  trueLayerType: string,
-): "TRANSACTION" | "SAVINGS" | "CASH" | "OTHER" {
+  trueLayerType: string
+): 'TRANSACTION' | 'SAVINGS' | 'CASH' | 'OTHER' {
   switch (trueLayerType) {
-    case "TRANSACTION":
-      return "TRANSACTION";
-    case "SAVINGS":
-      return "SAVINGS";
+    case 'TRANSACTION':
+      return 'TRANSACTION';
+    case 'SAVINGS':
+      return 'SAVINGS';
     default:
-      return "OTHER";
+      return 'OTHER';
   }
 }
 
@@ -82,15 +82,20 @@ function mapAccountType(
 function transformTrueLayerAccount(
   account: TrueLayerAccount,
   balance: TrueLayerBalance,
-  connection: { bankId: string; bankName: string; logo?: string; alias?: string },
+  connection: {
+    bankId: string;
+    bankName: string;
+    logo?: string;
+    alias?: string;
+  }
 ): BankAccount {
   return {
     accountId: account.account_id,
-    source: "truelayer",
+    source: 'truelayer',
     bankName: connection.bankName,
     bankId: connection.bankId,
     logo: connection.logo,
-    displayName: connection.alias || account.display_name || "Bank Account",
+    displayName: connection.alias || account.display_name || 'Bank Account',
     iban: account.account_number?.iban,
     accountType: mapAccountType(account.account_type),
     currency: account.currency,
@@ -128,7 +133,7 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
           try {
             const balance = await TrueLayerService.getBalance(
               accessToken,
-              account.account_id,
+              account.account_id
             );
             return transformTrueLayerAccount(account, balance, {
               bankId: connection.bankId,
@@ -139,7 +144,7 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
           } catch (err) {
             console.error(
               `Failed to fetch balance for account ${account.account_id}:`,
-              err,
+              err
             );
             // Return account with 0 balance if balance fetch fails
             return transformTrueLayerAccount(
@@ -150,22 +155,22 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
                 bankName: connection.bankName,
                 logo: connection.logo,
                 alias: accountAlias,
-              },
+              }
             );
           }
-        }),
+        })
       );
 
       accounts.push(...accountsWithBalances);
     } catch (err) {
       console.error(
         `Failed to fetch accounts from ${connection.bankName}:`,
-        err,
+        err
       );
       errors.push({
         source: `truelayer:${connection.bankId}`,
         message:
-          err instanceof Error ? err.message : "Failed to fetch accounts",
+          err instanceof Error ? err.message : 'Failed to fetch accounts',
       });
     }
   }
@@ -178,7 +183,7 @@ async function fetchTrueLayerAccounts(userId: string): Promise<{
  */
 export async function aggregateBankAccounts(
   userId: string,
-  miCashAccounts: CashAccount[],
+  miCashAccounts: CashAccount[]
 ): Promise<AggregatorResult> {
   const errors: { source: string; message: string }[] = [];
 

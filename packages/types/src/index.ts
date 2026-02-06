@@ -65,3 +65,11 @@ export type {
 } from './Transaction';
 export type { User } from './User';
 export type { ProductGroup, ProductItems, UserProducts } from './UserProducts';
+export type {
+  BaseUserTransaction,
+  CreateFromBankTransactionRequest,
+  CreateUserTransactionRequest,
+  UpdateUserTransactionRequest,
+  UserTransaction,
+  UserTransactionType,
+} from './UserTransaction';

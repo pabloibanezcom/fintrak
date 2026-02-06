@@ -12,14 +12,13 @@ import categoryRoutes from './routes/categoryRoutes';
 import counterpartyRoutes from './routes/counterpartyRoutes';
 import cronRoutes from './routes/cronRoutes';
 import cryptoAssetRoutes from './routes/cryptoAssetRoutes';
-import expenseRoutes from './routes/expenseRoutes';
 import importRoutes from './routes/importRoutes';
-import incomeRoutes from './routes/incomeRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import productRoutes from './routes/productRoutes';
 import recurringTransactionRoutes from './routes/recurringTransactionRoutes';
 import tagRoutes from './routes/tagRoutes';
 import uploadRoutes from './routes/uploadRoutes';
+import userTransactionRoutes from './routes/userTransactionRoutes';
 
 const app = express();
 
@@ -43,13 +42,12 @@ app.use('/api/bank-transactions', bankTransactionRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', counterpartyRoutes);
 app.use('/api', cryptoAssetRoutes);
-app.use('/api', expenseRoutes);
 app.use('/api/import', importRoutes);
-app.use('/api', incomeRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api', productRoutes);
 app.use('/api', recurringTransactionRoutes);
 app.use('/api', tagRoutes);
+app.use('/api', userTransactionRoutes);
 app.use('/api/upload', uploadRoutes);
 
 app.use('/', (_req, res) => {

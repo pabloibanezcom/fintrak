@@ -82,8 +82,6 @@
   gap: var(--spacing-3);
 }
 
-
-
 /* Bottom Section */
 .bottomSection {
   display: grid;
@@ -170,6 +168,4 @@
   .walletsList {
     grid-template-columns: 1fr;
   }
-
-
 }

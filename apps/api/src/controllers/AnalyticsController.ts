@@ -1,8 +1,7 @@
 /// <reference path="../index.d.ts" />
 
 import type { Request, Response } from 'express';
-import ExpenseModel from '../models/ExpenseModel';
-import IncomeModel from '../models/IncomeModel';
+import UserTransactionModel from '../models/UserTransactionModel';
 import { requireAuth } from '../utils/authUtils';
 import { handleGenericError } from '../utils/errorUtils';
 import { buildDateRangeQuery } from '../utils/queryUtils';
@@ -27,8 +26,8 @@ export const getPeriodSummary = async (req: Request, res: Response) => {
     if (currency) baseQuery.currency = currency;
 
     // Get expenses with category totals
-    const expenseAggregation = await ExpenseModel.aggregate([
-      { $match: baseQuery },
+    const expenseAggregation = await UserTransactionModel.aggregate([
+      { $match: { ...baseQuery, type: 'expense' } },
       {
         $group: {
           _id: '$category',
@@ -61,8 +60,8 @@ export const getPeriodSummary = async (req: Request, res: Response) => {
     ]);
 
     // Get incomes with category totals
-    const incomeAggregation = await IncomeModel.aggregate([
-      { $match: baseQuery },
+    const incomeAggregation = await UserTransactionModel.aggregate([
+      { $match: { ...baseQuery, type: 'income' } },
       {
         $group: {
           _id: '$category',
@@ -106,27 +105,12 @@ export const getPeriodSummary = async (req: Request, res: Response) => {
 
     // Get latest transactions (both expenses and incomes)
     const limit = Number.parseInt(latestCount as string, 10);
-    const latestExpenses = await ExpenseModel.find(baseQuery)
+    const latestTransactions = await UserTransactionModel.find(baseQuery)
       .populate('category', 'key name color icon')
-      .populate('payee', 'key name type logo')
+      .populate('counterparty', 'key name type logo')
       .sort({ date: -1 })
       .limit(limit)
       .lean();
-
-    const latestIncomes = await IncomeModel.find(baseQuery)
-      .populate('category', 'key name color icon')
-      .populate('source', 'key name type logo')
-      .sort({ date: -1 })
-      .limit(limit)
-      .lean();
-
-    // Combine and sort by date, then take the latest X
-    const latestTransactions = [
-      ...latestExpenses.map((exp) => ({ ...exp, type: 'expense' as const })),
-      ...latestIncomes.map((inc) => ({ ...inc, type: 'income' as const })),
-    ]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, limit);
 
     res.json({
       period: {

@@ -1,6 +1,9 @@
 /// <reference path="../index.d.ts" />
 import type { Request, Response } from 'express';
 import BankTransaction from '../models/BankTransactionModel';
+import CategoryModel from '../models/CategoryModel';
+import CounterpartyModel from '../models/CounterpartyModel';
+import UserTransactionModel from '../models/UserTransactionModel';
 
 /**
  * Get all bank transactions for the authenticated user
@@ -254,10 +257,165 @@ export const getTransactionStats = async (
   }
 };
 
+/**
+ * Create a user transaction (expense/income) from a bank transaction
+ * POST /api/bank-transactions/:id/create-transaction
+ */
+export const createTransactionFromBankTransaction = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const { category, counterparty, title, tags, description } = req.body;
+
+    // 1. Find the bank transaction
+    const bankTransaction = await BankTransaction.findOne({ _id: id, userId });
+    if (!bankTransaction) {
+      res.status(404).json({ error: 'Bank transaction not found' });
+      return;
+    }
+
+    // 2. Check if already linked to a user transaction
+    const existingTransaction = await UserTransactionModel.findOne({
+      bankTransactionId: id,
+      userId,
+    });
+    if (existingTransaction) {
+      res.status(409).json({
+        error: 'Bank transaction already linked to a transaction',
+        transactionId: existingTransaction._id,
+      });
+      return;
+    }
+
+    // 3. Validate required fields
+    if (!category) {
+      res.status(400).json({ error: 'Category is required' });
+      return;
+    }
+
+    // 4. Resolve category by key
+    const categoryDoc = await CategoryModel.findOne({ key: category, userId });
+    if (!categoryDoc) {
+      res.status(400).json({ error: 'Invalid category' });
+      return;
+    }
+
+    // 5. Resolve counterparty by key if provided
+    let counterpartyId = null;
+    if (counterparty) {
+      const counterpartyDoc = await CounterpartyModel.findOne({
+        key: counterparty,
+        userId,
+      });
+      if (!counterpartyDoc) {
+        res.status(400).json({ error: 'Invalid counterparty' });
+        return;
+      }
+      counterpartyId = counterpartyDoc._id;
+    }
+
+    // 6. Determine type from bank transaction (DEBIT -> expense, CREDIT -> income)
+    const type = bankTransaction.type === 'DEBIT' ? 'expense' : 'income';
+
+    // 7. Create the user transaction
+    const userTransaction = new UserTransactionModel({
+      type,
+      title:
+        title || bankTransaction.merchantName || bankTransaction.description,
+      amount: Math.abs(bankTransaction.amount),
+      currency: bankTransaction.currency,
+      category: categoryDoc._id,
+      counterparty: counterpartyId,
+      date: bankTransaction.timestamp,
+      periodicity: 'NOT_RECURRING',
+      description:
+        description ||
+        `From bank transaction: ${bankTransaction.merchantName || bankTransaction.description}`,
+      tags: tags || [],
+      bankTransactionId: bankTransaction._id,
+      userId,
+    });
+
+    const savedTransaction = await userTransaction.save();
+
+    // Populate before returning
+    await savedTransaction.populate('category');
+    await savedTransaction.populate('counterparty');
+
+    res.status(201).json(savedTransaction);
+  } catch (error) {
+    console.error('Error creating transaction from bank transaction:', error);
+    if ((error as { code?: number }).code === 11000) {
+      res
+        .status(409)
+        .json({ error: 'Bank transaction already linked to a transaction' });
+      return;
+    }
+    res.status(500).json({ error: 'Failed to create transaction' });
+  }
+};
+
+/**
+ * Get the linked user transaction for a bank transaction
+ * GET /api/bank-transactions/:id/linked
+ */
+export const getLinkedTransaction = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+
+    // Check bank transaction exists
+    const bankTransaction = await BankTransaction.findOne({ _id: id, userId });
+    if (!bankTransaction) {
+      res.status(404).json({ error: 'Bank transaction not found' });
+      return;
+    }
+
+    // Look for linked user transaction
+    const userTransaction = await UserTransactionModel.findOne({
+      bankTransactionId: id,
+      userId,
+    })
+      .populate('category')
+      .populate('counterparty');
+
+    if (userTransaction) {
+      res.json({
+        linked: true,
+        transaction: userTransaction,
+      });
+      return;
+    }
+
+    res.json({ linked: false, transaction: null });
+  } catch (error) {
+    console.error('Error fetching linked transaction:', error);
+    res.status(500).json({ error: 'Failed to fetch linked transaction' });
+  }
+};
+
 export default {
   getAllTransactions,
   getTransactionById,
   updateTransaction,
   deleteTransaction,
   getTransactionStats,
+  createTransactionFromBankTransaction,
+  getLinkedTransaction,
 };

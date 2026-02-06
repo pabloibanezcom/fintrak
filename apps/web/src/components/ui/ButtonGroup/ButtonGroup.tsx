@@ -12,6 +12,7 @@ export interface ButtonGroupItem {
   onClick?: () => void;
   title?: string;
   active?: boolean;
+  disabled?: boolean;
 }
 
 export interface ButtonGroupProps {
@@ -85,6 +86,7 @@ export function ButtonGroup({
       styles.item,
       styles[`display-${display}`],
       isActive && styles.active,
+      item.disabled && styles.disabled,
       showTooltip && styles.withTooltip,
       animated && styles.animatedItem,
       itemClassName,
@@ -135,6 +137,7 @@ export function ButtonGroup({
         className={itemClasses}
         title={tooltipTitle}
         onClick={item.onClick}
+        disabled={item.disabled}
         data-item-id={item.id}
       >
         {content}

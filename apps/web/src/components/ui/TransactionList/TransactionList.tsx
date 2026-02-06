@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useCallback, useEffect, useRef } from 'react';
 import { Card } from '../Card/Card';
 import { Icon } from '../Icon';
@@ -17,6 +18,8 @@ export interface TransactionListItem {
   bank?: string;
   bankLogo?: string;
   account?: string;
+  isLinked?: boolean;
+  linkedTransactionId?: string;
 }
 
 interface TransactionListProps {
@@ -25,6 +28,7 @@ interface TransactionListProps {
   isLoadingMore?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  onTransactionClick?: (transaction: TransactionListItem) => void;
   formatAmount?: (amount: number, currency: string) => string;
   formatDate?: (date: string) => string;
   emptyMessage?: string;
@@ -37,6 +41,7 @@ export function TransactionList({
   isLoadingMore = false,
   hasMore = false,
   onLoadMore,
+  onTransactionClick,
   formatAmount = (amount, currency) =>
     new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -115,40 +120,72 @@ export function TransactionList({
             <div className={styles.empty}>{emptyMessage}</div>
           ) : (
             <>
-              {transactions.map((tx) => (
-                <div key={tx.id} className={styles.row}>
-                  <span className={styles.date}>{formatDate(tx.date)}</span>
-                  <div className={styles.description}>
-                    <span className={styles.title}>{tx.title}</span>
-                    {tx.description && (
-                      <span className={styles.subtitle}>{tx.description}</span>
-                    )}
-                  </div>
-                  {showBankInfo && (
-                    <span className={styles.bank}>
-                      {tx.bankLogo && (
-                        <Image
-                          src={tx.bankLogo}
-                          alt={tx.bank || 'Bank'}
-                          width={20}
-                          height={20}
-                          className={styles.bankLogo}
-                        />
+              {transactions.map((tx) => {
+                const rowContent = (
+                  <>
+                    <span className={styles.date}>{formatDate(tx.date)}</span>
+                    <div className={styles.description}>
+                      <div className={styles.titleRow}>
+                        <span className={styles.title}>{tx.title}</span>
+                        {tx.isLinked && tx.linkedTransactionId && (
+                          <Link
+                            href={`/transactions/${tx.linkedTransactionId}`}
+                            className={styles.linkedBadge}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View Transaction →
+                          </Link>
+                        )}
+                      </div>
+                      {tx.description && (
+                        <span className={styles.subtitle}>
+                          {tx.description}
+                        </span>
                       )}
-                      {tx.bank || '-'}
+                    </div>
+                    {showBankInfo && (
+                      <span className={styles.bank}>
+                        {tx.bankLogo && (
+                          <Image
+                            src={tx.bankLogo}
+                            alt={tx.bank || 'Bank'}
+                            width={20}
+                            height={20}
+                            className={styles.bankLogo}
+                          />
+                        )}
+                        {tx.bank || '-'}
+                      </span>
+                    )}
+                    {showBankInfo && (
+                      <span className={styles.account}>
+                        {tx.account || '-'}
+                      </span>
+                    )}
+                    <span
+                      className={`${styles.amount} ${tx.type === 'credit' ? styles.credit : styles.debit}`}
+                    >
+                      {tx.type === 'credit' ? '+' : '-'}
+                      {formatAmount(Math.abs(tx.amount), tx.currency)}
                     </span>
-                  )}
-                  {showBankInfo && (
-                    <span className={styles.account}>{tx.account || '-'}</span>
-                  )}
-                  <span
-                    className={`${styles.amount} ${tx.type === 'credit' ? styles.credit : styles.debit}`}
+                  </>
+                );
+
+                return onTransactionClick ? (
+                  <button
+                    key={tx.id}
+                    type="button"
+                    className={`${styles.row} ${styles.clickable}`}
+                    onClick={() => onTransactionClick(tx)}
                   >
-                    {tx.type === 'credit' ? '+' : '-'}
-                    {formatAmount(Math.abs(tx.amount), tx.currency)}
-                  </span>
-                </div>
-              ))}
+                    {rowContent}
+                  </button>
+                ) : (
+                  <div key={tx.id} className={styles.row}>
+                    {rowContent}
+                  </div>
+                );
+              })}
 
               <div ref={loadMoreRef} className={styles.loadMore}>
                 {isLoadingMore && (

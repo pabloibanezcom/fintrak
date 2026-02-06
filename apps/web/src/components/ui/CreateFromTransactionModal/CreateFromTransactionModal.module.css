@@ -1,0 +1,65 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.transactionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+}
+
+.infoLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.infoValue {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+.credit {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.debit {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.error {
+  padding: var(--spacing-3);
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  background-color: var(--color-error-bg);
+  border-radius: var(--radius-md);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-2);
+}

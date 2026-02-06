@@ -55,8 +55,6 @@ export const bankAccountsService = {
   },
 
   getAccountBalance: async (accountId: string): Promise<AccountBalance> => {
-    return apiClient.get<AccountBalance>(
-      `/bank/accounts/${accountId}/balance`
-    );
+    return apiClient.get<AccountBalance>(`/bank/accounts/${accountId}/balance`);
   },
 };
