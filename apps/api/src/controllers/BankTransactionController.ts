@@ -28,6 +28,7 @@ export const getAllTransactions = async (
       from,
       to,
       search,
+      reviewStatus,
       limit = '50',
       offset = '0',
     } = req.query;
@@ -52,6 +53,25 @@ export const getAllTransactions = async (
       query.$or = [{ description: searchRegex }, { merchantName: searchRegex }];
     }
 
+    // Handle reviewStatus filter
+    if (reviewStatus === 'dismissed') {
+      query.dismissed = true;
+    } else if (reviewStatus === 'linked' || reviewStatus === 'unreviewed') {
+      // Find all bank transaction IDs that have linked user transactions
+      const linkedBankTxIds = await UserTransactionModel.distinct(
+        'bankTransactionId',
+        { userId, bankTransactionId: { $ne: null } }
+      );
+
+      if (reviewStatus === 'linked') {
+        query._id = { $in: linkedBankTxIds };
+      } else {
+        // unreviewed: not dismissed AND not linked
+        query.dismissed = { $ne: true };
+        query._id = { $nin: linkedBankTxIds };
+      }
+    }
+
     const transactions = await BankTransaction.find(query)
       .sort({ timestamp: -1 })
       .skip(Number(offset))
@@ -59,8 +79,24 @@ export const getAllTransactions = async (
 
     const total = await BankTransaction.countDocuments(query);
 
+    // Batch fetch linked transaction IDs for all returned transactions
+    const transactionIds = transactions.map((tx) => tx._id);
+    const linkedUserTransactions = await UserTransactionModel.find(
+      { userId, bankTransactionId: { $in: transactionIds } },
+      { bankTransactionId: 1, _id: 1 }
+    );
+    const linkedTransactionIds: Record<string, string> = {};
+    for (const ut of linkedUserTransactions) {
+      if (ut.bankTransactionId) {
+        linkedTransactionIds[ut.bankTransactionId.toString()] = String(
+          ut._id
+        );
+      }
+    }
+
     res.json({
       transactions,
+      linkedTransactionIds,
       pagination: {
         total,
         limit: Number(limit),
@@ -120,11 +156,12 @@ export const updateTransaction = async (
     }
 
     const { id } = req.params;
-    const { processed, notified } = req.body;
+    const { processed, notified, dismissed } = req.body;
 
     const updateFields: Record<string, boolean> = {};
     if (processed !== undefined) updateFields.processed = processed;
     if (notified !== undefined) updateFields.notified = notified;
+    if (dismissed !== undefined) updateFields.dismissed = dismissed;
 
     const transaction = await BankTransaction.findOneAndUpdate(
       { _id: id, userId },
@@ -345,6 +382,14 @@ export const createTransactionFromBankTransaction = async (
     });
 
     const savedTransaction = await userTransaction.save();
+
+    // Clear dismissed flag if it was previously set
+    if (bankTransaction.dismissed) {
+      await BankTransaction.updateOne(
+        { _id: id },
+        { $set: { dismissed: false } }
+      );
+    }
 
     // Populate before returning
     await savedTransaction.populate('category');

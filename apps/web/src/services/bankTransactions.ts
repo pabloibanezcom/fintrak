@@ -16,12 +16,14 @@ export interface BankTransaction {
   status: 'pending' | 'settled';
   processed: boolean;
   notified: boolean;
+  dismissed: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface BankTransactionsResponse {
   transactions: BankTransaction[];
+  linkedTransactionIds: Record<string, string>;
   pagination: {
     total: number;
     limit: number;
@@ -29,11 +31,14 @@ export interface BankTransactionsResponse {
   };
 }
 
+export type ReviewStatus = 'unreviewed' | 'linked' | 'dismissed';
+
 export interface GetBankTransactionsParams {
   accountId?: string;
   bankId?: string;
   type?: 'CREDIT' | 'DEBIT';
   processed?: boolean;
+  reviewStatus?: ReviewStatus;
   from?: string;
   to?: string;
   limit?: number;
@@ -103,6 +108,7 @@ export const bankTransactionsService = {
     if (params.limit) query.set('limit', String(params.limit));
     if (params.offset) query.set('offset', String(params.offset));
     if (params.search) query.set('search', params.search);
+    if (params.reviewStatus) query.set('reviewStatus', params.reviewStatus);
 
     const queryString = query.toString();
     const endpoint = queryString
@@ -132,5 +138,17 @@ export const bankTransactionsService = {
       `/bank-transactions/${id}/create-transaction`,
       data
     );
+  },
+
+  dismissTransaction: async (id: string): Promise<BankTransaction> => {
+    return apiClient.patch<BankTransaction>(`/bank-transactions/${id}`, {
+      dismissed: true,
+    });
+  },
+
+  undismissTransaction: async (id: string): Promise<BankTransaction> => {
+    return apiClient.patch<BankTransaction>(`/bank-transactions/${id}`, {
+      dismissed: false,
+    });
   },
 };

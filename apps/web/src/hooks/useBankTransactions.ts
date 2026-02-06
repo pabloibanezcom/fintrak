@@ -5,6 +5,7 @@ import {
   type BankTransaction,
   bankTransactionsService,
   type GetBankTransactionsParams,
+  type ReviewStatus,
 } from '@/services/bankTransactions';
 
 const DEFAULT_LIMIT = 20;
@@ -15,6 +16,7 @@ interface UseBankTransactionsOptions {
   from?: string;
   to?: string;
   search?: string;
+  reviewStatus?: ReviewStatus;
 }
 
 interface UseBankTransactionsReturn {
@@ -27,15 +29,16 @@ interface UseBankTransactionsReturn {
   total: number;
   loadMore: () => void;
   refetch: () => void;
+  updateTransaction: (id: string, updates: Partial<BankTransaction>) => void;
 }
 
 export function useBankTransactions(
   options: UseBankTransactionsOptions = {}
 ): UseBankTransactionsReturn {
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
-  const [linkedTransactionIds, setLinkedTransactionIds] = useState<Map<string, string>>(
-    new Map()
-  );
+  const [linkedTransactionIds, setLinkedTransactionIds] = useState<
+    Map<string, string>
+  >(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -43,7 +46,7 @@ export function useBankTransactions(
   const [total, setTotal] = useState(0);
   const offsetRef = useRef(0);
 
-  const { accountId, bankId, from, to, search } = options;
+  const { accountId, bankId, from, to, search, reviewStatus } = options;
 
   const fetchTransactions = useCallback(
     async (isLoadMore = false) => {
@@ -66,6 +69,7 @@ export function useBankTransactions(
         if (from) params.from = from;
         if (to) params.to = to;
         if (search) params.search = search;
+        if (reviewStatus) params.reviewStatus = reviewStatus;
 
         const response = await bankTransactionsService.getTransactions(params);
 
@@ -79,36 +83,17 @@ export function useBankTransactions(
         offsetRef.current += response.transactions.length;
         setHasMore(offsetRef.current < response.pagination.total);
 
-        // Fetch linked status for all transactions
-        // Use the response transactions to avoid stale closure
-        const fetchedTxIds = response.transactions.map((tx) => tx._id);
-
-        // For simplicity, just check linked status for newly fetched transactions
-        // and merge with existing linked IDs
-        const newLinkedMap = new Map<string, string>();
-        
-        await Promise.all(
-          fetchedTxIds.map(async (id) => {
-            try {
-              const linkedResponse =
-                await bankTransactionsService.getLinkedTransaction(id);
-              if (linkedResponse.linked && linkedResponse.transaction) {
-                // API returns 'id', not '_id'
-                const txId = linkedResponse.transaction.id || linkedResponse.transaction._id;
-                if (txId) {
-                  newLinkedMap.set(id, txId);
-                }
-              }
-            } catch {
-              // Ignore errors for individual linked checks
-            }
-          })
+        // Use batch linked IDs from API response
+        const newLinkedMap = new Map<string, string>(
+          Object.entries(response.linkedTransactionIds || {})
         );
-        
+
         if (isLoadMore) {
           setLinkedTransactionIds((prev) => {
             const updated = new Map(prev);
-            newLinkedMap.forEach((txId, bankTxId) => updated.set(bankTxId, txId));
+            newLinkedMap.forEach((txId, bankTxId) =>
+              updated.set(bankTxId, txId)
+            );
             return updated;
           });
         } else {
@@ -123,7 +108,7 @@ export function useBankTransactions(
         setIsLoadingMore(false);
       }
     },
-    [accountId, bankId, from, to, search]
+    [accountId, bankId, from, to, search, reviewStatus]
   );
 
   const loadMore = useCallback(() => {
@@ -135,6 +120,15 @@ export function useBankTransactions(
   const refetch = useCallback(() => {
     fetchTransactions(false);
   }, [fetchTransactions]);
+
+  const updateTransaction = useCallback(
+    (id: string, updates: Partial<BankTransaction>) => {
+      setTransactions((prev) =>
+        prev.map((tx) => (tx._id === id ? { ...tx, ...updates } : tx))
+      );
+    },
+    []
+  );
 
   useEffect(() => {
     fetchTransactions(false);
@@ -150,5 +144,6 @@ export function useBankTransactions(
     total,
     loadMore,
     refetch,
+    updateTransaction,
   };
 }
