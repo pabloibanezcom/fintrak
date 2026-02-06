@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Card } from '../Card/Card';
 import { Icon } from '../Icon';
 import styles from './TransactionList.module.css';
@@ -19,6 +19,7 @@ export interface TransactionListItem {
   bankLogo?: string;
   account?: string;
   isLinked?: boolean;
+  isDismissed?: boolean;
   linkedTransactionId?: string;
 }
 
@@ -57,39 +58,60 @@ export function TransactionList({
   showBankInfo = true,
 }: TransactionListProps) {
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasMore && !isLoadingMore && onLoadMore) {
-        onLoadMore();
-      }
-    },
-    [hasMore, isLoadingMore, onLoadMore]
+  const scrollRootRef = useRef<Element | null>(null);
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(
+    null
   );
+
+  // Callback ref: fires when the sentinel div mounts/unmounts
+  const loadMoreRef = useCallback((node: HTMLDivElement | null) => {
+    setSentinelNode(node);
+  }, []);
 
   useEffect(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
 
-    observerRef.current = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: '100px',
-      threshold: 0,
-    });
+    if (!sentinelNode) return;
 
-    if (loadMoreRef.current) {
-      observerRef.current.observe(loadMoreRef.current);
+    // Find the closest scrollable ancestor to use as root
+    if (!scrollRootRef.current) {
+      let el: Element | null = sentinelNode.parentElement;
+      while (el) {
+        const { overflowY } = getComputedStyle(el);
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          scrollRootRef.current = el;
+          break;
+        }
+        el = el.parentElement;
+      }
     }
 
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isLoadingMore &&
+          onLoadMore
+        ) {
+          onLoadMore();
+        }
+      },
+      {
+        root: scrollRootRef.current || null,
+        rootMargin: '200px',
+        threshold: 0,
       }
+    );
+
+    observerRef.current.observe(sentinelNode);
+
+    return () => {
+      observerRef.current?.disconnect();
     };
-  }, [handleObserver]);
+  }, [sentinelNode, hasMore, isLoadingMore, onLoadMore]);
 
   if (isLoading) {
     return (
@@ -110,6 +132,7 @@ export function TransactionList({
         <div className={styles.tableHeader}>
           <span>Date</span>
           <span>Description</span>
+          {showBankInfo && <span className={styles.statusHeader}>Income/Expense</span>}
           {showBankInfo && <span>Bank</span>}
           {showBankInfo && <span>Account</span>}
           <span>Amount</span>
@@ -121,28 +144,47 @@ export function TransactionList({
           ) : (
             <>
               {transactions.map((tx) => {
+                const rowClass = [
+                  styles.row,
+                  onTransactionClick ? styles.clickable : '',
+                  tx.isDismissed ? styles.dismissedRow : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+
                 const rowContent = (
                   <>
                     <span className={styles.date}>{formatDate(tx.date)}</span>
                     <div className={styles.description}>
-                      <div className={styles.titleRow}>
-                        <span className={styles.title}>{tx.title}</span>
-                        {tx.isLinked && tx.linkedTransactionId && (
-                          <Link
-                            href={`/transactions/${tx.linkedTransactionId}`}
-                            className={styles.linkedBadge}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            View Transaction →
-                          </Link>
-                        )}
-                      </div>
+                      <span className={styles.title}>{tx.title}</span>
                       {tx.description && (
                         <span className={styles.subtitle}>
                           {tx.description}
                         </span>
                       )}
                     </div>
+                    {showBankInfo && (
+                      <span className={styles.statusCell}>
+                        {tx.isLinked && tx.linkedTransactionId && (
+                          <Link
+                            href={`/budget/transactions/${tx.linkedTransactionId}`}
+                            className={styles.statusIcon}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label="View linked transaction"
+                          >
+                            <Icon name="transfer" size={16} />
+                          </Link>
+                        )}
+                        {tx.isDismissed && (
+                          <Icon
+                            name="close"
+                            size={14}
+                            className={styles.dismissedIcon}
+                            aria-label="Dismissed"
+                          />
+                        )}
+                      </span>
+                    )}
                     {showBankInfo && (
                       <span className={styles.bank}>
                         {tx.bankLogo && (
@@ -175,13 +217,13 @@ export function TransactionList({
                   <button
                     key={tx.id}
                     type="button"
-                    className={`${styles.row} ${styles.clickable}`}
+                    className={rowClass}
                     onClick={() => onTransactionClick(tx)}
                   >
                     {rowContent}
                   </button>
                 ) : (
-                  <div key={tx.id} className={styles.row}>
+                  <div key={tx.id} className={rowClass}>
                     {rowContent}
                   </div>
                 );
