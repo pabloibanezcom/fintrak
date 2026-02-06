@@ -15,6 +15,7 @@ export interface IBankTransaction extends Document {
   status: 'pending' | 'settled';
   processed: boolean;
   notified: boolean;
+  dismissed: boolean;
   raw: object;
   createdAt: Date;
   updatedAt: Date;
@@ -45,6 +46,7 @@ const BankTransactionSchema: Schema = new Schema(
     },
     processed: { type: Boolean, default: false },
     notified: { type: Boolean, default: false },
+    dismissed: { type: Boolean, default: false },
     raw: { type: Schema.Types.Mixed },
   },
   {
@@ -58,6 +60,7 @@ BankTransactionSchema.index({ userId: 1, transactionId: 1 }, { unique: true });
 // Index for querying unprocessed/unnotified transactions
 BankTransactionSchema.index({ userId: 1, processed: 1 });
 BankTransactionSchema.index({ userId: 1, notified: 1 });
+BankTransactionSchema.index({ userId: 1, dismissed: 1 });
 
 // Index for querying by account
 BankTransactionSchema.index({ userId: 1, accountId: 1, timestamp: -1 });

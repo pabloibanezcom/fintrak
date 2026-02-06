@@ -1,6 +1,7 @@
 'use client';
 
 import { formatCurrency, formatPercentage } from '@/utils';
+import { Icon } from '../../ui/Icon';
 import styles from './StatCard.module.css';
 
 interface StatCardProps {
@@ -27,15 +28,11 @@ export function StatCard({
           <span
             className={`${styles.change} ${change >= 0 ? styles.positive : styles.negative}`}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path
-                d={change >= 0 ? 'M5 1v8M2 4l3-3 3 3' : 'M5 9V1M2 6l3 3 3-3'}
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Icon
+              name={change >= 0 ? 'arrowUp' : 'arrowDown'}
+              size={10}
+              className={styles.trendIcon}
+            />
             {formatPercentage(Math.abs(change))}
           </span>
           <span className={styles.period}>This month</span>

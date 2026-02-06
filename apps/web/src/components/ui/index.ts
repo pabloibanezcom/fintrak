@@ -36,6 +36,7 @@ export { Modal, type ModalProps } from './Modal/Modal';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar/ProgressBar';
 export { Select, type SelectOption, type SelectProps } from './Select/Select';
 export { Toaster } from './Toaster/Toaster';
+export { Toggle, type ToggleProps } from './Toggle/Toggle';
 export {
   TransactionList,
   type TransactionListItem,

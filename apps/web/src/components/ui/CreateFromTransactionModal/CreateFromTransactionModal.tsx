@@ -14,25 +14,32 @@ import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { Modal } from '../Modal/Modal';
 import { Select } from '../Select/Select';
+import { Toggle } from '../Toggle/Toggle';
 import styles from './CreateFromTransactionModal.module.css';
 
 export interface CreateFromTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   transaction: BankTransaction | null;
+  isLinked?: boolean;
   onSuccess?: () => void;
+  onDismissChange?: (transactionId: string, dismissed: boolean) => void;
 }
 
 export function CreateFromTransactionModal({
   isOpen,
   onClose,
   transaction,
+  isLinked = false,
   onSuccess,
+  onDismissChange,
 }: CreateFromTransactionModalProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [counterparties, setCounterparties] = useState<Counterparty[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDismissing, setIsDismissing] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -72,6 +79,7 @@ export function CreateFromTransactionModal({
         title: transaction?.merchantName || transaction?.description || '',
         description: '',
       });
+      setIsDismissed(transaction?.dismissed ?? false);
       setError(null);
     }
   }, [isOpen, transaction, loadData]);
@@ -106,6 +114,38 @@ export function CreateFromTransactionModal({
       setError(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDismissToggle = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!transaction) return;
+
+    const shouldDismiss = e.target.checked;
+    setIsDismissed(shouldDismiss);
+    setIsDismissing(true);
+    setError(null);
+
+    try {
+      if (shouldDismiss) {
+        await bankTransactionsService.dismissTransaction(transaction._id);
+        toast.success('Transaction dismissed');
+      } else {
+        await bankTransactionsService.undismissTransaction(transaction._id);
+        toast.success('Transaction restored');
+      }
+      onDismissChange?.(transaction._id, shouldDismiss);
+      if (shouldDismiss) {
+        onClose();
+      }
+    } catch (err) {
+      setIsDismissed(!shouldDismiss);
+      const message =
+        err instanceof Error ? err.message : 'Failed to update transaction';
+      setError(message);
+    } finally {
+      setIsDismissing(false);
     }
   };
 
@@ -171,7 +211,7 @@ export function CreateFromTransactionModal({
               setFormData((prev) => ({ ...prev, category: value }))
             }
             placeholder="Select a category..."
-            disabled={isLoadingData}
+            disabled={isLoadingData || isDismissed}
           />
 
           <Select
@@ -182,7 +222,7 @@ export function CreateFromTransactionModal({
               setFormData((prev) => ({ ...prev, counterparty: value }))
             }
             placeholder={`Select ${counterpartyLabel.toLowerCase()}...`}
-            disabled={isLoadingData}
+            disabled={isLoadingData || isDismissed}
           />
 
           <Input
@@ -192,6 +232,7 @@ export function CreateFromTransactionModal({
               setFormData((prev) => ({ ...prev, title: e.target.value }))
             }
             placeholder="Override default title..."
+            disabled={isDismissed}
           />
 
           <Input
@@ -201,25 +242,42 @@ export function CreateFromTransactionModal({
               setFormData((prev) => ({ ...prev, description: e.target.value }))
             }
             placeholder="Add notes..."
+            disabled={isDismissed}
           />
 
           <div className={styles.actions}>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={isSubmitting}
-              disabled={isLoadingData || !formData.category}
-            >
-              {isExpense ? 'Create Expense' : 'Create Income'}
-            </Button>
+            {!isLinked && (
+              <Toggle
+                label="Dismiss"
+                size="sm"
+                checked={isDismissed}
+                onChange={handleDismissToggle}
+                disabled={isSubmitting || isDismissing}
+              />
+            )}
+            <div className={styles.actionsRight}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSubmitting || isDismissing}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isSubmitting}
+                disabled={
+                  isLoadingData ||
+                  !formData.category ||
+                  isDismissing ||
+                  isDismissed
+                }
+              >
+                {isExpense ? 'Create Expense' : 'Create Income'}
+              </Button>
+            </div>
           </div>
         </form>
       </div>

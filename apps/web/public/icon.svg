@@ -1,0 +1,10 @@
+<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>FinTrak Logo</title>
+  <rect width="40" height="40" rx="12" fill="#ff6b35" />
+  <path
+    d="M12 14h16M12 20h12M12 26h8"
+    stroke="white"
+    stroke-width="2.5"
+    stroke-linecap="round"
+  />
+</svg>

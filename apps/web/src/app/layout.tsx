@@ -13,6 +13,10 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Fintrak - Financial Dashboard',
   description: 'Track your finances, expenses, and investments in one place',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default async function RootLayout({

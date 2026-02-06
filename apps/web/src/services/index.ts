@@ -14,6 +14,7 @@ export {
   type CreateTransactionFromBankRequest,
   type GetBankTransactionsParams,
   type LinkedTransactionResponse,
+  type ReviewStatus,
 } from './bankTransactions';
 export { type Category, categoriesService } from './categories';
 export {

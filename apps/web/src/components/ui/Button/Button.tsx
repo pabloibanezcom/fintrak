@@ -1,4 +1,5 @@
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
+import { Icon } from '../Icon';
 import styles from './Button.module.css';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -42,18 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading && (
           <span className={styles.spinner}>
-            <svg viewBox="0 0 24 24" fill="none" className={styles.spinnerIcon}>
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray="31.416"
-                strokeDashoffset="10"
-              />
-            </svg>
+            <Icon name="spinner" className={styles.spinnerIcon} />
           </span>
         )}
         <span className={isLoading ? styles.hiddenText : styles.content}>

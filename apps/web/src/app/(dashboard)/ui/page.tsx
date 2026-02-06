@@ -100,6 +100,11 @@ const components: ShowroomItem[] = [
     description: 'Visual progress indicators',
     href: '/ui/progress-bar',
   },
+  {
+    name: 'Toggle',
+    description: 'Switch controls for binary on/off settings',
+    href: '/ui/toggle',
+  },
 ];
 
 function ItemGrid({ items }: { items: ShowroomItem[] }) {

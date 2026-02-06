@@ -15,7 +15,7 @@ import {
 } from '@/components/ui';
 import { useBankAccounts } from '@/hooks/useBankAccounts';
 import { useBankTransactions } from '@/hooks/useBankTransactions';
-import type { BankTransaction } from '@/services';
+import type { BankTransaction, ReviewStatus } from '@/services';
 import { formatCurrency, formatDate } from '@/utils';
 import styles from './page.module.css';
 
@@ -27,6 +27,7 @@ export default function BankTransactionsPage() {
     dateTo: '',
     bankId: '',
     accountId: '',
+    reviewStatus: '',
   });
   const [selectedTransaction, setSelectedTransaction] =
     useState<BankTransaction | null>(null);
@@ -49,12 +50,14 @@ export default function BankTransactionsPage() {
     total,
     loadMore,
     refetch,
+    updateTransaction,
   } = useBankTransactions({
     from: filters.dateFrom || undefined,
     to: filters.dateTo || undefined,
     search: filters.search || undefined,
     bankId: filters.bankId || undefined,
     accountId: filters.accountId || undefined,
+    reviewStatus: (filters.reviewStatus as ReviewStatus) || undefined,
   });
 
   const bankOptions: FilterOption[] = useMemo(
@@ -100,9 +103,16 @@ export default function BankTransactionsPage() {
         bankLogo: getBankLogo(tx.accountId),
         account: getAccountDisplayName(tx.accountId),
         isLinked: linkedTransactionIds.has(tx._id),
+        isDismissed: tx.dismissed,
         linkedTransactionId: linkedTransactionIds.get(tx._id),
       })),
-    [transactions, linkedTransactionIds, getBankDisplayName, getBankLogo, getAccountDisplayName]
+    [
+      transactions,
+      linkedTransactionIds,
+      getBankDisplayName,
+      getBankLogo,
+      getAccountDisplayName,
+    ]
   );
 
   const handleTransactionClick = useCallback(
@@ -124,6 +134,13 @@ export default function BankTransactionsPage() {
   const handleModalSuccess = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  const handleDismissChange = useCallback(
+    (transactionId: string, dismissed: boolean) => {
+      updateTransaction(transactionId, { dismissed });
+    },
+    [updateTransaction]
+  );
 
   return (
     <div className={styles.page}>
@@ -158,7 +175,13 @@ export default function BankTransactionsPage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         transaction={selectedTransaction}
+        isLinked={
+          selectedTransaction
+            ? linkedTransactionIds.has(selectedTransaction._id)
+            : false
+        }
         onSuccess={handleModalSuccess}
+        onDismissChange={handleDismissChange}
       />
     </div>
   );

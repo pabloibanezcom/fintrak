@@ -10,10 +10,18 @@ const iconNames = [
   'arrowRight',
   'arrowUp',
   'banking',
+  'bitcoin',
   'budget',
+  'calendar',
+  'chartLine',
+  'check',
   'chevronDown',
   'close',
+  'eye',
+  'eyeOff',
+  'google',
   'investments',
+  'layers',
   'loader',
   'logo',
   'moon',
@@ -26,6 +34,7 @@ const iconNames = [
   'spinner',
   'sun',
   'sync',
+  'transfer',
 ];
 
 export default function IconShowroomPage() {

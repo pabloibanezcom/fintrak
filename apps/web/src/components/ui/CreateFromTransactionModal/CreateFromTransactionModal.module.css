@@ -59,7 +59,12 @@
 
 .actions {
   display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-3);
+  justify-content: space-between;
+  align-items: center;
   padding-top: var(--spacing-2);
+}
+
+.actionsRight {
+  display: flex;
+  gap: var(--spacing-3);
 }

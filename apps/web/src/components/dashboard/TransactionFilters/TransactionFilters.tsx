@@ -11,6 +11,7 @@ export interface TransactionFiltersValue {
   dateTo: string;
   bankId: string;
   accountId: string;
+  reviewStatus: string;
 }
 
 export interface FilterOption {
@@ -67,6 +68,13 @@ export function TransactionFilters({
     [onChange, value]
   );
 
+  const handleReviewStatusChange = useCallback(
+    (newStatus: string) => {
+      onChange({ ...value, reviewStatus: newStatus });
+    },
+    [onChange, value]
+  );
+
   const handleClearFilters = useCallback(() => {
     onChange({
       search: '',
@@ -74,6 +82,7 @@ export function TransactionFilters({
       dateTo: '',
       bankId: '',
       accountId: '',
+      reviewStatus: '',
     });
   }, [onChange]);
 
@@ -82,7 +91,8 @@ export function TransactionFilters({
     value.dateFrom ||
     value.dateTo ||
     value.bankId ||
-    value.accountId;
+    value.accountId ||
+    value.reviewStatus;
 
   // Create options with "All" option prepended
   const bankSelectOptions: SelectOption[] = useMemo(
@@ -99,6 +109,13 @@ export function TransactionFilters({
     () => [{ value: '', label: 'All accounts' }, ...filteredAccounts],
     [filteredAccounts]
   );
+
+  const reviewStatusOptions: SelectOption[] = [
+    { value: '', label: 'All' },
+    { value: 'unreviewed', label: 'Unreviewed' },
+    { value: 'linked', label: 'Linked' },
+    { value: 'dismissed', label: 'Dismissed' },
+  ];
 
   return (
     <Card padding="md" className={styles.card}>
@@ -145,6 +162,15 @@ export function TransactionFilters({
             value={value.accountId}
             onChange={handleAccountChange}
             placeholder="All accounts"
+            className={styles.select}
+          />
+
+          <Select
+            label="Status"
+            options={reviewStatusOptions}
+            value={value.reviewStatus}
+            onChange={handleReviewStatusChange}
+            placeholder="All"
             className={styles.select}
           />
 
