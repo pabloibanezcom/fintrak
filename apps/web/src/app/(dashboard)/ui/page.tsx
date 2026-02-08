@@ -76,6 +76,11 @@ const components: ShowroomItem[] = [
     href: '/ui/card',
   },
   {
+    name: 'ColorPicker',
+    description: 'Color selection with preset swatches and custom input',
+    href: '/ui/color-picker',
+  },
+  {
     name: 'DateSelector',
     description: 'Date range picker with presets and custom selection',
     href: '/ui/date-selector',

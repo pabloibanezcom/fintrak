@@ -189,3 +189,32 @@
 .progressItem {
   max-width: 400px;
 }
+
+/* Color picker */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  max-width: 500px;
+}
+
+.colorPreview {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+[data-theme="dark"] .colorPreview {
+  background-color: var(--color-neutral-800);
+}
+
+.colorSwatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}

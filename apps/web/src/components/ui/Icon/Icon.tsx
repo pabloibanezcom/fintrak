@@ -33,6 +33,17 @@ import {
   SunIcon,
   SyncIcon,
   TransferIcon,
+  ShoppingIcon,
+  EntertainmentIcon,
+  MortgageIcon,
+  TaxIcon,
+  PayrollIcon,
+  OtherIcon,
+  HealthIcon,
+  InsuranceIcon,
+  UtilitiesIcon,
+  GroceryIcon,
+  TransportIcon,
 } from './icons';
 
 const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -67,6 +78,17 @@ const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   sun: SunIcon,
   sync: SyncIcon,
   transfer: TransferIcon,
+  shopping: ShoppingIcon,
+  entertainment: EntertainmentIcon,
+  mortgage: MortgageIcon,
+  tax: TaxIcon,
+  payroll: PayrollIcon,
+  other: OtherIcon,
+  health: HealthIcon,
+  insurance: InsuranceIcon,
+  utilities: UtilitiesIcon,
+  grocery: GroceryIcon,
+  transport: TransportIcon,
 };
 
 interface IconProps {
@@ -76,6 +98,10 @@ interface IconProps {
   style?: CSSProperties;
   'aria-label'?: string;
   'aria-hidden'?: boolean;
+}
+
+export function isValidIconName(name: string): boolean {
+  return name in iconMap;
 }
 
 export function Icon({

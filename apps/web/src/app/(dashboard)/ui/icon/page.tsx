@@ -35,6 +35,17 @@ const iconNames = [
   'sun',
   'sync',
   'transfer',
+  'shopping',
+  'entertainment',
+  'mortgage',
+  'tax',
+  'payroll',
+  'other',
+  'health',
+  'insurance',
+  'utilities',
+  'grocery',
+  'transport',
 ];
 
 export default function IconShowroomPage() {

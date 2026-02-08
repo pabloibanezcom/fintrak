@@ -12,10 +12,19 @@ export {
   type ButtonGroupProps,
 } from './ButtonGroup/ButtonGroup';
 export { Card, type CardProps } from './Card/Card';
+export { ColorPicker, type ColorPickerProps } from './ColorPicker';
 export {
   CreateFromTransactionModal,
   type CreateFromTransactionModalProps,
 } from './CreateFromTransactionModal/CreateFromTransactionModal';
+export {
+  CreateCategoryModal,
+  type CreateCategoryModalProps,
+} from './CreateCategoryModal/CreateCategoryModal';
+export {
+  CreateCounterpartyModal,
+  type CreateCounterpartyModalProps,
+} from './CreateCounterpartyModal/CreateCounterpartyModal';
 export {
   DateSelector,
   type DateSelectorProps,
@@ -25,7 +34,10 @@ export {
   type DropdownMenuItem,
   type DropdownMenuProps,
 } from './DropdownMenu/DropdownMenu';
-export { Icon } from './Icon';
+export {
+  Icon,
+  isValidIconName,
+} from './Icon/Icon';
 export { Input, type InputProps } from './Input/Input';
 export {
   InvestmentCard,

@@ -2,9 +2,67 @@
 
 import type { Counterparty } from '@fintrak/types';
 import type { Request, Response } from 'express';
-import CounterpartyModel from '../models/CounterpartyModel';
+import CounterpartyModel, {
+  type ICounterparty,
+} from '../models/CounterpartyModel';
 import { requireAuth } from '../utils/authUtils';
 import { handleGenericError, handleNotFoundError } from '../utils/errorUtils';
+
+/** Fields inherited from parent when not set on child */
+const INHERITED_FIELDS: (keyof Counterparty)[] = [
+  'logo',
+  'type',
+  'titleTemplate',
+];
+
+/**
+ * Resolve inherited fields from parent into child counterparty.
+ * Returns a plain object with parent fields merged where the child has none.
+ */
+function resolveWithParent(
+  child: ICounterparty,
+  parent: ICounterparty | null
+): Record<string, unknown> {
+  const resolved = child.toJSON();
+  if (!parent) return resolved;
+
+  const parentJson = parent.toJSON();
+  for (const field of INHERITED_FIELDS) {
+    if (resolved[field] === undefined || resolved[field] === null) {
+      resolved[field] = parentJson[field];
+    }
+  }
+  return resolved;
+}
+
+/**
+ * Validate that a parentKey references a valid parent counterparty
+ * (must exist and not be a child itself).
+ */
+async function validateParent(
+  parentKey: string,
+  userId: string,
+  res: Response
+): Promise<ICounterparty | null> {
+  const parent = await CounterpartyModel.findOne({
+    key: parentKey,
+    userId,
+  });
+
+  if (!parent) {
+    res.status(400).json({ error: 'Parent counterparty not found' });
+    return null;
+  }
+
+  if (parent.parentKey) {
+    res
+      .status(400)
+      .json({ error: 'Parent counterparty cannot itself be a child' });
+    return null;
+  }
+
+  return parent;
+}
 
 export const searchCounterparties = async (req: Request, res: Response) => {
   try {
@@ -19,6 +77,7 @@ export const searchCounterparties = async (req: Request, res: Response) => {
       address,
       notes,
       titleTemplate,
+      parentKey,
       limit = 50,
       offset = 0,
       sortBy = 'name',
@@ -53,6 +112,11 @@ export const searchCounterparties = async (req: Request, res: Response) => {
       query.type = type;
     }
 
+    // Parent filter
+    if (parentKey) {
+      query.parentKey = parentKey;
+    }
+
     // Build sort object
     const sort: any = {};
     const validSortFields = ['name', 'type', 'key', 'createdAt', 'updatedAt'];
@@ -70,8 +134,30 @@ export const searchCounterparties = async (req: Request, res: Response) => {
     // Get total count for pagination
     const totalCount = await CounterpartyModel.countDocuments(query);
 
+    // Resolve inherited fields for child counterparties
+    const parentKeys = [
+      ...new Set(
+        counterparties
+          .map((cp) => cp.parentKey)
+          .filter((pk): pk is string => !!pk)
+      ),
+    ];
+
+    let parentMap = new Map<string, ICounterparty>();
+    if (parentKeys.length > 0) {
+      const parents = await CounterpartyModel.find({
+        userId,
+        key: { $in: parentKeys },
+      });
+      parentMap = new Map(parents.map((p) => [p.key, p]));
+    }
+
+    const resolved = counterparties.map((cp) =>
+      resolveWithParent(cp, parentMap.get(cp.parentKey || '') || null)
+    );
+
     res.json({
-      counterparties,
+      counterparties: resolved,
       pagination: {
         total: totalCount,
         limit: Number(limit),
@@ -86,6 +172,7 @@ export const searchCounterparties = async (req: Request, res: Response) => {
         address,
         notes,
         titleTemplate,
+        parentKey,
       },
       sort: {
         sortBy: sortField,
@@ -108,7 +195,16 @@ export const getCounterpartyById = async (req: Request, res: Response) => {
       return handleNotFoundError(res, 'Counterparty');
     }
 
-    res.json(counterparty);
+    // Resolve parent fields if child
+    let parent: ICounterparty | null = null;
+    if (counterparty.parentKey) {
+      parent = await CounterpartyModel.findOne({
+        key: counterparty.parentKey,
+        userId,
+      });
+    }
+
+    res.json(resolveWithParent(counterparty, parent));
   } catch (error) {
     return handleGenericError(res, 'fetch counterparty', error);
   }
@@ -132,6 +228,16 @@ export const createCounterparty = async (req: Request, res: Response) => {
       });
     }
 
+    // Validate parent if provided
+    if (counterpartyData.parentKey) {
+      const parent = await validateParent(
+        counterpartyData.parentKey,
+        userId,
+        res
+      );
+      if (!parent) return;
+    }
+
     const counterparty = new CounterpartyModel({
       ...counterpartyData,
       userId,
@@ -150,6 +256,24 @@ export const updateCounterparty = async (req: Request, res: Response) => {
     if (!userId) return;
     const { id } = req.params;
     const updateData: Partial<Counterparty> = req.body;
+
+    // Validate parent if being updated
+    if (updateData.parentKey) {
+      const parent = await validateParent(updateData.parentKey, userId, res);
+      if (!parent) return;
+
+      // Prevent setting parentKey on a counterparty that has children
+      const childCount = await CounterpartyModel.countDocuments({
+        userId,
+        parentKey: id,
+      });
+      if (childCount > 0) {
+        return res.status(400).json({
+          error:
+            'Cannot set parent on a counterparty that has children (max 2 levels)',
+        });
+      }
+    }
 
     const counterparty = await CounterpartyModel.findOneAndUpdate(
       { key: id, userId },
@@ -180,6 +304,12 @@ export const deleteCounterparty = async (req: Request, res: Response) => {
     if (!counterparty) {
       return handleNotFoundError(res, 'Counterparty');
     }
+
+    // Orphan any children that referenced this parent
+    await CounterpartyModel.updateMany(
+      { userId, parentKey: id },
+      { $unset: { parentKey: '' } }
+    );
 
     res.json({ message: 'Counterparty deleted successfully' });
   } catch (error) {

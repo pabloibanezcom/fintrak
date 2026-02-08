@@ -59,6 +59,11 @@ router.use(authenticate); // all routes require auth
  *           type: string
  *         description: Search in title templates (case-insensitive)
  *       - in: query
+ *         name: parentKey
+ *         schema:
+ *           type: string
+ *         description: Filter by parent counterparty key (returns children of that parent)
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
@@ -181,11 +186,12 @@ router.get('/counterparties/:id', getCounterpartyById);
  *           schema:
  *             $ref: '#/components/schemas/Counterparty'
  *           example:
- *             id: "amazon"
+ *             key: "amazon"
  *             name: "Amazon"
  *             type: "company"
  *             email: "support@amazon.com"
  *             notes: "Online shopping"
+ *             parentKey: "amazon-group"
  *     responses:
  *       201:
  *         description: Counterparty created successfully
@@ -256,10 +262,14 @@ router.post('/counterparties', createCounterparty);
  *                 type: string
  *               notes:
  *                 type: string
+ *               parentKey:
+ *                 type: string
+ *                 description: Key of the parent counterparty (max 2 levels, parent cannot itself be a child)
  *           example:
  *             name: "Updated Amazon"
  *             email: "updated@amazon.com"
  *             phone: "+1-800-123-4567"
+ *             parentKey: "amazon-group"
  *     responses:
  *       200:
  *         description: Counterparty updated successfully
@@ -312,7 +322,7 @@ router.put('/counterparties/:id', updateCounterparty);
  *         description: The counterparty ID
  *     responses:
  *       200:
- *         description: Counterparty deleted successfully
+ *         description: Counterparty deleted successfully. If the deleted counterparty was a parent, its children are orphaned (parentKey unset).
  *         content:
  *           application/json:
  *             schema:

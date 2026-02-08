@@ -31,4 +31,7 @@ export interface Counterparty {
   
   /** Template for transaction titles (e.g., "Compra en {name}", "Pago a {name}") */
   titleTemplate?: string;
+
+  /** Key of the parent counterparty (for child/location counterparties) */
+  parentKey?: string;
 }

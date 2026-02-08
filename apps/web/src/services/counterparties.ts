@@ -10,6 +10,8 @@ export interface Counterparty {
   address?: string;
   notes?: string;
   titleTemplate?: string;
+  parentKey?: string;
+  defaultCategory?: string;
 }
 
 export interface CounterpartiesResponse {
@@ -25,6 +27,7 @@ export interface CounterpartiesResponse {
 export interface SearchCounterpartiesParams {
   name?: string;
   type?: 'company' | 'person' | 'institution' | 'other';
+  parentKey?: string;
   limit?: number;
   offset?: number;
 }
@@ -37,6 +40,7 @@ export const counterpartiesService = {
 
     if (params.name) query.set('name', params.name);
     if (params.type) query.set('type', params.type);
+    if (params.parentKey) query.set('parentKey', params.parentKey);
     if (params.limit) query.set('limit', String(params.limit));
     if (params.offset) query.set('offset', String(params.offset));
 
@@ -50,5 +54,20 @@ export const counterpartiesService = {
 
   getCounterparty: async (id: string): Promise<Counterparty> => {
     return apiClient.get<Counterparty>(`/counterparties/${id}`);
+  },
+
+  create: async (data: Partial<Counterparty>): Promise<Counterparty> => {
+    return apiClient.post<Counterparty>('/counterparties', data);
+  },
+
+  update: async (
+    id: string,
+    data: Partial<Counterparty>
+  ): Promise<Counterparty> => {
+    return apiClient.put<Counterparty>(`/counterparties/${id}`, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    return apiClient.delete<void>(`/counterparties/${id}`);
   },
 };

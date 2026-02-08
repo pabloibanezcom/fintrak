@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.error {
+  padding: var(--spacing-3);
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  background-color: var(--color-error-bg);
+  border-radius: var(--radius-md);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: var(--spacing-2);
+  gap: var(--spacing-3);
+}
