@@ -17,6 +17,7 @@ interface UseBankTransactionsOptions {
   to?: string;
   search?: string;
   reviewStatus?: ReviewStatus;
+  limit?: number;
 }
 
 interface UseBankTransactionsReturn {
@@ -46,7 +47,10 @@ export function useBankTransactions(
   const [total, setTotal] = useState(0);
   const offsetRef = useRef(0);
 
-  const { accountId, bankId, from, to, search, reviewStatus } = options;
+  const { accountId, bankId, from, to, search, reviewStatus, limit } =
+    options;
+
+  const pageSize = limit || DEFAULT_LIMIT;
 
   const fetchTransactions = useCallback(
     async (isLoadMore = false) => {
@@ -60,7 +64,7 @@ export function useBankTransactions(
 
       try {
         const params: GetBankTransactionsParams = {
-          limit: DEFAULT_LIMIT,
+          limit: pageSize,
           offset: isLoadMore ? offsetRef.current : 0,
         };
 
@@ -108,7 +112,7 @@ export function useBankTransactions(
         setIsLoadingMore(false);
       }
     },
-    [accountId, bankId, from, to, search, reviewStatus]
+    [accountId, bankId, from, to, search, reviewStatus, pageSize]
   );
 
   const loadMore = useCallback(() => {

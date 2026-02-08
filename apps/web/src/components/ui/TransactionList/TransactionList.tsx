@@ -172,7 +172,7 @@ export function TransactionList({
                             onClick={(e) => e.stopPropagation()}
                             aria-label="View linked transaction"
                           >
-                            <Icon name="transfer" size={16} />
+                            <Icon name="transfer" size={14} />
                           </Link>
                         )}
                         {tx.isDismissed && (

@@ -161,13 +161,54 @@ export function CreateFromTransactionModal({
     label: cat.name,
   }));
 
-  const counterpartyOptions = [
-    { value: '', label: 'None' },
-    ...counterparties.map((cp) => ({
-      value: cp.key,
-      label: cp.name,
-    })),
-  ];
+  const counterpartyOptions = (() => {
+    // Build a map of parent names for "Parent - Child" labelling
+    const parentNameMap = new Map<string, string>();
+    for (const cp of counterparties) {
+      if (!cp.parentKey) {
+        parentNameMap.set(cp.key, cp.name);
+      }
+    }
+
+    // Separate parents and children, sort alphabetically
+    const parents = counterparties
+      .filter((cp) => !cp.parentKey)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    const children = counterparties
+      .filter((cp) => cp.parentKey)
+      .sort((a, b) => {
+        // Group by parent, then alphabetically
+        const parentCmp = (a.parentKey || '').localeCompare(b.parentKey || '');
+        return parentCmp !== 0 ? parentCmp : a.name.localeCompare(b.name);
+      });
+
+    // Build flat list: parents first, then children grouped under parent
+    const sorted: Counterparty[] = [];
+    for (const parent of parents) {
+      sorted.push(parent);
+      for (const child of children) {
+        if (child.parentKey === parent.key) {
+          sorted.push(child);
+        }
+      }
+    }
+    // Add orphan children (parent not in list)
+    for (const child of children) {
+      if (child.parentKey && !parentNameMap.has(child.parentKey)) {
+        sorted.push(child);
+      }
+    }
+
+    return [
+      { value: '', label: 'None' },
+      ...sorted.map((cp) => ({
+        value: cp.key,
+        label: cp.parentKey && parentNameMap.has(cp.parentKey)
+          ? `${parentNameMap.get(cp.parentKey)} - ${cp.name}`
+          : cp.name,
+      })),
+    ];
+  })();
 
   if (!transaction) return null;
 

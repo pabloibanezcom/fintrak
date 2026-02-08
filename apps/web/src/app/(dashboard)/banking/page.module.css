@@ -1,27 +1,13 @@
 .page {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
+  flex-direction: column;
+  gap: var(--spacing-5);
 }
 
-.card {
-  max-width: 400px;
-  text-align: center;
+.header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-4);
-}
-
-.icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  background-color: var(--color-primary-50);
-  border-radius: var(--radius-full);
+  gap: var(--spacing-1);
 }
 
 .title {
@@ -30,8 +16,36 @@
   color: var(--color-text-primary);
 }
 
-.description {
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
-  line-height: var(--line-height-relaxed);
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.transactionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.viewAll {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-500);
+  transition: color var(--transition-fast);
+}
+
+.viewAll:hover {
+  color: var(--color-primary-600);
 }
