@@ -43,7 +43,10 @@ export function CreateCategoryModal({
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    name: '',
+    name: {
+      en: '',
+      es: '',
+    },
     icon: '',
     color: PRESET_COLORS[0],
   });
@@ -58,7 +61,10 @@ export function CreateCategoryModal({
         });
       } else {
         setFormData({
-          name: '',
+          name: {
+            en: '',
+            es: '',
+          },
           icon: '',
           color: PRESET_COLORS[0],
         });
@@ -70,8 +76,8 @@ export function CreateCategoryModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name) {
-      setError('Please enter a name');
+    if (!formData.name.en || !formData.name.es) {
+      setError('Please enter names in both English and Spanish');
       return;
     }
 
@@ -92,7 +98,14 @@ export function CreateCategoryModal({
         });
         toast.success('Category updated successfully');
       } else {
+        // Generate key from English name (lowercase, hyphenated)
+        const key = formData.name.en
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
+
         await categoriesService.create({
+          key,
           name: formData.name,
           icon: formData.icon || undefined,
           color: formData.color,
@@ -123,12 +136,28 @@ export function CreateCategoryModal({
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <Input
-            label="Name *"
-            value={formData.name}
+            label="Name (English) *"
+            value={formData.name.en}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
+              setFormData((prev) => ({
+                ...prev,
+                name: { ...prev.name, en: e.target.value },
+              }))
             }
-            placeholder="Category name..."
+            placeholder="Category name in English..."
+            disabled={isSubmitting}
+          />
+
+          <Input
+            label="Name (Spanish) *"
+            value={formData.name.es}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                name: { ...prev.name, es: e.target.value },
+              }))
+            }
+            placeholder="Nombre de la categoría en español..."
             disabled={isSubmitting}
           />
 
@@ -164,7 +193,7 @@ export function CreateCategoryModal({
               type="submit"
               variant="primary"
               isLoading={isSubmitting}
-              disabled={!formData.name}
+              disabled={!formData.name.en || !formData.name.es}
             >
               {category ? 'Save Changes' : 'Create Category'}
             </Button>

@@ -1,13 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CreateCategoryModal, Icon, isValidIconName } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CreateCategoryModal,
+  Icon,
+  isValidIconName,
+} from '@/components/ui';
 import { type Category, categoriesService } from '@/services';
 import { toast } from '@/utils';
 import styles from './page.module.css';
 
 export default function CategoriesPage() {
+  const locale = useLocale() as 'en' | 'es';
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -101,12 +109,12 @@ export default function CategoriesPage() {
                   {category.icon && isValidIconName(category.icon) ? (
                     <Icon name={category.icon} size={20} />
                   ) : (
-                    getInitials(category.name)
+                    getInitials(category.name[locale])
                   )}
                 </div>
                 <div className={styles.cardInfo}>
-                  <span className={styles.cardName} title={category.name}>
-                    {category.name}
+                  <span className={styles.cardName} title={category.name[locale]}>
+                    {category.name[locale]}
                   </span>
                 </div>
               </Link>

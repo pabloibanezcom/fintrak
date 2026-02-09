@@ -14,10 +14,6 @@ export {
 export { Card, type CardProps } from './Card/Card';
 export { ColorPicker, type ColorPickerProps } from './ColorPicker';
 export {
-  CreateFromTransactionModal,
-  type CreateFromTransactionModalProps,
-} from './CreateFromTransactionModal/CreateFromTransactionModal';
-export {
   CreateCategoryModal,
   type CreateCategoryModalProps,
 } from './CreateCategoryModal/CreateCategoryModal';
@@ -25,6 +21,10 @@ export {
   CreateCounterpartyModal,
   type CreateCounterpartyModalProps,
 } from './CreateCounterpartyModal/CreateCounterpartyModal';
+export {
+  CreateFromTransactionModal,
+  type CreateFromTransactionModalProps,
+} from './CreateFromTransactionModal/CreateFromTransactionModal';
 export {
   DateSelector,
   type DateSelectorProps,

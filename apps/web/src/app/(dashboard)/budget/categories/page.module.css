@@ -47,7 +47,9 @@
   align-items: center;
   gap: var(--spacing-4);
   position: relative;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
 }
 

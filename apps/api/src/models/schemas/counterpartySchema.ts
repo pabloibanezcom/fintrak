@@ -15,6 +15,7 @@ export const counterpartySchemaDefinition = {
   notes: { type: String },
   titleTemplate: { type: String },
   parentKey: { type: String },
+  defaultCategory: { type: String },
 };
 
 export const counterpartySchema = new Schema(counterpartySchemaDefinition);

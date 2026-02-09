@@ -34,4 +34,7 @@ export interface Counterparty {
 
   /** Key of the parent counterparty (for child/location counterparties) */
   parentKey?: string;
+
+  /** Default category key for transactions with this counterparty */
+  defaultCategory?: string;
 }

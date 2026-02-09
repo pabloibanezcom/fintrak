@@ -207,9 +207,7 @@ export default function ColorPickerShowroomPage() {
           <div className={styles.examples}>
             <div className={styles.example}>
               <span className={styles.exampleLabel}>Basic:</span>
-              <code>
-                {'<ColorPicker value={color} onChange={setColor} />'}
-              </code>
+              <code>{'<ColorPicker value={color} onChange={setColor} />'}</code>
             </div>
             <div className={styles.example}>
               <span className={styles.exampleLabel}>With label:</span>

@@ -10,20 +10,8 @@ export function GroceryIcon(props: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle
-        cx="9"
-        cy="21"
-        r="1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <circle
-        cx="19"
-        cy="21"
-        r="1.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
+      <circle cx="9" cy="21" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="19" cy="21" r="1.5" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }

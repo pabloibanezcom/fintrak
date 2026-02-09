@@ -1,13 +1,28 @@
 'use client';
 
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CreateCounterpartyModal, Icon, Avatar } from '@/components/ui';
-import { type Counterparty, counterpartiesService } from '@/services';
+import {
+  Avatar,
+  Button,
+  Card,
+  CreateCounterpartyModal,
+  Icon,
+} from '@/components/ui';
+import {
+  type Category,
+  type Counterparty,
+  categoriesService,
+  counterpartiesService,
+} from '@/services';
 import { toast } from '@/utils';
 import styles from './page.module.css';
 
 export default function CounterpartiesPage() {
+  const locale = useLocale() as 'en' | 'es';
   const [counterparties, setCounterparties] = useState<Counterparty[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCounterparty, setSelectedCounterparty] =
@@ -17,8 +32,12 @@ export default function CounterpartiesPage() {
     setIsLoading(true);
     try {
       // Fetch all for now as we don't have server side pagination in UI yet
-      const response = await counterpartiesService.search({ limit: 100 });
-      setCounterparties(response.counterparties);
+      const [counterpartiesResponse, categoriesData] = await Promise.all([
+        counterpartiesService.search({ limit: 100 }),
+        categoriesService.getCategories(),
+      ]);
+      setCounterparties(counterpartiesResponse.counterparties);
+      setCategories(categoriesData);
     } catch (error) {
       console.error('Failed to fetch counterparties:', error);
       toast.error('Failed to load counterparties');
@@ -78,20 +97,24 @@ export default function CounterpartiesPage() {
       .toUpperCase();
   };
 
+  // Create a map for quick category lookup
+  const categoryMap = new Map(categories.map((cat) => [cat.key, cat]));
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Counterparties</h1>
-        <p className={styles.subtitle}>
-          Manage people and companies you transact with
-        </p>
-      </div>
-
-      <div className={styles.actions}>
-        <Button onClick={handleCreateClick} variant="primary">
-          <Icon name="Plus" size={16} />
-          <span>Add Counterparty</span>
-        </Button>
+        <div className={styles.headerContent}>
+          <div className={styles.headerText}>
+            <h1 className={styles.title}>Counterparties</h1>
+            <p className={styles.subtitle}>
+              Manage people and companies you transact with
+            </p>
+          </div>
+          <Button onClick={handleCreateClick} variant="primary">
+            <Icon name="Plus" size={16} />
+            <span>Add Counterparty</span>
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -102,23 +125,46 @@ export default function CounterpartiesPage() {
         <div className={styles.grid}>
           {counterparties.map((cp) => (
             <Card key={cp.key} className={styles.card} padding="sm">
-              <Avatar
-                src={cp.logo}
-                alt={cp.name}
-                fallback={getInitials(cp.name)}
-                size="md"
-              />
-              <div className={styles.cardInfo}>
-                <span className={styles.cardName} title={cp.name}>
-                  {cp.name}
-                </span>
-                <span className={styles.cardType}>{cp.type}</span>
-              </div>
+              <Link
+                href={`/budget/counterparties/${cp.key}`}
+                className={styles.cardLink}
+              >
+                <Avatar
+                  src={cp.logo}
+                  alt={cp.name}
+                  fallback={getInitials(cp.name)}
+                  size="md"
+                />
+                <div className={styles.cardInfo}>
+                  <span className={styles.cardName} title={cp.name}>
+                    {cp.name}
+                  </span>
+                  {cp.defaultCategory && categoryMap.get(cp.defaultCategory) ? (
+                    <span className={styles.cardCategory}>
+                      <span
+                        className={styles.categoryDot}
+                        style={{
+                          backgroundColor: categoryMap.get(cp.defaultCategory)
+                            ?.color,
+                        }}
+                      />
+                      {categoryMap.get(cp.defaultCategory)?.name[locale]}
+                    </span>
+                  ) : (
+                    cp.type && (
+                      <span className={styles.cardType}>{cp.type}</span>
+                    )
+                  )}
+                </div>
+              </Link>
               <div className={styles.cardActions}>
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => handleEditClick(cp)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleEditClick(cp);
+                  }}
                   title="Edit"
                 >
                   <Icon name="Pen" size={14} />
@@ -127,7 +173,10 @@ export default function CounterpartiesPage() {
                   size="sm"
                   variant="ghost"
                   className={styles.deleteBtn}
-                  onClick={() => handleDeleteClick(cp)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDeleteClick(cp);
+                  }}
                   title="Delete"
                 >
                   <Icon name="Trash" size={14} />

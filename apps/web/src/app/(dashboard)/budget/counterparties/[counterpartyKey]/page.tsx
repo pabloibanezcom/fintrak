@@ -1,32 +1,30 @@
 'use client';
 
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import {
+  Avatar,
   Button,
   Card,
-  CreateCategoryModal,
+  CreateCounterpartyModal,
   Icon,
-  isValidIconName,
 } from '@/components/ui';
 import {
-  type Category,
-  categoriesService,
+  type Counterparty,
+  counterpartiesService,
   type UserTransaction,
   userTransactionsService,
 } from '@/services';
 import { formatCurrency, formatDate, toast } from '@/utils';
 import styles from './page.module.css';
 
-export default function CategoryDetailPage() {
-  const locale = useLocale() as 'en' | 'es';
+export default function CounterpartyDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const categoryKey = params.categoryKey as string;
+  const counterpartyKey = params.counterpartyKey as string;
 
-  const [category, setCategory] = useState<Category | null>(null);
+  const [counterparty, setCounterparty] = useState<Counterparty | null>(null);
   const [transactions, setTransactions] = useState<UserTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,22 +35,22 @@ export default function CategoryDetailPage() {
     hasMore: false,
   });
 
-  const fetchCategory = useCallback(async () => {
+  const fetchCounterparty = useCallback(async () => {
     try {
-      const data = await categoriesService.getCategory(categoryKey);
-      setCategory(data);
+      const data = await counterpartiesService.getById(counterpartyKey);
+      setCounterparty(data);
     } catch (error) {
-      console.error('Failed to fetch category:', error);
-      toast.error('Failed to load category');
-      router.push('/budget/categories');
+      console.error('Failed to fetch counterparty:', error);
+      toast.error('Failed to load counterparty');
+      router.push('/budget/counterparties');
     }
-  }, [categoryKey, router]);
+  }, [counterpartyKey, router]);
 
   const fetchTransactions = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await userTransactionsService.search({
-        category: categoryKey,
+        counterparty: counterpartyKey,
         sortBy: 'date',
         sortOrder: 'desc',
         limit: pagination.limit,
@@ -66,12 +64,12 @@ export default function CategoryDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [categoryKey, pagination.limit, pagination.offset]);
+  }, [counterpartyKey, pagination.limit, pagination.offset]);
 
   useEffect(() => {
-    fetchCategory();
+    fetchCounterparty();
     fetchTransactions();
-  }, [fetchCategory, fetchTransactions]);
+  }, [fetchCounterparty, fetchTransactions]);
 
   const handleEditClick = () => {
     setIsModalOpen(true);
@@ -82,7 +80,16 @@ export default function CategoryDetailPage() {
   };
 
   const handleSuccess = () => {
-    fetchCategory();
+    fetchCounterparty();
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
   };
 
   // Calculate statistics
@@ -100,7 +107,7 @@ export default function CategoryDetailPage() {
     { totalExpenses: 0, expenseCount: 0, totalIncome: 0, incomeCount: 0 }
   );
 
-  if (!category) {
+  if (!counterparty) {
     return (
       <div className={styles.page}>
         <div className={styles.loading}>Loading...</div>
@@ -111,39 +118,26 @@ export default function CategoryDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <Link href="/budget/categories" className={styles.backLink}>
+        <Link href="/budget/counterparties" className={styles.backLink}>
           <Icon name="arrowLeft" size={16} />
-          <span>Back to Categories</span>
+          <span>Back to Counterparties</span>
         </Link>
 
         <div className={styles.headerContent}>
-          <div className={styles.categoryInfo}>
-            <div
-              className={styles.categoryIcon}
-              style={{
-                backgroundColor: category.color
-                  ? `${category.color}15`
-                  : undefined,
-                color: category.color || undefined,
-              }}
-            >
-              {category.icon && isValidIconName(category.icon) ? (
-                <Icon name={category.icon} size={32} />
-              ) : (
-                <span className={styles.iconText}>
-                  {category.name[locale]
-                    .split(' ')
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join('')
-                    .toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div className={styles.categoryDetails}>
-              <h1 className={styles.title}>{category.name[locale]}</h1>
+          <div className={styles.counterpartyInfo}>
+            <Avatar
+              src={counterparty.logo}
+              alt={counterparty.name}
+              fallback={getInitials(counterparty.name)}
+              size="lg"
+            />
+            <div className={styles.counterpartyDetails}>
+              <h1 className={styles.title}>{counterparty.name}</h1>
               <p className={styles.subtitle}>
-                Category details and transactions
+                {counterparty.type && (
+                  <span className={styles.type}>{counterparty.type}</span>
+                )}
+                Counterparty details and transactions
               </p>
             </div>
           </div>
@@ -204,7 +198,7 @@ export default function CategoryDetailPage() {
           <div className={styles.loading}>Loading transactions...</div>
         ) : transactions.length === 0 ? (
           <Card className={styles.empty}>
-            <p>No transactions found for this category.</p>
+            <p>No transactions found for this counterparty.</p>
           </Card>
         ) : (
           <div className={styles.transactions}>
@@ -224,10 +218,10 @@ export default function CategoryDetailPage() {
                     )}
                     <div className={styles.transactionMeta}>
                       <span>{formatDate(tx.date)}</span>
-                      {tx.counterparty && (
+                      {tx.category && (
                         <>
                           <span className={styles.separator}>•</span>
-                          <span>{tx.counterparty.name}</span>
+                          <span>{tx.category.name}</span>
                         </>
                       )}
                     </div>
@@ -252,10 +246,10 @@ export default function CategoryDetailPage() {
         )}
       </div>
 
-      <CreateCategoryModal
+      <CreateCounterpartyModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        category={category}
+        counterparty={counterparty}
         onSuccess={handleSuccess}
       />
     </div>

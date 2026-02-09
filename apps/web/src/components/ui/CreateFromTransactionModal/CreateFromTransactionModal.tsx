@@ -203,9 +203,10 @@ export function CreateFromTransactionModal({
       { value: '', label: 'None' },
       ...sorted.map((cp) => ({
         value: cp.key,
-        label: cp.parentKey && parentNameMap.has(cp.parentKey)
-          ? `${parentNameMap.get(cp.parentKey)} - ${cp.name}`
-          : cp.name,
+        label:
+          cp.parentKey && parentNameMap.has(cp.parentKey)
+            ? `${parentNameMap.get(cp.parentKey)} - ${cp.name}`
+            : cp.name,
       })),
     ];
   })();

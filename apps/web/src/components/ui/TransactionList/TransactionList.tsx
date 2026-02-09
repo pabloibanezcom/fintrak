@@ -59,9 +59,7 @@ export function TransactionList({
 }: TransactionListProps) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const scrollRootRef = useRef<Element | null>(null);
-  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(
-    null
-  );
+  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
 
   // Callback ref: fires when the sentinel div mounts/unmounts
   const loadMoreRef = useCallback((node: HTMLDivElement | null) => {
@@ -132,7 +130,9 @@ export function TransactionList({
         <div className={styles.tableHeader}>
           <span>Date</span>
           <span>Description</span>
-          {showBankInfo && <span className={styles.statusHeader}>Income/Expense</span>}
+          {showBankInfo && (
+            <span className={styles.statusHeader}>Income/Expense</span>
+          )}
           {showBankInfo && <span>Bank</span>}
           {showBankInfo && <span>Account</span>}
           <span>Amount</span>

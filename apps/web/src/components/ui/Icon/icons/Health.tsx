@@ -10,10 +10,7 @@ export function HealthIcon(props: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M8 12h3v3h2v-3h3v-2h-3V7h-2v3H8v2Z"
-        fill="currentColor"
-      />
+      <path d="M8 12h3v3h2v-3h3v-2h-3V7h-2v3H8v2Z" fill="currentColor" />
     </svg>
   );
 }

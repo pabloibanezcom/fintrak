@@ -47,8 +47,7 @@ export function useBankTransactions(
   const [total, setTotal] = useState(0);
   const offsetRef = useRef(0);
 
-  const { accountId, bankId, from, to, search, reviewStatus, limit } =
-    options;
+  const { accountId, bankId, from, to, search, reviewStatus, limit } = options;
 
   const pageSize = limit || DEFAULT_LIMIT;
 

@@ -169,57 +169,23 @@ export const importTransactions = async (req: Request, res: Response) => {
         // Clean up description
         const cleanDescription = row.description.trim();
 
-        // Smart category detection based on keywords
-        let category: any = null;
-        const description = cleanDescription.toLowerCase();
-        const movementType = (row.movement_type || '').toLowerCase();
-        const searchText = `${description} ${movementType}`.trim();
-
-        // Get all user categories with keywords
-        const userCategories = await CategoryModel.find({
+        // Fallback: use "otros" (Other) category, create if doesn't exist
+        let category = await CategoryModel.findOne({
           userId,
-          keywords: { $exists: true, $not: { $size: 0 } },
+          key: 'otros',
         });
 
-        // Find best matching category based on keywords
-        let bestCategoryMatch: { category: any; matches: number } | null = null;
-
-        for (const cat of userCategories) {
-          if (cat.keywords && cat.keywords.length > 0) {
-            let matches = 0;
-            for (const keyword of cat.keywords) {
-              if (searchText.includes(keyword.toLowerCase())) {
-                matches++;
-              }
-            }
-            if (
-              matches > 0 &&
-              (!bestCategoryMatch || matches > bestCategoryMatch.matches)
-            ) {
-              bestCategoryMatch = { category: cat, matches };
-            }
-          }
-        }
-
-        if (bestCategoryMatch) {
-          category = bestCategoryMatch.category;
-        } else {
-          // Fallback: use "otros" category, create if doesn't exist
-          category = await CategoryModel.findOne({
-            userId,
+        if (!category) {
+          category = await CategoryModel.create({
             key: 'otros',
+            name: {
+              en: 'Other',
+              es: 'Otros',
+            },
+            color: '#6B7280',
+            icon: 'other',
+            userId,
           });
-
-          if (!category) {
-            category = await CategoryModel.create({
-              key: 'otros',
-              name: 'Otros',
-              color: '#6B7280',
-              icon: 'help-circle',
-              keywords: [],
-              userId,
-            });
-          }
         }
 
         // Generate title based on counterparty (will be set after counterparty detection)
