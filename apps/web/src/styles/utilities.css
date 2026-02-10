@@ -231,3 +231,29 @@
 .sticky {
   position: sticky;
 }
+
+/* Links */
+.link-primary {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-500);
+  transition: color var(--transition-fast);
+}
+
+.link-primary:hover {
+  color: var(--color-primary-600);
+}
+
+/* Animations */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

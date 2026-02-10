@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Avatar, Card, Icon } from '@/components/ui';
+import { Avatar, Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function AvatarShowroomPage() {

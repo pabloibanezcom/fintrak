@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { Toaster } from '@/components/ui';
+import { Toaster } from '@/components/features';
 import {
   SessionProvider,
   SyncProvider,

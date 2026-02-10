@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Icon } from '@/components/ui';
+import { Icon } from '@/components/primitives';
 import styles from './SyncOverlay.module.css';
 
 export function SyncOverlay() {

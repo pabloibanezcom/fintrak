@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, Icon, Input } from '@/components/ui';
+import { Card, Icon, Input } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function InputShowroomPage() {

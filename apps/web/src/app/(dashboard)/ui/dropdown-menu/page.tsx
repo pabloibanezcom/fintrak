@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Button, Card, DropdownMenu, Icon } from '@/components/ui';
+import { DropdownMenu } from '@/components/features';
+import { Button, Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function DropdownMenuShowroomPage() {

@@ -3,13 +3,9 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Avatar,
-  Button,
-  Card,
-  CreateCounterpartyModal,
-  Icon,
-} from '@/components/ui';
+import { PageContainer, SectionHeader } from '@/components/layout';
+import { CreateCounterpartyModal } from '@/components/modals';
+import { Avatar, Button, Card, Icon } from '@/components/primitives';
 import {
   type Counterparty,
   counterpartiesService,
@@ -17,7 +13,6 @@ import {
   userTransactionsService,
 } from '@/services';
 import { formatCurrency, formatDate, toast } from '@/utils';
-import styles from './page.module.css';
 
 export default function CounterpartyDetailPage() {
   const params = useParams();
@@ -109,74 +104,159 @@ export default function CounterpartyDetailPage() {
 
   if (!counterparty) {
     return (
-      <div className={styles.page}>
-        <div className={styles.loading}>Loading...</div>
-      </div>
+      <PageContainer>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <Link href="/budget/counterparties" className={styles.backLink}>
-          <Icon name="arrowLeft" size={16} />
-          <span>Back to Counterparties</span>
-        </Link>
+    <PageContainer>
+      <Link
+        href="/budget/counterparties"
+        className="link-primary"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'var(--spacing-xs)',
+          marginBottom: 'var(--spacing-md)',
+        }}
+      >
+        <Icon name="arrowLeft" size={16} />
+        <span>Back to Counterparties</span>
+      </Link>
 
-        <div className={styles.headerContent}>
-          <div className={styles.counterpartyInfo}>
-            <Avatar
-              src={counterparty.logo}
-              alt={counterparty.name}
-              fallback={getInitials(counterparty.name)}
-              size="lg"
-            />
-            <div className={styles.counterpartyDetails}>
-              <h1 className={styles.title}>{counterparty.name}</h1>
-              <p className={styles.subtitle}>
-                {counterparty.type && (
-                  <span className={styles.type}>{counterparty.type}</span>
-                )}
-                Counterparty details and transactions
-              </p>
-            </div>
-          </div>
-
-          <div className={styles.actions}>
-            <Button onClick={handleEditClick} variant="ghost" size="sm">
-              <Icon name="settings" size={16} />
-              <span>Edit</span>
-            </Button>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 'var(--spacing-lg)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+          }}
+        >
+          <Avatar
+            src={counterparty.logo}
+            alt={counterparty.name}
+            fallback={getInitials(counterparty.name)}
+            size="lg"
+          />
+          <div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+              {counterparty.name}
+            </h1>
+            <p
+              style={{
+                color: 'var(--color-text-secondary)',
+                margin: '0.25rem 0 0',
+              }}
+            >
+              {counterparty.type && (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    padding: '0.125rem 0.5rem',
+                    marginRight: '0.5rem',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--color-background-secondary)',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                  }}
+                >
+                  {counterparty.type}
+                </span>
+              )}
+              Counterparty details and transactions
+            </p>
           </div>
         </div>
+
+        <Button onClick={handleEditClick} variant="ghost" size="sm">
+          <Icon name="settings" size={16} />
+          <span>Edit</span>
+        </Button>
       </div>
 
-      <div className={styles.stats}>
-        <Card className={styles.statCard}>
-          <div className={styles.statLabel}>Total Expenses</div>
-          <div className={styles.statValue}>
+      <div className="grid-3col">
+        <Card className="card-container">
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Total Expenses
+          </div>
+          <div
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.25rem',
+            }}
+          >
             {formatCurrency(stats.totalExpenses, 'EUR')}
           </div>
-          <div className={styles.statCount}>
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             {stats.expenseCount} transactions
           </div>
         </Card>
 
-        <Card className={styles.statCard}>
-          <div className={styles.statLabel}>Total Income</div>
-          <div className={styles.statValue}>
+        <Card className="card-container">
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Total Income
+          </div>
+          <div
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.25rem',
+            }}
+          >
             {formatCurrency(stats.totalIncome, 'EUR')}
           </div>
-          <div className={styles.statCount}>
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             {stats.incomeCount} transactions
           </div>
         </Card>
 
-        <Card className={styles.statCard}>
-          <div className={styles.statLabel}>Net</div>
+        <Card className="card-container">
           <div
-            className={styles.statValue}
             style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Net
+          </div>
+          <div
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.25rem',
               color:
                 stats.totalIncome - stats.totalExpenses >= 0
                   ? 'var(--color-success)'
@@ -185,42 +265,67 @@ export default function CounterpartyDetailPage() {
           >
             {formatCurrency(stats.totalIncome - stats.totalExpenses, 'EUR')}
           </div>
-          <div className={styles.statCount}>
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             {stats.expenseCount + stats.incomeCount} total
           </div>
         </Card>
       </div>
 
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Transactions</h2>
+      <div className="flex-col">
+        <SectionHeader title="Transactions" />
 
         {isLoading ? (
-          <div className={styles.loading}>Loading transactions...</div>
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            Loading transactions...
+          </div>
         ) : transactions.length === 0 ? (
-          <Card className={styles.empty}>
+          <Card className="card-container">
             <p>No transactions found for this counterparty.</p>
           </Card>
         ) : (
-          <div className={styles.transactions}>
+          <div className="flex-col">
             {transactions.map((tx) => (
-              <Card
-                key={tx._id}
-                className={styles.transactionCard}
-                padding="sm"
-              >
-                <div className={styles.transactionMain}>
-                  <div className={styles.transactionInfo}>
-                    <div className={styles.transactionTitle}>{tx.title}</div>
+              <Card key={tx._id} className="card-container" padding="sm">
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 'var(--spacing-md)',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>
+                      {tx.title}
+                    </div>
                     {tx.description && (
-                      <div className={styles.transactionDescription}>
+                      <div
+                        style={{
+                          fontSize: '0.875rem',
+                          color: 'var(--color-text-secondary)',
+                          marginBottom: '0.25rem',
+                        }}
+                      >
                         {tx.description}
                       </div>
                     )}
-                    <div className={styles.transactionMeta}>
+                    <div
+                      style={{
+                        fontSize: '0.875rem',
+                        color: 'var(--color-text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                      }}
+                    >
                       <span>{formatDate(tx.date)}</span>
                       {tx.category && (
                         <>
-                          <span className={styles.separator}>•</span>
+                          <span>•</span>
                           <span>{tx.category.name}</span>
                         </>
                       )}
@@ -228,8 +333,9 @@ export default function CounterpartyDetailPage() {
                   </div>
 
                   <div
-                    className={styles.transactionAmount}
                     style={{
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap',
                       color:
                         tx.type === 'income'
                           ? 'var(--color-success)'
@@ -252,6 +358,6 @@ export default function CounterpartyDetailPage() {
         counterparty={counterparty}
         onSuccess={handleSuccess}
       />
-    </div>
+    </PageContainer>
   );
 }

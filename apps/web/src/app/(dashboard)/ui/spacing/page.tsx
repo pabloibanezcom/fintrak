@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, Icon } from '@/components/ui';
+import { Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 import spacingStyles from './page.module.css';
 

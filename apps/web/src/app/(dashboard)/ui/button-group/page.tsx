@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { ButtonGroup, Card, Icon } from '@/components/ui';
+import { ButtonGroup } from '@/components/features';
+import { Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function ButtonGroupShowroomPage() {

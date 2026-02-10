@@ -3,13 +3,9 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Avatar,
-  Button,
-  Card,
-  CreateCounterpartyModal,
-  Icon,
-} from '@/components/ui';
+import { PageContainer, PageHeader } from '@/components/layout';
+import { CreateCounterpartyModal } from '@/components/modals';
+import { Avatar, Button, Card, Icon } from '@/components/primitives';
 import {
   type Category,
   type Counterparty,
@@ -17,7 +13,6 @@ import {
   counterpartiesService,
 } from '@/services';
 import { toast } from '@/utils';
-import styles from './page.module.css';
 
 export default function CounterpartiesPage() {
   const locale = useLocale() as 'en' | 'es';
@@ -101,33 +96,46 @@ export default function CounterpartiesPage() {
   const categoryMap = new Map(categories.map((cat) => [cat.key, cat]));
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerText}>
-            <h1 className={styles.title}>Counterparties</h1>
-            <p className={styles.subtitle}>
-              Manage people and companies you transact with
-            </p>
-          </div>
+    <PageContainer>
+      <PageHeader
+        title="Counterparties"
+        subtitle="Manage people and companies you transact with"
+        actions={
           <Button onClick={handleCreateClick} variant="primary">
             <Icon name="Plus" size={16} />
             <span>Add Counterparty</span>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isLoading ? (
-        <div className={styles.loader}>Loading...</div>
+        <div
+          className="flex-col"
+          style={{ alignItems: 'center', padding: '2rem' }}
+        >
+          Loading...
+        </div>
       ) : counterparties.length === 0 ? (
-        <div className={styles.empty}>No counterparties found.</div>
+        <div
+          className="flex-col"
+          style={{ alignItems: 'center', padding: '2rem' }}
+        >
+          No counterparties found.
+        </div>
       ) : (
-        <div className={styles.grid}>
+        <div className="grid-auto">
           {counterparties.map((cp) => (
-            <Card key={cp.key} className={styles.card} padding="sm">
+            <Card key={cp.key} className="card-container" padding="sm">
               <Link
                 href={`/budget/counterparties/${cp.key}`}
-                className={styles.cardLink}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-sm)',
+                  flex: 1,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
               >
                 <Avatar
                   src={cp.logo}
@@ -135,15 +143,34 @@ export default function CounterpartiesPage() {
                   fallback={getInitials(cp.name)}
                   size="md"
                 />
-                <div className={styles.cardInfo}>
-                  <span className={styles.cardName} title={cp.name}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontWeight: '500',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title={cp.name}
+                  >
                     {cp.name}
                   </span>
                   {cp.defaultCategory && categoryMap.get(cp.defaultCategory) ? (
-                    <span className={styles.cardCategory}>
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        fontSize: '0.875rem',
+                        color: 'var(--color-text-secondary)',
+                      }}
+                    >
                       <span
-                        className={styles.categoryDot}
                         style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
                           backgroundColor: categoryMap.get(cp.defaultCategory)
                             ?.color,
                         }}
@@ -152,12 +179,19 @@ export default function CounterpartiesPage() {
                     </span>
                   ) : (
                     cp.type && (
-                      <span className={styles.cardType}>{cp.type}</span>
+                      <span
+                        style={{
+                          fontSize: '0.875rem',
+                          color: 'var(--color-text-secondary)',
+                        }}
+                      >
+                        {cp.type}
+                      </span>
                     )
                   )}
                 </div>
               </Link>
-              <div className={styles.cardActions}>
+              <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -172,12 +206,12 @@ export default function CounterpartiesPage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className={styles.deleteBtn}
                   onClick={(e) => {
                     e.preventDefault();
                     handleDeleteClick(cp);
                   }}
                   title="Delete"
+                  style={{ color: 'var(--color-error)' }}
                 >
                   <Icon name="Trash" size={14} />
                 </Button>
@@ -193,6 +227,6 @@ export default function CounterpartiesPage() {
         counterparty={selectedCounterparty}
         onSuccess={handleSuccess}
       />
-    </div>
+    </PageContainer>
   );
 }

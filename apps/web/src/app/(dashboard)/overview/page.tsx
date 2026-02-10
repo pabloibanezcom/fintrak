@@ -1,16 +1,17 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-
-import { SpendingLimitBar, StatCard } from '@/components/dashboard';
 import {
   BankAccountCard,
   type BankAccountItem,
-  Card,
   InvestmentCard,
+  SpendingLimitBar,
+  StatCard,
   TransactionList,
   type TransactionListItem,
-} from '@/components/ui';
+} from '@/components/data-display';
+import { PageContainer, PageHeader } from '@/components/layout';
+import { Card } from '@/components/primitives';
 import { useUser } from '@/context';
 import {
   useBankAccounts,
@@ -18,7 +19,6 @@ import {
   usePeriodSummary,
 } from '@/hooks';
 import { getGreetingPeriod } from '@/utils';
-import styles from './page.module.css';
 
 export default function OverviewPage() {
   const t = useTranslations();
@@ -53,19 +53,17 @@ export default function OverviewPage() {
   });
 
   return (
-    <div className={styles.page}>
-      <div className={styles.greeting}>
-        <h1 className={styles.greetingTitle}>
-          {t(`greetings.${greetingPeriod}`)}, {userName}
-        </h1>
-        <p className={styles.greetingSubtitle}>{t('dashboard.subtitle')}</p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={`${t(`greetings.${greetingPeriod}`)}, ${userName}`}
+        subtitle={t('dashboard.subtitle')}
+      />
 
-      <div className={styles.grid}>
+      <div style={{ display: 'grid', gap: 'var(--spacing-lg)' }}>
         {/* Main Dashboard Grid */}
-        <div className={styles.dashboardGrid}>
+        <div className="grid-2col" style={{ alignItems: 'start' }}>
           {/* Left Column */}
-          <div className={styles.column}>
+          <div className="flex-col">
             <BankAccountCard
               accounts={bankAccounts}
               title="Bank Accounts"
@@ -74,7 +72,7 @@ export default function OverviewPage() {
               emptyMessage="Connect a bank to see your accounts"
             />
             {/* Stats: Earnings & Spending */}
-            <div className={styles.biStatRow}>
+            <div className="grid-2col">
               <StatCard
                 label="Total Earnings"
                 value={totalIncomes}
@@ -91,7 +89,7 @@ export default function OverviewPage() {
           </div>
 
           {/* Right Column */}
-          <div className={styles.column}>
+          <div className="flex-col">
             <InvestmentCard
               funds={investmentData?.funds}
               etcs={investmentData?.etcs}
@@ -101,7 +99,7 @@ export default function OverviewPage() {
               emptyMessage="No investments found"
             />
             {/* Stats: Savings & Investments */}
-            <div className={styles.biStatRow}>
+            <div className="grid-2col">
               <StatCard
                 label="Monthly Savings"
                 value={totalIncomes - totalExpenses}
@@ -121,17 +119,57 @@ export default function OverviewPage() {
         </div>
 
         {/* Bottom Section */}
-        <div className={styles.bottomSection}>
+        <div className="flex-col">
           <SpendingLimitBar spent={1400} limit={5500} currency="EUR" />
 
-          <Card padding="md" className={styles.cardsSection}>
-            <div className={styles.cardsSectionHeader}>
-              <h3 className={styles.cardsSectionTitle}>My Cards</h3>
-              <button className={styles.addButton}>+ Add new</button>
+          <Card padding="md" className="card-container">
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--spacing-md)',
+              }}
+            >
+              <h3 style={{ fontSize: '1rem', fontWeight: '600', margin: 0 }}>
+                My Cards
+              </h3>
+              <button
+                type="button"
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'var(--color-primary-500)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                }}
+              >
+                + Add new
+              </button>
             </div>
-            <div className={styles.cardPlaceholder}>
-              <span className={styles.cardIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 'var(--spacing-xl)',
+                gap: 'var(--spacing-sm)',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              <span style={{ fontSize: '2rem' }}>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-label="Credit card icon"
+                >
+                  <title>Credit card</title>
                   <rect
                     x="2"
                     y="5"
@@ -150,7 +188,7 @@ export default function OverviewPage() {
         </div>
 
         {/* Recent Transactions */}
-        <div className={styles.activitiesSection}>
+        <div className="flex-col">
           <TransactionList
             transactions={
               data?.latestTransactions.map(
@@ -168,6 +206,6 @@ export default function OverviewPage() {
           />
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

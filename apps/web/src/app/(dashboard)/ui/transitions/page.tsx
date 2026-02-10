@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Button, Card, Icon } from '@/components/ui';
+import { Button, Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 import transitionStyles from './page.module.css';
 

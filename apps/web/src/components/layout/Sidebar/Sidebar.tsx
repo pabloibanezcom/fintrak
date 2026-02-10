@@ -2,7 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ButtonGroup, type ButtonGroupItem, Icon } from '@/components/ui';
+import { ButtonGroup, type ButtonGroupItem } from '@/components/features';
+import { Icon } from '@/components/primitives';
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button, Card, Icon } from '@/components/ui';
+import { Button, Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function ButtonShowroomPage() {

@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { type FormEvent, useState } from 'react';
-import { Button, Card, Input } from '@/components/ui';
+import { AuthCard } from '@/components/layout';
+import { Button, ErrorMessage, Input } from '@/components/primitives';
 import { authService } from '@/services';
-import styles from './page.module.css';
 
 export default function RegisterPage() {
   const t = useTranslations('auth.register');
@@ -44,12 +44,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card padding="lg" className={styles.card}>
-      <h1 className={styles.title}>{t('title')}</h1>
-      <p className={styles.subtitle}>{t('subtitle')}</p>
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
+    <AuthCard title={t('title')} subtitle={t('subtitle')}>
+      <form onSubmit={handleSubmit} className="flex-col gap-4">
+        <ErrorMessage message={error} />
 
         <Input
           label={t('emailLabel')}
@@ -86,12 +83,12 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <p className={styles.footer}>
+      <p className="text-center text-secondary" style={{ marginTop: '1.5rem' }}>
         {t('hasAccount')}{' '}
-        <Link href="/login" className={styles.link}>
+        <Link href="/login" className="link-primary">
           {t('signInLink')}
         </Link>
       </p>
-    </Card>
+    </AuthCard>
   );
 }

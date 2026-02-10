@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Card, DateSelector, Icon } from '@/components/ui';
+import { DateSelector } from '@/components/forms';
+import { Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function DateSelectorShowroomPage() {

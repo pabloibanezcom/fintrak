@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { Button, Card, Icon } from '@/components/ui';
+import { PageContainer } from '@/components/layout';
+import { Button, Card, Icon } from '@/components/primitives';
 import { type UserTransaction, userTransactionsService } from '@/services';
 import { formatCurrency, formatDate } from '@/utils';
-import styles from './page.module.css';
 
 export default function TransactionDetailPage() {
   const params = useParams();
@@ -39,93 +39,196 @@ export default function TransactionDetailPage() {
 
   if (isLoading) {
     return (
-      <div className={styles.page}>
-        <Card padding="lg" className={styles.loading}>
+      <PageContainer>
+        <Card
+          padding="lg"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+          }}
+        >
           <Icon name="Loader" />
           <span>Loading transaction...</span>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   if (error || !transaction) {
     return (
-      <div className={styles.page}>
-        <Card padding="lg" className={styles.error}>
-          <span className={styles.errorText}>
+      <PageContainer>
+        <Card
+          padding="lg"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+          }}
+        >
+          <span style={{ color: 'var(--color-error)' }}>
             {error || 'Transaction not found'}
           </span>
           <Button variant="outline" onClick={() => router.back()}>
             Go Back
           </Button>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   const isExpense = transaction.type === 'expense';
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
+    <PageContainer>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--spacing-md)',
+          marginBottom: 'var(--spacing-lg)',
+        }}
+      >
         <button
           type="button"
-          className={styles.backButton}
           onClick={() => router.back()}
           aria-label="Go back"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '40px',
+            height: '40px',
+            border: 'none',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--color-background-secondary)',
+            cursor: 'pointer',
+            color: 'inherit',
+          }}
         >
           <Icon name="ChevronLeft" />
         </button>
-        <div className={styles.headerContent}>
-          <h1 className={styles.title}>{transaction.title}</h1>
-          <p className={styles.subtitle}>
+        <div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+            {transaction.title}
+          </h1>
+          <p
+            style={{
+              color: 'var(--color-text-secondary)',
+              margin: '0.25rem 0 0',
+            }}
+          >
             {isExpense ? 'Expense' : 'Income'} • {formatDate(transaction.date)}
           </p>
         </div>
       </div>
 
-      <div className={styles.content}>
-        <Card padding="lg" className={styles.mainCard}>
-          <div className={styles.amountSection}>
+      <div className="grid-2col" style={{ alignItems: 'start' }}>
+        <Card padding="lg" className="card-container">
+          <div
+            style={{ textAlign: 'center', marginBottom: 'var(--spacing-lg)' }}
+          >
             <span
-              className={`${styles.amount} ${isExpense ? styles.expense : styles.income}`}
+              style={{
+                fontSize: '2rem',
+                fontWeight: '700',
+                color: isExpense
+                  ? 'var(--color-error)'
+                  : 'var(--color-success)',
+              }}
             >
               {isExpense ? '-' : '+'}
               {formatCurrency(transaction.amount, transaction.currency)}
             </span>
             <span
-              className={`${styles.typeBadge} ${isExpense ? styles.expense : styles.income}`}
+              style={{
+                display: 'inline-block',
+                marginLeft: 'var(--spacing-sm)',
+                padding: '0.25rem 0.5rem',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: isExpense
+                  ? 'var(--color-error-bg)'
+                  : 'var(--color-success-bg)',
+                color: isExpense
+                  ? 'var(--color-error)'
+                  : 'var(--color-success)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                textTransform: 'capitalize',
+              }}
             >
               {transaction.type}
             </span>
           </div>
 
-          <div className={styles.detailsGrid}>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Category</span>
-              <span className={styles.detailValue}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 'var(--spacing-md)',
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                Category
+              </span>
+              <span style={{ fontWeight: '500' }}>
                 {transaction.category.name}
               </span>
             </div>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Date</span>
-              <span className={styles.detailValue}>
+            <div>
+              <span
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                Date
+              </span>
+              <span style={{ fontWeight: '500' }}>
                 {formatDate(transaction.date)}
               </span>
             </div>
             {transaction.counterparty && (
-              <div className={styles.detailItem}>
-                <span className={styles.detailLabel}>
+              <div>
+                <span
+                  style={{
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text-secondary)',
+                    display: 'block',
+                    marginBottom: '0.25rem',
+                  }}
+                >
                   {isExpense ? 'Payee' : 'Source'}
                 </span>
-                <span className={styles.detailValue}>
+                <span style={{ fontWeight: '500' }}>
                   {transaction.counterparty.name}
                 </span>
               </div>
             )}
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Periodicity</span>
-              <span className={styles.detailValue}>
+            <div>
+              <span
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                Periodicity
+              </span>
+              <span style={{ fontWeight: '500' }}>
                 {transaction.periodicity === 'NOT_RECURRING'
                   ? 'One-time'
                   : transaction.periodicity}
@@ -134,45 +237,112 @@ export default function TransactionDetailPage() {
           </div>
 
           {transaction.description && (
-            <div className={styles.description}>
-              <span className={styles.detailLabel}>Description</span>
-              <p className={styles.descriptionText}>
+            <div
+              style={{
+                marginTop: 'var(--spacing-lg)',
+                paddingTop: 'var(--spacing-lg)',
+                borderTop: '1px solid var(--color-border)',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Description
+              </span>
+              <p style={{ margin: 0, lineHeight: '1.5' }}>
                 {transaction.description}
               </p>
             </div>
           )}
         </Card>
 
-        <Card padding="md" className={styles.sideCard}>
-          <span className={styles.sideCardTitle}>Details</span>
+        <Card padding="md" className="card-container">
+          <span
+            style={{
+              fontSize: '1rem',
+              fontWeight: '600',
+              display: 'block',
+              marginBottom: 'var(--spacing-md)',
+            }}
+          >
+            Details
+          </span>
 
-          <div className={styles.metaItem}>
-            <span className={styles.metaLabel}>Created</span>
-            <span className={styles.metaValue}>
-              {formatDate(transaction.createdAt)}
-            </span>
-          </div>
-
-          <div className={styles.metaItem}>
-            <span className={styles.metaLabel}>Last Updated</span>
-            <span className={styles.metaValue}>
-              {formatDate(transaction.updatedAt)}
-            </span>
-          </div>
-
-          {transaction.bankTransactionId && (
-            <Link
-              href={`/banking/transactions`}
-              className={styles.linkedBankTransaction}
-            >
-              <span className={styles.linkedLabel}>
-                Linked to bank transaction
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-sm)',
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                Created
               </span>
-              <span className={styles.linkedValue}>View →</span>
-            </Link>
-          )}
+              <span style={{ fontSize: '0.875rem' }}>
+                {formatDate(transaction.createdAt)}
+              </span>
+            </div>
+
+            <div>
+              <span
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                Last Updated
+              </span>
+              <span style={{ fontSize: '0.875rem' }}>
+                {formatDate(transaction.updatedAt)}
+              </span>
+            </div>
+
+            {transaction.bankTransactionId && (
+              <Link
+                href={`/banking/transactions`}
+                className="link-primary"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: 'var(--spacing-sm)',
+                  marginTop: 'var(--spacing-sm)',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'var(--color-background-secondary)',
+                  textDecoration: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text-secondary)',
+                    marginBottom: '0.25rem',
+                  }}
+                >
+                  Linked to bank transaction
+                </span>
+                <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>
+                  View →
+                </span>
+              </Link>
+            )}
+          </div>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

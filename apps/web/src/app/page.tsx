@@ -2,9 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Icon } from '@/components/ui';
+import { Icon } from '@/components/primitives';
 import { useSession } from '@/context';
-import styles from './page.module.css';
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,8 +20,16 @@ export default function HomePage() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <div className={styles.container}>
-      <Icon name="loader" size={48} />
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'var(--color-bg-body)',
+      }}
+    >
+      <Icon name="loader" size={48} className="spinner" />
     </div>
   );
 }

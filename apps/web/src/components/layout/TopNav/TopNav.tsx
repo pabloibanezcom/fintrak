@@ -9,8 +9,8 @@ import {
   type ButtonGroupItem,
   DropdownMenu,
   type DropdownMenuItem,
-  Icon,
-} from '@/components/ui';
+} from '@/components/features';
+import { Icon } from '@/components/primitives';
 import { useSession, useSync, useTheme, useUser } from '@/context';
 import type { Locale } from '@/i18n/config';
 import enFlag from '../LanguageSwitcher/flags/en.png';

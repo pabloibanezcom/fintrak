@@ -1,6 +1,7 @@
 @import "../styles/tokens.css";
 @import "../styles/typography.css";
 @import "../styles/utilities.css";
+@import "../styles/layouts.css";
 
 *,
 *::before,

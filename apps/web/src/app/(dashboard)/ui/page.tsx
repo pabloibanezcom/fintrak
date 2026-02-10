@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Card } from '@/components/ui';
+import { Card } from '@/components/primitives';
 import styles from './page.module.css';
 
 interface ShowroomItem {
@@ -44,11 +44,16 @@ const foundations: ShowroomItem[] = [
   },
 ];
 
-const components: ShowroomItem[] = [
+const primitives: ShowroomItem[] = [
   {
     name: 'Avatar',
     description: 'User profile images with fallback support',
     href: '/ui/avatar',
+  },
+  {
+    name: 'AuthDivider',
+    description: 'Text divider for auth pages (e.g., "OR")',
+    href: '/ui/auth-divider',
   },
   {
     name: 'Badge',
@@ -56,19 +61,9 @@ const components: ShowroomItem[] = [
     href: '/ui/badge',
   },
   {
-    name: 'BankAccountCard',
-    description: 'Display bank accounts with balances and details',
-    href: '/ui/bank-account-card',
-  },
-  {
     name: 'Button',
     description: 'Interactive buttons with various styles and states',
     href: '/ui/button',
-  },
-  {
-    name: 'ButtonGroup',
-    description: 'Grouped buttons for navigation and actions',
-    href: '/ui/button-group',
   },
   {
     name: 'Card',
@@ -76,19 +71,9 @@ const components: ShowroomItem[] = [
     href: '/ui/card',
   },
   {
-    name: 'ColorPicker',
-    description: 'Color selection with preset swatches and custom input',
-    href: '/ui/color-picker',
-  },
-  {
-    name: 'DateSelector',
-    description: 'Date range picker with presets and custom selection',
-    href: '/ui/date-selector',
-  },
-  {
-    name: 'DropdownMenu',
-    description: 'Dropdown menus with various item types',
-    href: '/ui/dropdown-menu',
+    name: 'ErrorMessage',
+    description: 'Error alert box for displaying error messages',
+    href: '/ui/error-message',
   },
   {
     name: 'Icon',
@@ -106,9 +91,164 @@ const components: ShowroomItem[] = [
     href: '/ui/progress-bar',
   },
   {
+    name: 'Select',
+    description: 'Dropdown select fields with options',
+    href: '/ui/select',
+  },
+  {
     name: 'Toggle',
     description: 'Switch controls for binary on/off settings',
     href: '/ui/toggle',
+  },
+];
+
+const forms: ShowroomItem[] = [
+  {
+    name: 'ColorPicker',
+    description: 'Color selection with preset swatches and custom input',
+    href: '/ui/color-picker',
+  },
+  {
+    name: 'DateSelector',
+    description: 'Date range picker with presets and custom selection',
+    href: '/ui/date-selector',
+  },
+];
+
+const dataDisplay: ShowroomItem[] = [
+  {
+    name: 'BankAccountCard',
+    description: 'Display bank accounts with balances and details',
+    href: '/ui/bank-account-card',
+  },
+  {
+    name: 'InvestmentCard',
+    description: 'Display investment portfolios and performance',
+    href: '/ui/investment-card',
+  },
+  {
+    name: 'SpendingLimitBar',
+    description: 'Visual spending limit and progress indicator',
+    href: '/ui/spending-limit-bar',
+  },
+  {
+    name: 'StatCard',
+    description: 'Statistical data cards with trends',
+    href: '/ui/stat-card',
+  },
+  {
+    name: 'TransactionList',
+    description: 'List of financial transactions with details',
+    href: '/ui/transaction-list',
+  },
+  {
+    name: 'WalletCard',
+    description: 'Display wallet balances and information',
+    href: '/ui/wallet-card',
+  },
+];
+
+const modals: ShowroomItem[] = [
+  {
+    name: 'Modal',
+    description: 'Base modal dialog component',
+    href: '/ui/modal',
+  },
+  {
+    name: 'CreateCategoryModal',
+    description: 'Modal for creating budget categories',
+    href: '/ui/create-category-modal',
+  },
+  {
+    name: 'CreateCounterpartyModal',
+    description: 'Modal for adding counterparties',
+    href: '/ui/create-counterparty-modal',
+  },
+  {
+    name: 'CreateFromTransactionModal',
+    description: 'Create budget entries from transactions',
+    href: '/ui/create-from-transaction-modal',
+  },
+];
+
+const features: ShowroomItem[] = [
+  {
+    name: 'ButtonGroup',
+    description: 'Grouped buttons for navigation and filtering',
+    href: '/ui/button-group',
+  },
+  {
+    name: 'DropdownMenu',
+    description: 'Dropdown menus with various item types',
+    href: '/ui/dropdown-menu',
+  },
+  {
+    name: 'Toaster',
+    description: 'Toast notifications for user feedback',
+    href: '/ui/toaster',
+  },
+  {
+    name: 'TransactionFilters',
+    description: 'Advanced filters for transaction lists',
+    href: '/ui/transaction-filters',
+  },
+];
+
+const layout: ShowroomItem[] = [
+  {
+    name: 'AuthCard',
+    description: 'Card wrapper for authentication pages',
+    href: '/ui/auth-card',
+  },
+  {
+    name: 'AuthLayout',
+    description: 'Centered layout for auth pages with logo',
+    href: '/ui/auth-layout',
+  },
+  {
+    name: 'DashboardLayout',
+    description: 'Main app shell with sidebar and navigation',
+    href: '/ui/dashboard-layout',
+  },
+  {
+    name: 'Footer',
+    description: 'Application footer component',
+    href: '/ui/footer',
+  },
+  {
+    name: 'LanguageSwitcher',
+    description: 'Language selection dropdown',
+    href: '/ui/language-switcher',
+  },
+  {
+    name: 'PageContainer',
+    description: 'Standard page wrapper component',
+    href: '/ui/page-container',
+  },
+  {
+    name: 'PageHeader',
+    description: 'Page title, subtitle, and actions',
+    href: '/ui/page-header',
+  },
+  {
+    name: 'SectionHeader',
+    description: 'Section title with optional actions',
+    href: '/ui/section-header',
+  },
+  {
+    name: 'Sidebar',
+    description: 'Main navigation sidebar',
+    href: '/ui/sidebar',
+  },
+  {
+    name: 'SyncOverlay',
+    description: 'Loading overlay during data sync',
+    href: '/ui/sync-overlay',
+  },
+  {
+    name: 'TopNav',
+    description: 'Top navigation bar',
+    href: '/ui/top-nav',
   },
 ];
 
@@ -143,8 +283,51 @@ export default function UIShowroomPage() {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Components</h2>
-        <ItemGrid items={components} />
+        <h2 className={styles.sectionTitle}>Primitives</h2>
+        <p className={styles.sectionDescription}>
+          Basic UI building blocks with no business logic
+        </p>
+        <ItemGrid items={primitives} />
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Forms</h2>
+        <p className={styles.sectionDescription}>
+          Form-related input components
+        </p>
+        <ItemGrid items={forms} />
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Data Display</h2>
+        <p className={styles.sectionDescription}>
+          Components for displaying data and information
+        </p>
+        <ItemGrid items={dataDisplay} />
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Modals</h2>
+        <p className={styles.sectionDescription}>
+          Dialog and modal components
+        </p>
+        <ItemGrid items={modals} />
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Features</h2>
+        <p className={styles.sectionDescription}>
+          Complex feature-specific components
+        </p>
+        <ItemGrid items={features} />
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Layout</h2>
+        <p className={styles.sectionDescription}>
+          Layout and structural components
+        </p>
+        <ItemGrid items={layout} />
       </section>
     </div>
   );

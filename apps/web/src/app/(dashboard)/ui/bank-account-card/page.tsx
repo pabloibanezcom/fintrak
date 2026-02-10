@@ -4,9 +4,8 @@ import Link from 'next/link';
 import {
   BankAccountCard,
   type BankAccountItem,
-  Card,
-  Icon,
-} from '@/components/ui';
+} from '@/components/data-display';
+import { Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 const sampleAccounts: BankAccountItem[] = [

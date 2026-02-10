@@ -4,10 +4,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { type FormEvent, useState } from 'react';
-import { Button, Card, Icon, Input } from '@/components/ui';
+import { AuthCard } from '@/components/layout';
+import {
+  AuthDivider,
+  Button,
+  ErrorMessage,
+  Icon,
+  Input,
+} from '@/components/primitives';
 import { useSession } from '@/context';
 import { authService } from '@/services';
-import styles from './page.module.css';
 
 export default function LoginPage() {
   const t = useTranslations('auth.login');
@@ -35,12 +41,9 @@ export default function LoginPage() {
   };
 
   return (
-    <Card padding="lg" className={styles.card}>
-      <h1 className={styles.title}>{t('title')}</h1>
-      <p className={styles.subtitle}>{t('subtitle')}</p>
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
+    <AuthCard title={t('title')} subtitle={t('subtitle')}>
+      <form onSubmit={handleSubmit} className="flex-col gap-4">
+        <ErrorMessage message={error} />
 
         <Input
           label={t('emailLabel')}
@@ -67,21 +70,19 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <div className={styles.divider}>
-        <span>{t('divider')}</span>
-      </div>
+      <AuthDivider text={t('divider')} />
 
       <Button variant="outline" fullWidth>
         <Icon name="google" size={20} />
         {t('googleButton')}
       </Button>
 
-      <p className={styles.footer}>
+      <p className="text-center text-secondary" style={{ marginTop: '1.5rem' }}>
         {t('noAccount')}{' '}
-        <Link href="/register" className={styles.link}>
+        <Link href="/register" className="link-primary">
           {t('signUpLink')}
         </Link>
       </p>
-    </Card>
+    </AuthCard>
   );
 }

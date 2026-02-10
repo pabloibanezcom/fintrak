@@ -1,16 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CreateCategoryModal,
-  Icon,
-  isValidIconName,
-} from '@/components/ui';
+import { PageContainer, SectionHeader } from '@/components/layout';
+import { CreateCategoryModal } from '@/components/modals';
+import { Button, Card, Icon, isValidIconName } from '@/components/primitives';
 import {
   type Category,
   categoriesService,
@@ -18,7 +14,6 @@ import {
   userTransactionsService,
 } from '@/services';
 import { formatCurrency, formatDate, toast } from '@/utils';
-import styles from './page.module.css';
 
 export default function CategoryDetailPage() {
   const locale = useLocale() as 'en' | 'es';
@@ -102,87 +97,165 @@ export default function CategoryDetailPage() {
 
   if (!category) {
     return (
-      <div className={styles.page}>
-        <div className={styles.loading}>Loading...</div>
-      </div>
+      <PageContainer>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <Link href="/budget/categories" className={styles.backLink}>
-          <Icon name="arrowLeft" size={16} />
-          <span>Back to Categories</span>
-        </Link>
+    <PageContainer>
+      <Link
+        href="/budget/categories"
+        className="link-primary"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'var(--spacing-xs)',
+          marginBottom: 'var(--spacing-md)',
+        }}
+      >
+        <Icon name="arrowLeft" size={16} />
+        <span>Back to Categories</span>
+      </Link>
 
-        <div className={styles.headerContent}>
-          <div className={styles.categoryInfo}>
-            <div
-              className={styles.categoryIcon}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 'var(--spacing-lg)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '64px',
+              height: '64px',
+              borderRadius: 'var(--radius-lg)',
+              backgroundColor: category.color
+                ? `${category.color}15`
+                : undefined,
+              color: category.color || undefined,
+            }}
+          >
+            {category.icon && isValidIconName(category.icon) ? (
+              <Icon name={category.icon} size={32} />
+            ) : (
+              <span style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                {category.name[locale]
+                  .split(' ')
+                  .map((n) => n[0])
+                  .slice(0, 2)
+                  .join('')
+                  .toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+              {category.name[locale]}
+            </h1>
+            <p
               style={{
-                backgroundColor: category.color
-                  ? `${category.color}15`
-                  : undefined,
-                color: category.color || undefined,
+                color: 'var(--color-text-secondary)',
+                margin: '0.25rem 0 0',
               }}
             >
-              {category.icon && isValidIconName(category.icon) ? (
-                <Icon name={category.icon} size={32} />
-              ) : (
-                <span className={styles.iconText}>
-                  {category.name[locale]
-                    .split(' ')
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join('')
-                    .toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div className={styles.categoryDetails}>
-              <h1 className={styles.title}>{category.name[locale]}</h1>
-              <p className={styles.subtitle}>
-                Category details and transactions
-              </p>
-            </div>
-          </div>
-
-          <div className={styles.actions}>
-            <Button onClick={handleEditClick} variant="ghost" size="sm">
-              <Icon name="settings" size={16} />
-              <span>Edit</span>
-            </Button>
+              Category details and transactions
+            </p>
           </div>
         </div>
+
+        <Button onClick={handleEditClick} variant="ghost" size="sm">
+          <Icon name="settings" size={16} />
+          <span>Edit</span>
+        </Button>
       </div>
 
-      <div className={styles.stats}>
-        <Card className={styles.statCard}>
-          <div className={styles.statLabel}>Total Expenses</div>
-          <div className={styles.statValue}>
+      <div className="grid-3col">
+        <Card className="card-container">
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Total Expenses
+          </div>
+          <div
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.25rem',
+            }}
+          >
             {formatCurrency(stats.totalExpenses, 'EUR')}
           </div>
-          <div className={styles.statCount}>
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             {stats.expenseCount} transactions
           </div>
         </Card>
 
-        <Card className={styles.statCard}>
-          <div className={styles.statLabel}>Total Income</div>
-          <div className={styles.statValue}>
+        <Card className="card-container">
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Total Income
+          </div>
+          <div
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.25rem',
+            }}
+          >
             {formatCurrency(stats.totalIncome, 'EUR')}
           </div>
-          <div className={styles.statCount}>
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             {stats.incomeCount} transactions
           </div>
         </Card>
 
-        <Card className={styles.statCard}>
-          <div className={styles.statLabel}>Net</div>
+        <Card className="card-container">
           <div
-            className={styles.statValue}
             style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Net
+          </div>
+          <div
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '0.25rem',
               color:
                 stats.totalIncome - stats.totalExpenses >= 0
                   ? 'var(--color-success)'
@@ -191,42 +264,67 @@ export default function CategoryDetailPage() {
           >
             {formatCurrency(stats.totalIncome - stats.totalExpenses, 'EUR')}
           </div>
-          <div className={styles.statCount}>
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             {stats.expenseCount + stats.incomeCount} total
           </div>
         </Card>
       </div>
 
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Transactions</h2>
+      <div className="flex-col">
+        <SectionHeader title="Transactions" />
 
         {isLoading ? (
-          <div className={styles.loading}>Loading transactions...</div>
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            Loading transactions...
+          </div>
         ) : transactions.length === 0 ? (
-          <Card className={styles.empty}>
+          <Card className="card-container">
             <p>No transactions found for this category.</p>
           </Card>
         ) : (
-          <div className={styles.transactions}>
+          <div className="flex-col">
             {transactions.map((tx) => (
-              <Card
-                key={tx._id}
-                className={styles.transactionCard}
-                padding="sm"
-              >
-                <div className={styles.transactionMain}>
-                  <div className={styles.transactionInfo}>
-                    <div className={styles.transactionTitle}>{tx.title}</div>
+              <Card key={tx._id} className="card-container" padding="sm">
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 'var(--spacing-md)',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>
+                      {tx.title}
+                    </div>
                     {tx.description && (
-                      <div className={styles.transactionDescription}>
+                      <div
+                        style={{
+                          fontSize: '0.875rem',
+                          color: 'var(--color-text-secondary)',
+                          marginBottom: '0.25rem',
+                        }}
+                      >
                         {tx.description}
                       </div>
                     )}
-                    <div className={styles.transactionMeta}>
+                    <div
+                      style={{
+                        fontSize: '0.875rem',
+                        color: 'var(--color-text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                      }}
+                    >
                       <span>{formatDate(tx.date)}</span>
                       {tx.counterparty && (
                         <>
-                          <span className={styles.separator}>•</span>
+                          <span>•</span>
                           <span>{tx.counterparty.name}</span>
                         </>
                       )}
@@ -234,8 +332,9 @@ export default function CategoryDetailPage() {
                   </div>
 
                   <div
-                    className={styles.transactionAmount}
                     style={{
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap',
                       color:
                         tx.type === 'income'
                           ? 'var(--color-success)'
@@ -258,6 +357,6 @@ export default function CategoryDetailPage() {
         category={category}
         onSuccess={handleSuccess}
       />
-    </div>
+    </PageContainer>
   );
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Card, Icon, Toggle } from '@/components/ui';
+import { Card, Icon, Toggle } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function ToggleShowroomPage() {

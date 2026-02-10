@@ -7,15 +7,15 @@ import { useCallback, useState } from 'react';
 import {
   BankAccountCard,
   type BankAccountItem,
-  CreateFromTransactionModal,
   TransactionList,
   type TransactionListItem,
-} from '@/components/ui';
+} from '@/components/data-display';
+import { PageContainer, PageHeader, SectionHeader } from '@/components/layout';
+import { CreateFromTransactionModal } from '@/components/modals';
 import { useBankAccounts } from '@/hooks/useBankAccounts';
 import { useBankTransactions } from '@/hooks/useBankTransactions';
 import type { BankTransaction } from '@/services';
 import { formatCurrency, formatDate } from '@/utils';
-import styles from './page.module.css';
 
 export default function BankingPage() {
   const t = useTranslations();
@@ -96,13 +96,11 @@ export default function BankingPage() {
   );
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{t('nav.banking')}</h1>
-        <p className={styles.subtitle}>
-          Manage your bank accounts and transactions
-        </p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('nav.banking')}
+        subtitle="Manage your bank accounts and transactions"
+      />
 
       <BankAccountCard
         accounts={bankAccounts}
@@ -112,13 +110,15 @@ export default function BankingPage() {
         emptyMessage="Connect a bank to see your accounts"
       />
 
-      <div className={styles.transactionsSection}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Recent Transactions</h2>
-          <Link href="/banking/transactions" className={styles.viewAll}>
-            View all
-          </Link>
-        </div>
+      <div className="flex-col">
+        <SectionHeader
+          title="Recent Transactions"
+          action={
+            <Link href="/banking/transactions" className="link-primary">
+              View all
+            </Link>
+          }
+        />
         <TransactionList
           transactions={transactionListItems}
           isLoading={isLoadingTransactions}
@@ -156,6 +156,6 @@ export default function BankingPage() {
         onSuccess={refetch}
         onDismissChange={handleDismissChange}
       />
-    </div>
+    </PageContainer>
   );
 }

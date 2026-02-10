@@ -4,20 +4,20 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
 
 import {
+  TransactionList,
+  type TransactionListItem,
+} from '@/components/data-display';
+import {
   type FilterOption,
   TransactionFilters,
   type TransactionFiltersValue,
-} from '@/components/dashboard';
-import {
-  CreateFromTransactionModal,
-  TransactionList,
-  type TransactionListItem,
-} from '@/components/ui';
+} from '@/components/features';
+import { PageContainer, PageHeader } from '@/components/layout';
+import { CreateFromTransactionModal } from '@/components/modals';
 import { useBankAccounts } from '@/hooks/useBankAccounts';
 import { useBankTransactions } from '@/hooks/useBankTransactions';
 import type { BankTransaction, ReviewStatus } from '@/services';
 import { formatCurrency, formatDate } from '@/utils';
-import styles from './page.module.css';
 
 export default function BankTransactionsPage() {
   const t = useTranslations();
@@ -143,13 +143,11 @@ export default function BankTransactionsPage() {
   );
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{t('nav.banking')}</h1>
-        <p className={styles.subtitle}>
-          View and manage your bank transactions
-        </p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('nav.banking')}
+        subtitle="View and manage your bank transactions"
+      />
 
       <TransactionFilters
         value={filters}
@@ -198,6 +196,6 @@ export default function BankTransactionsPage() {
         onSuccess={handleModalSuccess}
         onDismissChange={handleDismissChange}
       />
-    </div>
+    </PageContainer>
   );
 }

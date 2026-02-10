@@ -3,16 +3,11 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CreateCategoryModal,
-  Icon,
-  isValidIconName,
-} from '@/components/ui';
+import { PageContainer, PageHeader } from '@/components/layout';
+import { CreateCategoryModal } from '@/components/modals';
+import { Button, Card, Icon, isValidIconName } from '@/components/primitives';
 import { type Category, categoriesService } from '@/services';
 import { toast } from '@/utils';
-import styles from './page.module.css';
 
 export default function CategoriesPage() {
   const locale = useLocale() as 'en' | 'es';
@@ -69,37 +64,55 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerText}>
-            <h1 className={styles.title}>Categories</h1>
-            <p className={styles.subtitle}>
-              Manage transaction categories for your budget
-            </p>
-          </div>
+    <PageContainer>
+      <PageHeader
+        title="Categories"
+        subtitle="Manage transaction categories for your budget"
+        actions={
           <Button onClick={handleCreateClick} variant="primary">
             <Icon name="Plus" size={16} />
             <span>Add Category</span>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {isLoading ? (
-        <div className={styles.loader}>Loading...</div>
+        <div
+          className="flex-col"
+          style={{ alignItems: 'center', padding: '2rem' }}
+        >
+          Loading...
+        </div>
       ) : categories.length === 0 ? (
-        <div className={styles.empty}>No categories found.</div>
+        <div
+          className="flex-col"
+          style={{ alignItems: 'center', padding: '2rem' }}
+        >
+          No categories found.
+        </div>
       ) : (
-        <div className={styles.grid}>
+        <div className="grid-auto">
           {categories.map((category) => (
-            <Card key={category.key} className={styles.card} padding="sm">
+            <Card key={category.key} className="card-container" padding="sm">
               <Link
                 href={`/budget/categories/${category.key}`}
-                className={styles.cardLink}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-sm)',
+                  flex: 1,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
               >
                 <div
-                  className={styles.cardIcon}
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: 'var(--radius-md)',
                     backgroundColor: category.color
                       ? `${category.color}15`
                       : undefined,
@@ -112,13 +125,21 @@ export default function CategoriesPage() {
                     getInitials(category.name[locale])
                   )}
                 </div>
-                <div className={styles.cardInfo}>
-                  <span className={styles.cardName} title={category.name[locale]}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      display: 'block',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title={category.name[locale]}
+                  >
                     {category.name[locale]}
                   </span>
                 </div>
               </Link>
-              <div className={styles.cardActions}>
+              <div>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -142,6 +163,6 @@ export default function CategoriesPage() {
         category={selectedCategory}
         onSuccess={handleSuccess}
       />
-    </div>
+    </PageContainer>
   );
 }
