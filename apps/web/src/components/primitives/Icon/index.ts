@@ -1,4 +1,4 @@
-export { Icon } from './Icon';
+export { Icon, isValidIconName } from './Icon';
 
 // Re-export individual icon components for direct use if needed
 export * from './icons';

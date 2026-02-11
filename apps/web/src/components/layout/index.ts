@@ -4,11 +4,11 @@ export {
   DashboardLayout,
   type DashboardLayoutProps,
 } from './DashboardLayout';
-export { Footer } from './Footer/Footer';
-export { LanguageSwitcher } from './LanguageSwitcher/LanguageSwitcher';
+export { Footer } from './Footer';
+export { LanguageSwitcher } from './LanguageSwitcher';
 export { PageContainer, type PageContainerProps } from './PageContainer';
 export { PageHeader, type PageHeaderProps } from './PageHeader';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
-export { Sidebar } from './Sidebar/Sidebar';
+export { Sidebar } from './Sidebar';
 export { SyncOverlay } from './SyncOverlay';
-export { TopNav } from './TopNav/TopNav';
+export { TopNav } from './TopNav';

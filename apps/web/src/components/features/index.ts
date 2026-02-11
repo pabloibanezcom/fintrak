@@ -2,15 +2,15 @@ export {
   ButtonGroup,
   type ButtonGroupItem,
   type ButtonGroupProps,
-} from './ButtonGroup/ButtonGroup';
+} from './ButtonGroup';
 export {
   DropdownMenu,
   type DropdownMenuItem,
   type DropdownMenuProps,
-} from './DropdownMenu/DropdownMenu';
-export { Toaster } from './Toaster/Toaster';
+} from './DropdownMenu';
+export { Toaster } from './Toaster';
 export {
   type FilterOption,
   TransactionFilters,
   type TransactionFiltersValue,
-} from './TransactionFilters/TransactionFilters';
+} from './TransactionFilters';
