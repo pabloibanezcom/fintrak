@@ -41,14 +41,14 @@ describe('Category Routes Integration Tests', () => {
       await CategoryModel.create([
         {
           key: 'food',
-          name: 'Food',
+          name: { en: 'Food', es: 'Comida' },
           color: '#ff0000',
           icon: 'restaurant',
           userId,
         },
         {
           key: 'transport',
-          name: 'Transport',
+          name: { en: 'Transport', es: 'Transporte' },
           color: '#00ff00',
           icon: 'car',
           userId,
@@ -61,8 +61,8 @@ describe('Category Routes Integration Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(2);
-      expect(response.body[0].name).toBe('Food');
-      expect(response.body[1].name).toBe('Transport');
+      expect(response.body[0].name.en).toBe('Food');
+      expect(response.body[1].name.en).toBe('Transport');
     });
 
     it('should return 401 without auth token', async () => {
@@ -88,7 +88,7 @@ describe('Category Routes Integration Tests', () => {
     beforeEach(async () => {
       const category = await CategoryModel.create({
         key: 'food',
-        name: 'Food',
+        name: { en: 'Food', es: 'Comida' },
         color: '#ff0000',
         icon: 'restaurant',
         userId,
@@ -103,7 +103,7 @@ describe('Category Routes Integration Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.key).toBe(categoryId);
-      expect(response.body.name).toBe('Food');
+      expect(response.body.name.en).toBe('Food');
     });
 
     it('should return 404 for non-existent category', async () => {
@@ -119,7 +119,7 @@ describe('Category Routes Integration Tests', () => {
   describe('POST /api/categories', () => {
     const validCategoryData = {
       key: 'entertainment',
-      name: 'Entertainment',
+      name: { en: 'Entertainment', es: 'Entretenimiento' },
       color: '#0000ff',
       icon: 'movie',
     };
@@ -132,8 +132,9 @@ describe('Category Routes Integration Tests', () => {
 
       expect(response.status).toBe(201);
       expect(response.body.key).toBe(validCategoryData.key);
-      expect(response.body.name).toBe(validCategoryData.name);
-      expect(response.body.userId).toBe(userId);
+      expect(response.body.name).toEqual(
+        expect.objectContaining(validCategoryData.name)
+      );
 
       // Verify in database
       const category = await CategoryModel.findOne({
@@ -170,7 +171,7 @@ describe('Category Routes Integration Tests', () => {
     beforeEach(async () => {
       const category = await CategoryModel.create({
         key: 'food',
-        name: 'Food',
+        name: { en: 'Food', es: 'Comida' },
         color: '#ff0000',
         icon: 'restaurant',
         userId,
@@ -180,7 +181,7 @@ describe('Category Routes Integration Tests', () => {
 
     it('should update category successfully', async () => {
       const updateData = {
-        name: 'Food & Dining',
+        name: { en: 'Food & Dining', es: 'Comida y Restaurantes' },
         color: '#ff5500',
       };
 
@@ -190,7 +191,9 @@ describe('Category Routes Integration Tests', () => {
         .send(updateData);
 
       expect(response.status).toBe(200);
-      expect(response.body.name).toBe(updateData.name);
+      expect(response.body.name).toEqual(
+        expect.objectContaining(updateData.name)
+      );
       expect(response.body.color).toBe(updateData.color);
     });
 
@@ -198,7 +201,7 @@ describe('Category Routes Integration Tests', () => {
       const response = await request(app)
         .put('/api/categories/nonexistent')
         .set('Authorization', `Bearer ${authToken}`)
-        .send({ name: 'Updated' });
+        .send({ name: { en: 'Updated', es: 'Actualizado' } });
 
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty('error', 'Category not found');
@@ -211,7 +214,7 @@ describe('Category Routes Integration Tests', () => {
     beforeEach(async () => {
       const category = await CategoryModel.create({
         key: 'food',
-        name: 'Food',
+        name: { en: 'Food', es: 'Comida' },
         color: '#ff0000',
         icon: 'restaurant',
         userId,

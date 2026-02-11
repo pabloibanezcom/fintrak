@@ -56,6 +56,7 @@ describe('AuthController', () => {
       expect(mockUser.create).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'hashedPassword',
+        authProvider: 'email',
       });
       expect(statusMock).toHaveBeenCalledWith(201);
       expect(jsonMock).toHaveBeenCalledWith({

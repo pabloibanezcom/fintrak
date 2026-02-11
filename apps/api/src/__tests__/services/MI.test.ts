@@ -130,6 +130,7 @@ describe('MI Service - User Products Caching', () => {
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     delete process.env.MI_AUTH_UI;
     delete process.env.MI_API;
     delete process.env.MI_USER;
@@ -145,7 +146,7 @@ describe('MI Service - User Products Caching', () => {
     expect(result).toHaveProperty('totalValue');
     expect(result).toHaveProperty('items');
     expect(result.items).toHaveProperty('deposits');
-    expect(result.items).toHaveProperty('cashAccounts');
+    expect(result.items).toHaveProperty('bankAccounts');
     expect(result.items).toHaveProperty('funds');
     expect(result.items).toHaveProperty('etcs');
     expect(result.items).toHaveProperty('cryptoAssets');
@@ -204,33 +205,36 @@ describe('MI Service - User Products Caching', () => {
     // Total = 16200
     expect(result.totalValue).toBe(16200);
     expect(result.items.deposits.percentage).toBe(61.7); // 10000/16200 * 100
-    expect(result.items.cashAccounts.percentage).toBe(30.9); // 5000/16200 * 100
+    expect(result.items.bankAccounts.percentage).toBe(30.9); // 5000/16200 * 100
     expect(result.items.funds.percentage).toBe(7.4); // 1200/16200 * 100
     expect(result.items.etcs.percentage).toBe(0);
     expect(result.items.cryptoAssets.percentage).toBe(0);
   });
 
   it('should handle cache expiration after 60 seconds', async () => {
-    jest.useFakeTimers();
+    let now = Date.now();
+    const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
 
-    // First call
-    await fetchUserProducts('user123');
+    try {
+      // First call
+      await fetchUserProducts('user123');
 
-    mockedAxios.get.mockClear();
-    mockedAxios.post.mockClear();
+      mockedAxios.get.mockClear();
+      mockedAxios.post.mockClear();
 
-    // Advance time by 59 seconds - still within cache
-    jest.advanceTimersByTime(59000);
-    await fetchUserProducts('user123');
-    expect(mockedAxios.get).not.toHaveBeenCalled();
-    expect(mockedAxios.post).not.toHaveBeenCalled();
+      // Advance time by 59 seconds - still within cache
+      now += 59000;
+      await fetchUserProducts('user123');
+      expect(mockedAxios.get).not.toHaveBeenCalled();
+      expect(mockedAxios.post).not.toHaveBeenCalled();
 
-    // Advance time by 2 more seconds - cache expired
-    jest.advanceTimersByTime(2000);
-    await fetchUserProducts('user123');
-    expect(mockedAxios.get).toHaveBeenCalled();
-
-    jest.useRealTimers();
+      // Advance time by 2 more seconds - cache expired
+      now += 2000;
+      await fetchUserProducts('user123');
+      expect(mockedAxios.get).toHaveBeenCalled();
+    } finally {
+      dateNowSpy.mockRestore();
+    }
   });
 
   it('should clear cache when clearUserProductsCache is called', async () => {
@@ -305,7 +309,7 @@ describe('MI Service - User Products Caching', () => {
     // Promise.allSettled means the function doesn't throw, but returns empty items
     expect(result.totalValue).toBe(0);
     expect(result.items.deposits.items).toEqual([]);
-    expect(result.items.cashAccounts.items).toEqual([]);
+    expect(result.items.bankAccounts.items).toEqual([]);
 
     consoleErrorSpy.mockRestore();
   });

@@ -14,6 +14,12 @@ const mockCounterpartyModel = CounterpartyModel as jest.Mocked<
   typeof CounterpartyModel
 >;
 
+const asCounterpartyDoc = <T extends Record<string, unknown>>(data: T) =>
+  ({
+    ...data,
+    toJSON: () => ({ ...data }),
+  }) as any;
+
 describe('CounterpartyController', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
@@ -67,13 +73,14 @@ describe('CounterpartyController', () => {
           userId: 'userId123',
         },
       ];
+      const mockCounterpartyDocs = mockCounterparties.map(asCounterpartyDoc);
 
       req.query = { limit: '10', offset: '0' };
 
       mockCounterpartyModel.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
-            skip: jest.fn().mockResolvedValue(mockCounterparties),
+            skip: jest.fn().mockResolvedValue(mockCounterpartyDocs),
           }),
         }),
       } as any);
@@ -100,6 +107,7 @@ describe('CounterpartyController', () => {
           address: undefined,
           notes: undefined,
           titleTemplate: undefined,
+          parentKey: undefined,
         },
         sort: {
           sortBy: 'name',
@@ -260,13 +268,14 @@ describe('CounterpartyController', () => {
           type: 'company',
           userId: 'userId123',
         }));
+      const mockCounterpartyDocs = mockCounterparties.map(asCounterpartyDoc);
 
       req.query = { limit: '10', offset: '20' };
 
       mockCounterpartyModel.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
-            skip: jest.fn().mockResolvedValue(mockCounterparties),
+            skip: jest.fn().mockResolvedValue(mockCounterpartyDocs),
           }),
         }),
       } as any);
@@ -507,7 +516,9 @@ describe('CounterpartyController', () => {
         titleTemplate: 'Compra en {name}',
         userId: 'userId123',
       };
-      mockCounterpartyModel.findOne.mockResolvedValue(mockCounterparty as any);
+      mockCounterpartyModel.findOne.mockResolvedValue(
+        asCounterpartyDoc(mockCounterparty)
+      );
 
       await getCounterpartyById(req as Request, res as Response);
 

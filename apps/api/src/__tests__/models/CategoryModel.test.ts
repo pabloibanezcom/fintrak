@@ -3,18 +3,26 @@ import CategoryModel, { type ICategory } from '../../models/CategoryModel';
 describe('CategoryModel', () => {
   const validCategoryData = {
     key: 'food',
-    name: 'Food & Dining',
+    name: {
+      en: 'Food & Dining',
+      es: 'Comida y Restaurantes',
+    },
     color: '#ff0000',
     icon: 'restaurant',
     userId: 'user123',
   };
+
+  beforeAll(async () => {
+    await CategoryModel.init();
+  });
 
   it('should create a category successfully', async () => {
     const category: ICategory = new CategoryModel(validCategoryData);
     const savedCategory = await category.save();
 
     expect(savedCategory.key).toBe(validCategoryData.key);
-    expect(savedCategory.name).toBe(validCategoryData.name);
+    expect(savedCategory.name.en).toBe(validCategoryData.name.en);
+    expect(savedCategory.name.es).toBe(validCategoryData.name.es);
     expect(savedCategory.color).toBe(validCategoryData.color);
     expect(savedCategory.icon).toBe(validCategoryData.icon);
     expect(savedCategory.userId).toBe(validCategoryData.userId);
@@ -69,7 +77,7 @@ describe('CategoryModel', () => {
     expect(savedCategory2.userId).toBe('user456');
   });
 
-  it('should save with optional keywords', async () => {
+  it('should ignore unknown fields like keywords', async () => {
     const categoryWithKeywords = {
       ...validCategoryData,
       keywords: ['restaurant', 'dining', 'eat'],
@@ -78,7 +86,7 @@ describe('CategoryModel', () => {
     const category = new CategoryModel(categoryWithKeywords);
     const savedCategory = await category.save();
 
-    expect(savedCategory.keywords).toEqual(['restaurant', 'dining', 'eat']);
+    expect((savedCategory as any).keywords).toBeUndefined();
   });
 
   it('should update timestamps on modification', async () => {
@@ -89,7 +97,10 @@ describe('CategoryModel', () => {
     // Wait a moment to ensure timestamp difference
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    savedCategory.name = 'Updated Food & Dining';
+    savedCategory.name = {
+      en: 'Updated Food & Dining',
+      es: 'Comida y Restaurantes Actualizada',
+    };
     const updatedCategory = await savedCategory.save();
 
     expect(updatedCategory.updatedAt.getTime()).toBeGreaterThan(

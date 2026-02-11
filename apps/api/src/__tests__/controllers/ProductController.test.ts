@@ -57,7 +57,7 @@ describe('ProductController', () => {
           },
         ],
       },
-      cashAccounts: {
+      bankAccounts: {
         value: 2000,
         percentage: 20,
         items: [
@@ -122,7 +122,7 @@ describe('ProductController', () => {
             },
           ],
         },
-        cashAccounts: {
+        bankAccounts: {
           value: 1500,
           percentage: 18.75,
           items: [
