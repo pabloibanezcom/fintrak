@@ -10,6 +10,8 @@ export interface TransactionListItem {
   id: string;
   title: string;
   description?: string;
+  dismissNote?: string;
+  linkedTitle?: string;
   amount: number;
   currency: string;
   date: string;
@@ -159,6 +161,16 @@ export function TransactionList({
                       {tx.description && (
                         <span className={styles.subtitle}>
                           {tx.description}
+                        </span>
+                      )}
+                      {tx.dismissNote && (
+                        <span className={styles.dismissNote}>
+                          {tx.dismissNote}
+                        </span>
+                      )}
+                      {tx.linkedTitle && (
+                        <span className={styles.linkedSubtitle}>
+                          {tx.linkedTitle}
                         </span>
                       )}
                     </div>

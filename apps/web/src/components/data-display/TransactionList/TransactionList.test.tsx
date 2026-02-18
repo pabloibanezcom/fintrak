@@ -60,10 +60,13 @@ describe('TransactionList', () => {
       account: 'Main',
       isLinked: true,
       linkedTransactionId: 'budget-11',
+      linkedTitle: 'Salary (budget transaction)',
     },
     {
       id: 'tx-2',
       title: 'Coffee',
+      description: 'Cafe Nero',
+      dismissNote: 'Personal expense, ignored',
       amount: 25.5,
       currency: 'USD',
       date: '2026-01-03T00:00:00.000Z',
@@ -114,6 +117,8 @@ describe('TransactionList', () => {
 
     expect(screen.getByText('+$100.00')).toBeTruthy();
     expect(screen.getByText('-$25.50')).toBeTruthy();
+    expect(screen.getByText('Salary (budget transaction)')).toBeTruthy();
+    expect(screen.getByText('Personal expense, ignored')).toBeTruthy();
     expect(screen.getByLabelText('Dismissed')).toBeTruthy();
 
     const linkedTransactionAnchor = screen.getByRole('link', {

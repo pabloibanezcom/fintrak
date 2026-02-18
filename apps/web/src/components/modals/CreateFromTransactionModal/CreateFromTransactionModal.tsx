@@ -24,7 +24,11 @@ export interface CreateFromTransactionModalProps {
   bankName?: string;
   accountName?: string;
   onSuccess?: () => void;
-  onDismissChange?: (transactionId: string, dismissed: boolean) => void;
+  onDismissChange?: (
+    transactionId: string,
+    dismissed: boolean,
+    dismissNote?: string
+  ) => void;
 }
 
 export function CreateFromTransactionModal({
@@ -43,7 +47,9 @@ export function CreateFromTransactionModal({
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
+  const [isSavingDismissNote, setIsSavingDismissNote] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [dismissNote, setDismissNote] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -84,6 +90,7 @@ export function CreateFromTransactionModal({
         description: '',
       });
       setIsDismissed(transaction?.dismissed ?? false);
+      setDismissNote(transaction?.dismissNote || '');
       setError(null);
     }
   }, [isOpen, transaction, loadData]);
@@ -140,11 +147,53 @@ export function CreateFromTransactionModal({
         toast.success('Transaction restored');
       }
       onDismissChange?.(transaction._id, shouldDismiss);
-      if (shouldDismiss) {
-        onClose();
-      }
     } catch (err) {
       setIsDismissed(!shouldDismiss);
+      const message =
+        err instanceof Error ? err.message : 'Failed to update transaction';
+      setError(message);
+    } finally {
+      setIsDismissing(false);
+    }
+  };
+
+  const handleDismissNoteSave = async () => {
+    if (!transaction || !isDismissed) return;
+
+    setIsSavingDismissNote(true);
+    setError(null);
+    const note = dismissNote.trim();
+
+    try {
+      await bankTransactionsService.dismissTransaction(
+        transaction._id,
+        note || undefined
+      );
+      onDismissChange?.(transaction._id, true, note || undefined);
+      toast.success('Dismiss note saved');
+      onClose();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to save dismiss note';
+      setError(message);
+    } finally {
+      setIsSavingDismissNote(false);
+    }
+  };
+
+  const handleRestoreDismissed = async () => {
+    if (!transaction) return;
+
+    setIsDismissing(true);
+    setError(null);
+
+    try {
+      await bankTransactionsService.undismissTransaction(transaction._id);
+      setIsDismissed(false);
+      setDismissNote('');
+      onDismissChange?.(transaction._id, false);
+      toast.success('Transaction restored');
+    } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Failed to update transaction';
       setError(message);
@@ -265,84 +314,122 @@ export function CreateFromTransactionModal({
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <Select
-            label="Category *"
-            options={categoryOptions}
-            value={formData.category}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, category: value }))
-            }
-            placeholder="Select a category..."
-            disabled={isLoadingData || isDismissed}
-          />
+        {isDismissed ? (
+          <div className={styles.form}>
+            <Input
+              label="Dismiss note (optional)"
+              value={dismissNote}
+              onChange={(e) => setDismissNote(e.target.value)}
+              placeholder="Reason for dismissing this transaction"
+              disabled={isDismissing || isSavingDismissNote}
+            />
 
-          <Select
-            label={counterpartyLabel}
-            options={counterpartyOptions}
-            value={formData.counterparty}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, counterparty: value }))
-            }
-            placeholder={`Select ${counterpartyLabel.toLowerCase()}...`}
-            disabled={isLoadingData || isDismissed}
-          />
-
-          <Input
-            label="Title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, title: e.target.value }))
-            }
-            placeholder="Override default title..."
-            disabled={isDismissed}
-          />
-
-          <Input
-            label="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, description: e.target.value }))
-            }
-            placeholder="Add notes..."
-            disabled={isDismissed}
-          />
-
-          <div className={styles.actions}>
-            {!isLinked && (
-              <Toggle
-                label="Dismiss"
-                size="sm"
-                checked={isDismissed}
-                onChange={handleDismissToggle}
-                disabled={isSubmitting || isDismissing}
-              />
-            )}
-            <div className={styles.actionsRight}>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting || isDismissing}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                isLoading={isSubmitting}
-                disabled={
-                  isLoadingData ||
-                  !formData.category ||
-                  isDismissing ||
-                  isDismissed
-                }
-              >
-                {isExpense ? 'Create Expense' : 'Create Income'}
-              </Button>
+            <div className={styles.actions}>
+              <div />
+              <div className={styles.actionsRight}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  disabled={isDismissing}
+                >
+                  Close
+                </Button>
+                {!isLinked && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    isLoading={isDismissing}
+                    onClick={handleRestoreDismissed}
+                  >
+                    Restore
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="primary"
+                  isLoading={isSavingDismissNote}
+                  onClick={handleDismissNoteSave}
+                  disabled={isDismissing}
+                >
+                  Save note
+                </Button>
+              </div>
             </div>
           </div>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <Select
+              label="Category *"
+              options={categoryOptions}
+              value={formData.category}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, category: value }))
+              }
+              placeholder="Select a category..."
+              disabled={isLoadingData}
+            />
+
+            <Select
+              label={counterpartyLabel}
+              options={counterpartyOptions}
+              value={formData.counterparty}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, counterparty: value }))
+              }
+              placeholder={`Select ${counterpartyLabel.toLowerCase()}...`}
+              disabled={isLoadingData}
+            />
+
+            <Input
+              label="Title"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
+              placeholder="Override default title..."
+            />
+
+            <Input
+              label="Description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, description: e.target.value }))
+              }
+              placeholder="Add notes..."
+            />
+
+            <div className={styles.actions}>
+              {!isLinked && (
+                <Toggle
+                  label="Dismiss"
+                  size="sm"
+                  checked={isDismissed}
+                  onChange={handleDismissToggle}
+                  disabled={isSubmitting || isDismissing}
+                />
+              )}
+              <div className={styles.actionsRight}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  disabled={isSubmitting || isDismissing}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isSubmitting}
+                  disabled={isLoadingData || !formData.category || isDismissing}
+                >
+                  {isExpense ? 'Create Expense' : 'Create Income'}
+                </Button>
+              </div>
+            </div>
+          </form>
+        )}
       </div>
     </Modal>
   );

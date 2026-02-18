@@ -210,6 +210,13 @@ router.get('/:id', getTransactionById);
  *               notified:
  *                 type: boolean
  *                 description: Mark transaction as notified/not notified
+ *               dismissed:
+ *                 type: boolean
+ *                 description: Mark transaction as dismissed/restored
+ *               dismissNote:
+ *                 type: string
+ *                 nullable: true
+ *                 description: Optional note explaining why a transaction was dismissed
  *     responses:
  *       200:
  *         description: Updated bank transaction

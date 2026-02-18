@@ -84,20 +84,26 @@ export const getAllTransactions = async (
     const transactionIds = transactions.map((tx) => tx._id);
     const linkedUserTransactions = await UserTransactionModel.find(
       { userId, bankTransactionId: { $in: transactionIds } },
-      { bankTransactionId: 1, _id: 1 }
+      { bankTransactionId: 1, _id: 1, title: 1 }
     );
     const linkedTransactionIds: Record<string, string> = {};
+    const linkedTransactions: Record<string, { id: string; title: string }> =
+      {};
     for (const ut of linkedUserTransactions) {
       if (ut.bankTransactionId) {
-        linkedTransactionIds[ut.bankTransactionId.toString()] = String(
-          ut._id
-        );
+        const bankTransactionId = ut.bankTransactionId.toString();
+        linkedTransactionIds[bankTransactionId] = String(ut._id);
+        linkedTransactions[bankTransactionId] = {
+          id: String(ut._id),
+          title: ut.title,
+        };
       }
     }
 
     res.json({
       transactions,
       linkedTransactionIds,
+      linkedTransactions,
       pagination: {
         total,
         limit: Number(limit),
@@ -157,16 +163,46 @@ export const updateTransaction = async (
     }
 
     const { id } = req.params;
-    const { processed, notified, dismissed } = req.body;
+    const { processed, notified, dismissed, dismissNote } = req.body;
 
-    const updateFields: Record<string, boolean> = {};
-    if (processed !== undefined) updateFields.processed = processed;
-    if (notified !== undefined) updateFields.notified = notified;
-    if (dismissed !== undefined) updateFields.dismissed = dismissed;
+    const setFields: Record<string, unknown> = {};
+    const unsetFields: Record<string, ''> = {};
+
+    if (processed !== undefined) setFields.processed = processed;
+    if (notified !== undefined) setFields.notified = notified;
+    if (dismissed !== undefined) setFields.dismissed = dismissed;
+
+    if (dismissNote !== undefined) {
+      if (dismissNote === null || dismissNote === '') {
+        unsetFields.dismissNote = '';
+      } else if (typeof dismissNote === 'string') {
+        setFields.dismissNote = dismissNote.trim();
+      } else {
+        res.status(400).json({ error: 'dismissNote must be a string' });
+        return;
+      }
+    }
+
+    // Clearing dismiss state should also clear any existing dismiss note.
+    if (dismissed === false && dismissNote === undefined) {
+      unsetFields.dismissNote = '';
+    }
+
+    const updateQuery: Record<string, Record<string, unknown>> = {};
+    if (Object.keys(setFields).length > 0) {
+      updateQuery.$set = setFields;
+    }
+    if (Object.keys(unsetFields).length > 0) {
+      updateQuery.$unset = unsetFields;
+    }
+    if (Object.keys(updateQuery).length === 0) {
+      res.status(400).json({ error: 'No valid fields provided to update' });
+      return;
+    }
 
     const transaction = await BankTransaction.findOneAndUpdate(
       { _id: id, userId },
-      { $set: updateFields },
+      updateQuery,
       { new: true }
     );
 
@@ -388,7 +424,7 @@ export const createTransactionFromBankTransaction = async (
     if (bankTransaction.dismissed) {
       await BankTransaction.updateOne(
         { _id: id },
-        { $set: { dismissed: false } }
+        { $set: { dismissed: false }, $unset: { dismissNote: '' } }
       );
     }
 

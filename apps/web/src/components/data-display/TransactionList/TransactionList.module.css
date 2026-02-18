@@ -108,6 +108,22 @@ button.clickable:focus-visible {
   text-overflow: ellipsis;
 }
 
+.dismissNote {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linkedSubtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .statusHeader {
   /* Column header for Income/Expense */
 }

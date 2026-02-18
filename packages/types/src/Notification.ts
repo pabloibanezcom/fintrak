@@ -109,6 +109,9 @@ export interface StoredBankTransaction {
   /** Whether the transaction was dismissed during review */
   dismissed?: boolean;
 
+  /** Optional user-provided note explaining why it was dismissed */
+  dismissNote?: string;
+
   /** Raw TrueLayer response */
   raw?: unknown;
 

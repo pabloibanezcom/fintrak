@@ -18,13 +18,20 @@ export interface BankTransaction {
   processed: boolean;
   notified: boolean;
   dismissed: boolean;
+  dismissNote?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LinkedTransactionSummary {
+  id: string;
+  title: string;
 }
 
 export interface BankTransactionsResponse {
   transactions: BankTransaction[];
   linkedTransactionIds: Record<string, string>;
+  linkedTransactions?: Record<string, LinkedTransactionSummary>;
   pagination: {
     total: number;
     limit: number;
@@ -141,15 +148,20 @@ export const bankTransactionsService = {
     );
   },
 
-  dismissTransaction: async (id: string): Promise<BankTransaction> => {
+  dismissTransaction: async (
+    id: string,
+    dismissNote?: string
+  ): Promise<BankTransaction> => {
     return apiClient.patch<BankTransaction>(`/bank-transactions/${id}`, {
       dismissed: true,
+      dismissNote,
     });
   },
 
   undismissTransaction: async (id: string): Promise<BankTransaction> => {
     return apiClient.patch<BankTransaction>(`/bank-transactions/${id}`, {
       dismissed: false,
+      dismissNote: null,
     });
   },
 };

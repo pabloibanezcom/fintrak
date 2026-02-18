@@ -313,6 +313,7 @@ describe('CreateFromTransactionModal', () => {
       />
     );
 
+    expect(screen.queryByLabelText('Dismiss note (optional)')).toBeNull();
     fireEvent.click(screen.getByRole('switch', { name: 'Dismiss' }));
 
     await waitFor(() => {
@@ -321,10 +322,50 @@ describe('CreateFromTransactionModal', () => {
 
     expect(onDismissChange).toHaveBeenCalledWith('tx-1', true);
     expect(toastSuccessSpy).toHaveBeenCalledWith('Transaction dismissed');
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByLabelText('Dismiss note (optional)')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Create Expense' })).toBeNull();
+  });
+
+  it('shows dismiss note input for dismissed transaction and saves it', async () => {
+    const onClose = vi.fn();
+    const onDismissChange = vi.fn();
+    dismissTransactionSpy.mockResolvedValueOnce({});
+
+    render(
+      <CreateFromTransactionModal
+        isOpen
+        onClose={onClose}
+        onDismissChange={onDismissChange}
+        transaction={
+          {
+            ...transaction,
+            dismissed: true,
+            dismissNote: 'Reviewed and ignored',
+          } as any
+        }
+      />
+    );
+
+    const dismissNoteInput = screen.getByLabelText('Dismiss note (optional)');
+    expect(dismissNoteInput).toHaveProperty('value', 'Reviewed and ignored');
+    expect(screen.queryByRole('button', { name: 'Create Expense' })).toBeNull();
+
+    fireEvent.change(dismissNoteInput, {
+      target: { value: 'Updated note' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save note' }));
+
+    await waitFor(() => {
+      expect(dismissTransactionSpy).toHaveBeenCalledWith('tx-1', 'Updated note');
+    });
+
+    expect(onDismissChange).toHaveBeenCalledWith('tx-1', true, 'Updated note');
+    expect(toastSuccessSpy).toHaveBeenCalledWith('Dismiss note saved');
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('restores a dismissed transaction when toggle is turned off', async () => {
+  it('restores dismissed transaction', async () => {
     const onClose = vi.fn();
     const onDismissChange = vi.fn();
     undismissTransactionSpy.mockResolvedValueOnce({});
@@ -334,14 +375,22 @@ describe('CreateFromTransactionModal', () => {
         isOpen
         onClose={onClose}
         onDismissChange={onDismissChange}
-        transaction={{ ...transaction, dismissed: true } as any}
+        transaction={
+          {
+            ...transaction,
+            dismissed: true,
+            dismissNote: 'Reviewed and ignored',
+          } as any
+        }
       />
     );
 
-    const dismissToggle = await screen.findByRole('switch', { name: 'Dismiss' });
-    expect((dismissToggle as HTMLInputElement).checked).toBe(true);
-
-    fireEvent.click(dismissToggle);
+    expect(screen.getByLabelText('Dismiss note (optional)')).toHaveProperty(
+      'value',
+      'Reviewed and ignored'
+    );
+    expect(screen.queryByRole('button', { name: 'Create Expense' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Restore' }));
 
     await waitFor(() => {
       expect(undismissTransactionSpy).toHaveBeenCalledWith('tx-1');

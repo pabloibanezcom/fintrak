@@ -36,6 +36,7 @@ export default function BankingPage() {
   const {
     transactions,
     linkedTransactionIds,
+    linkedTransactions,
     isLoading: isLoadingTransactions,
     refetch,
     updateTransaction,
@@ -54,11 +55,20 @@ export default function BankingPage() {
     };
   });
 
-  const transactionListItems: TransactionListItem[] = transactions.map(
-    (tx) => ({
+  const transactionListItems: TransactionListItem[] = transactions.map((tx) => {
+    const linkedTransaction = linkedTransactions.get(tx._id);
+    const title =
+      tx.merchantName?.trim() || tx.description?.trim() || 'Bank transaction';
+    const bankDescription =
+      tx.description && tx.description !== title ? tx.description : undefined;
+    const dismissNote = tx.dismissNote?.trim() || undefined;
+
+    return {
       id: tx._id,
-      title: tx.merchantName || tx.description,
-      description: tx.merchantName ? tx.description : undefined,
+      title,
+      description: bankDescription,
+      dismissNote,
+      linkedTitle: linkedTransaction?.title,
       amount: tx.amount,
       currency: tx.currency,
       date: tx.timestamp,
@@ -69,8 +79,8 @@ export default function BankingPage() {
       isLinked: linkedTransactionIds.has(tx._id),
       isDismissed: tx.dismissed,
       linkedTransactionId: linkedTransactionIds.get(tx._id),
-    })
-  );
+    };
+  });
 
   const handleTransactionClick = useCallback(
     (item: TransactionListItem) => {
@@ -89,8 +99,11 @@ export default function BankingPage() {
   }, []);
 
   const handleDismissChange = useCallback(
-    (transactionId: string, dismissed: boolean) => {
-      updateTransaction(transactionId, { dismissed });
+    (transactionId: string, dismissed: boolean, dismissNote?: string) => {
+      updateTransaction(transactionId, {
+        dismissed,
+        dismissNote: dismissed ? dismissNote : undefined,
+      });
     },
     [updateTransaction]
   );

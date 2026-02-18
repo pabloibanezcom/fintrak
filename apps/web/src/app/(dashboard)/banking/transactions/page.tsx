@@ -44,6 +44,7 @@ export default function BankTransactionsPage() {
   const {
     transactions,
     linkedTransactionIds,
+    linkedTransactions,
     isLoading,
     isLoadingMore,
     hasMore,
@@ -91,24 +92,38 @@ export default function BankTransactionsPage() {
 
   const transactionListItems: TransactionListItem[] = useMemo(
     () =>
-      transactions.map((tx) => ({
-        id: tx._id,
-        title: tx.merchantName || tx.description,
-        description: tx.merchantName ? tx.description : undefined,
-        amount: tx.amount,
-        currency: tx.currency,
-        date: tx.timestamp,
-        type: tx.type === 'CREDIT' ? 'credit' : 'debit',
-        bank: getBankDisplayName(tx.accountId),
-        bankLogo: getBankLogo(tx.accountId),
-        account: getAccountDisplayName(tx.accountId),
-        isLinked: linkedTransactionIds.has(tx._id),
-        isDismissed: tx.dismissed,
-        linkedTransactionId: linkedTransactionIds.get(tx._id),
-      })),
+      transactions.map((tx) => {
+        const linkedTransaction = linkedTransactions.get(tx._id);
+        const title =
+          tx.merchantName?.trim() ||
+          tx.description?.trim() ||
+          'Bank transaction';
+        const bankDescription =
+          tx.description && tx.description !== title ? tx.description : undefined;
+        const dismissNote = tx.dismissNote?.trim() || undefined;
+
+        return {
+          id: tx._id,
+          title,
+          description: bankDescription,
+          dismissNote,
+          linkedTitle: linkedTransaction?.title,
+          amount: tx.amount,
+          currency: tx.currency,
+          date: tx.timestamp,
+          type: tx.type === 'CREDIT' ? 'credit' : 'debit',
+          bank: getBankDisplayName(tx.accountId),
+          bankLogo: getBankLogo(tx.accountId),
+          account: getAccountDisplayName(tx.accountId),
+          isLinked: linkedTransactionIds.has(tx._id),
+          isDismissed: tx.dismissed,
+          linkedTransactionId: linkedTransactionIds.get(tx._id),
+        };
+      }),
     [
       transactions,
       linkedTransactionIds,
+      linkedTransactions,
       getBankDisplayName,
       getBankLogo,
       getAccountDisplayName,
@@ -136,8 +151,11 @@ export default function BankTransactionsPage() {
   }, [refetch]);
 
   const handleDismissChange = useCallback(
-    (transactionId: string, dismissed: boolean) => {
-      updateTransaction(transactionId, { dismissed });
+    (transactionId: string, dismissed: boolean, dismissNote?: string) => {
+      updateTransaction(transactionId, {
+        dismissed,
+        dismissNote: dismissed ? dismissNote : undefined,
+      });
     },
     [updateTransaction]
   );

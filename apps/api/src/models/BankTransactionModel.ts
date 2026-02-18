@@ -34,6 +34,7 @@ const BankTransactionSchema: Schema = new Schema(
     processed: { type: Boolean, default: false },
     notified: { type: Boolean, default: false },
     dismissed: { type: Boolean, default: false },
+    dismissNote: { type: String, trim: true },
     raw: { type: Schema.Types.Mixed },
   },
   {

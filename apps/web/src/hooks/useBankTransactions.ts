@@ -5,6 +5,7 @@ import {
   type BankTransaction,
   bankTransactionsService,
   type GetBankTransactionsParams,
+  type LinkedTransactionSummary,
   type ReviewStatus,
 } from '@/services/bankTransactions';
 
@@ -23,6 +24,7 @@ interface UseBankTransactionsOptions {
 interface UseBankTransactionsReturn {
   transactions: BankTransaction[];
   linkedTransactionIds: Map<string, string>;
+  linkedTransactions: Map<string, LinkedTransactionSummary>;
   isLoading: boolean;
   isLoadingMore: boolean;
   error: Error | null;
@@ -39,6 +41,9 @@ export function useBankTransactions(
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
   const [linkedTransactionIds, setLinkedTransactionIds] = useState<
     Map<string, string>
+  >(new Map());
+  const [linkedTransactions, setLinkedTransactions] = useState<
+    Map<string, LinkedTransactionSummary>
   >(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -90,6 +95,10 @@ export function useBankTransactions(
         const newLinkedMap = new Map<string, string>(
           Object.entries(response.linkedTransactionIds || {})
         );
+        const newLinkedTransactionsMap = new Map<
+          string,
+          LinkedTransactionSummary
+        >(Object.entries(response.linkedTransactions || {}));
 
         if (isLoadMore) {
           setLinkedTransactionIds((prev) => {
@@ -99,8 +108,16 @@ export function useBankTransactions(
             );
             return updated;
           });
+          setLinkedTransactions((prev) => {
+            const updated = new Map(prev);
+            newLinkedTransactionsMap.forEach((tx, bankTxId) =>
+              updated.set(bankTxId, tx)
+            );
+            return updated;
+          });
         } else {
           setLinkedTransactionIds(newLinkedMap);
+          setLinkedTransactions(newLinkedTransactionsMap);
         }
       } catch (err) {
         setError(
@@ -140,6 +157,7 @@ export function useBankTransactions(
   return {
     transactions,
     linkedTransactionIds,
+    linkedTransactions,
     isLoading,
     isLoadingMore,
     error,
