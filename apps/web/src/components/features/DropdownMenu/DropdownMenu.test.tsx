@@ -1,9 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { DropdownMenu } from './DropdownMenu';
 
 vi.mock('next/link', () => ({
-  default: ({ href, children, ...props }: Record<string, unknown>) => (
+  default: ({
+    href,
+    children,
+    ...props
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
+    href: string;
+    children?: ReactNode;
+  }) => (
     <a href={String(href)} {...props}>
       {children}
     </a>

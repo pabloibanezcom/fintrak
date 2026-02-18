@@ -1,8 +1,9 @@
 import { apiClient } from './api';
+import type { LocalizedName } from './types';
 
 export interface Category {
   key: string;
-  name: string;
+  name: LocalizedName;
   color: string;
   icon: string;
 }

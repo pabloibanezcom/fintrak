@@ -9,7 +9,7 @@ import {
   categoriesService,
   counterpartiesService,
 } from '@/services';
-import { toast } from '@/utils';
+import { getLocalizedText, toast } from '@/utils';
 import styles from './CreateCounterpartyModal.module.css';
 
 export interface CreateCounterpartyModalProps {
@@ -199,7 +199,10 @@ export function CreateCounterpartyModal({
             label="Default Category"
             options={[
               { value: '', label: 'None' },
-              ...categories.map((c) => ({ value: c.key, label: c.name })),
+              ...categories.map((c) => ({
+                value: c.key,
+                label: getLocalizedText(c.name) || c.key,
+              })),
             ]}
             value={formData.defaultCategory}
             onChange={(value) =>

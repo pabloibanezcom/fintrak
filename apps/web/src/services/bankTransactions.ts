@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import type { LocalizedName } from './types';
 
 export interface BankTransaction {
   _id: string;
@@ -49,7 +50,7 @@ export interface GetBankTransactionsParams {
 export interface Category {
   _id: string;
   key: string;
-  name: string;
+  name: LocalizedName;
   icon?: string;
   color?: string;
 }

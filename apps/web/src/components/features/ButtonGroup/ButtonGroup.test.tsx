@@ -1,9 +1,17 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ButtonGroup } from './ButtonGroup';
 
 vi.mock('next/link', () => ({
-  default: ({ href, children, ...props }: Record<string, unknown>) => (
+  default: ({
+    href,
+    children,
+    ...props
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
+    href: string;
+    children?: ReactNode;
+  }) => (
     <a href={String(href)} {...props}>
       {children}
     </a>

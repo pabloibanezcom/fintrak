@@ -13,4 +13,5 @@ export {
   getStartOfMonth,
   toISODateString,
 } from './date';
+export { getLocalizedText } from './localization';
 export { toast } from './toast';

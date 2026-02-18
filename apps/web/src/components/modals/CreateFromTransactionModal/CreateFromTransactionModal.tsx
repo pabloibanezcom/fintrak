@@ -12,7 +12,7 @@ import {
   categoriesService,
   counterpartiesService,
 } from '@/services';
-import { formatCurrency, formatDate, toast } from '@/utils';
+import { formatCurrency, formatDate, getLocalizedText, toast } from '@/utils';
 import styles from './CreateFromTransactionModal.module.css';
 
 export interface CreateFromTransactionModalProps {
@@ -155,7 +155,7 @@ export function CreateFromTransactionModal({
 
   const categoryOptions = categories.map((cat) => ({
     value: cat.key,
-    label: cat.name,
+    label: getLocalizedText(cat.name) || cat.key,
   }));
 
   const counterpartyOptions = (() => {

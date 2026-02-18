@@ -12,7 +12,7 @@ import {
   type UserTransaction,
   userTransactionsService,
 } from '@/services';
-import { formatCurrency, formatDate, toast } from '@/utils';
+import { formatCurrency, formatDate, getLocalizedText, toast } from '@/utils';
 
 export default function CounterpartyDetailPage() {
   const params = useParams();
@@ -326,7 +326,7 @@ export default function CounterpartyDetailPage() {
                       {tx.category && (
                         <>
                           <span>•</span>
-                          <span>{tx.category.name}</span>
+                          <span>{getLocalizedText(tx.category.name)}</span>
                         </>
                       )}
                     </div>

@@ -114,11 +114,15 @@ vi.mock('@/services', () => ({
   },
 }));
 
-vi.mock('@/utils', () => ({
-  toast: {
-    success: toastSuccessSpy,
-  },
-}));
+vi.mock('@/utils', async () => {
+  const actual = await vi.importActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    toast: {
+      success: toastSuccessSpy,
+    },
+  };
+});
 
 describe('CreateCounterpartyModal', () => {
   beforeEach(() => {

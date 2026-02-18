@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { PageContainer } from '@/components/layout';
 import { Button, Card, Icon } from '@/components/primitives';
 import { type UserTransaction, userTransactionsService } from '@/services';
-import { formatCurrency, formatDate } from '@/utils';
+import { formatCurrency, formatDate, getLocalizedText } from '@/utils';
 
 export default function TransactionDetailPage() {
   const params = useParams();
@@ -80,6 +80,9 @@ export default function TransactionDetailPage() {
   }
 
   const isExpense = transaction.type === 'expense';
+  const categoryName =
+    getLocalizedText(transaction.category?.name) || 'Uncategorized';
+  const counterpartyName = getLocalizedText(transaction.counterparty?.name);
 
   return (
     <PageContainer>
@@ -182,7 +185,7 @@ export default function TransactionDetailPage() {
                 Category
               </span>
               <span style={{ fontWeight: '500' }}>
-                {transaction.category.name}
+                {categoryName}
               </span>
             </div>
             <div>
@@ -213,7 +216,7 @@ export default function TransactionDetailPage() {
                   {isExpense ? 'Payee' : 'Source'}
                 </span>
                 <span style={{ fontWeight: '500' }}>
-                  {transaction.counterparty.name}
+                  {counterpartyName}
                 </span>
               </div>
             )}

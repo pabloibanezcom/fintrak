@@ -1,9 +1,10 @@
 import { apiClient } from './api';
+import type { LocalizedName } from './types';
 
 export interface Category {
   _id: string;
   key: string;
-  name: string;
+  name: LocalizedName;
   icon?: string;
   color?: string;
 }
