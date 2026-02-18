@@ -1,6 +1,7 @@
 /// <reference path="../index.d.ts" />
 import type { Request, Response } from 'express';
 import * as PushNotificationService from '../services/PushNotificationService';
+import { logError } from '../utils/logging';
 
 /**
  * Register a device for push notifications
@@ -45,7 +46,7 @@ export const registerDevice = async (
       },
     });
   } catch (error) {
-    console.error('Error registering device:', error);
+    logError('Error registering device:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({ error: message });
   }
@@ -77,7 +78,7 @@ export const unregisterDevice = async (
 
     res.status(200).json({ message: 'Device unregistered successfully' });
   } catch (error) {
-    console.error('Error unregistering device:', error);
+    logError('Error unregistering device:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({ error: message });
   }

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { type MediaType, uploadFile } from '../services/s3Service';
+import { logError } from '../utils/logging';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -50,7 +51,7 @@ export async function uploadMedia(
       userId: req.user.id,
     });
   } catch (error) {
-    console.error('Error uploading media:', error);
+    logError('Error uploading media:', error);
     res.status(500).json({
       error: 'Failed to upload media',
       message: error instanceof Error ? error.message : 'Unknown error',

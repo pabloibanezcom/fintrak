@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import User, { type IUser } from '../models/UserModel';
 import { deleteFile, uploadFile } from '../services/s3Service';
 import { requireAuth } from '../utils/authUtils';
+import { logError } from '../utils/logging';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'defaultsecret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -159,7 +160,7 @@ export const googleTokenAuth = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error('Google token verification failed:', error);
+    logError('Google token verification failed:', error);
     res.status(401).json({ error: 'Invalid Google token' });
   }
 };
@@ -278,7 +279,7 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
       try {
         await deleteFile(currentUser.profilePicture);
       } catch (deleteError) {
-        console.error('Failed to delete old profile picture:', deleteError);
+        logError('Failed to delete old profile picture:', deleteError);
         // Continue with upload even if delete fails
       }
     }
@@ -311,7 +312,7 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
       updatedAt: user.updatedAt,
     });
   } catch (err) {
-    console.error('Failed to update profile picture:', err);
+    logError('Failed to update profile picture:', err);
     res.status(500).json({ error: 'Failed to update profile picture' });
   }
 };

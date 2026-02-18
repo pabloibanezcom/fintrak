@@ -4,6 +4,7 @@ import BankTransaction from '../models/BankTransactionModel';
 import CategoryModel from '../models/CategoryModel';
 import CounterpartyModel from '../models/CounterpartyModel';
 import UserTransactionModel from '../models/UserTransactionModel';
+import { logError } from '../utils/logging';
 
 /**
  * Get all bank transactions for the authenticated user
@@ -104,7 +105,7 @@ export const getAllTransactions = async (
       },
     });
   } catch (error) {
-    console.error('Error fetching bank transactions:', error);
+    logError('Error fetching bank transactions:', error);
     res.status(500).json({ error: 'Failed to fetch transactions' });
   }
 };
@@ -135,7 +136,7 @@ export const getTransactionById = async (
 
     res.json(transaction);
   } catch (error) {
-    console.error('Error fetching bank transaction:', error);
+    logError('Error fetching bank transaction:', error);
     res.status(500).json({ error: 'Failed to fetch transaction' });
   }
 };
@@ -176,7 +177,7 @@ export const updateTransaction = async (
 
     res.json(transaction);
   } catch (error) {
-    console.error('Error updating bank transaction:', error);
+    logError('Error updating bank transaction:', error);
     res.status(500).json({ error: 'Failed to update transaction' });
   }
 };
@@ -210,7 +211,7 @@ export const deleteTransaction = async (
 
     res.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
-    console.error('Error deleting bank transaction:', error);
+    logError('Error deleting bank transaction:', error);
     res.status(500).json({ error: 'Failed to delete transaction' });
   }
 };
@@ -289,7 +290,7 @@ export const getTransactionStats = async (
       }
     );
   } catch (error) {
-    console.error('Error fetching transaction stats:', error);
+    logError('Error fetching transaction stats:', error);
     res.status(500).json({ error: 'Failed to fetch transaction stats' });
   }
 };
@@ -397,7 +398,7 @@ export const createTransactionFromBankTransaction = async (
 
     res.status(201).json(savedTransaction);
   } catch (error) {
-    console.error('Error creating transaction from bank transaction:', error);
+    logError('Error creating transaction from bank transaction:', error);
     if ((error as { code?: number }).code === 11000) {
       res
         .status(409)
@@ -450,7 +451,7 @@ export const getLinkedTransaction = async (
 
     res.json({ linked: false, transaction: null });
   } catch (error) {
-    console.error('Error fetching linked transaction:', error);
+    logError('Error fetching linked transaction:', error);
     res.status(500).json({ error: 'Failed to fetch linked transaction' });
   }
 };

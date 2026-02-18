@@ -14,6 +14,7 @@ import TagModel from '../models/TagModel';
 import UserTransactionModel from '../models/UserTransactionModel';
 import { GenericImportService } from '../services/GenericImportService';
 import { requireAuth } from '../utils/authUtils';
+import { logError } from '../utils/logging';
 
 const storage = multer.memoryStorage();
 export const upload = multer({ storage });
@@ -26,7 +27,7 @@ const handleImportError = (
   error: unknown,
   entityName: string
 ) => {
-  console.error(`${entityName} import error:`, error);
+  logError(`${entityName} import error:`, error);
   const errorMessage = error instanceof Error ? error.message : 'Unknown error';
   // Return 400 for validation errors (invalid JSON/format)
   const statusCode =
@@ -308,7 +309,7 @@ export const importTransactions = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Import error:', error);
+    logError('Import error:', error);
     res.status(500).json({
       error: 'Failed to import transactions',
       message: error instanceof Error ? error.message : 'Unknown error',

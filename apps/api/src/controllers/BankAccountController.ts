@@ -1,6 +1,7 @@
 /// <reference path="../index.d.ts" />
 import type { Request, Response } from 'express';
 import BankAccount from '../models/BankAccountModel';
+import { logError } from '../utils/logging';
 
 /**
  * Get all bank accounts for the authenticated user
@@ -29,7 +30,7 @@ export const getAllAccounts = async (
 
     res.json(accounts);
   } catch (error) {
-    console.error('Error fetching bank accounts:', error);
+    logError('Error fetching bank accounts:', error);
     res.status(500).json({ error: 'Failed to fetch bank accounts' });
   }
 };
@@ -60,7 +61,7 @@ export const getAccountById = async (
 
     res.json(account);
   } catch (error) {
-    console.error('Error fetching bank account:', error);
+    logError('Error fetching bank account:', error);
     res.status(500).json({ error: 'Failed to fetch bank account' });
   }
 };
@@ -99,7 +100,7 @@ export const updateAccount = async (
 
     res.json(account);
   } catch (error) {
-    console.error('Error updating bank account:', error);
+    logError('Error updating bank account:', error);
     res.status(500).json({ error: 'Failed to update bank account' });
   }
 };
@@ -130,7 +131,7 @@ export const deleteAccount = async (
 
     res.json({ message: 'Account deleted successfully' });
   } catch (error) {
-    console.error('Error deleting bank account:', error);
+    logError('Error deleting bank account:', error);
     res.status(500).json({ error: 'Failed to delete bank account' });
   }
 };

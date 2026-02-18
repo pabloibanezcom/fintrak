@@ -3,6 +3,7 @@ import { ProductSnapshot } from '../models/ProductSnapshotModel';
 import User from '../models/UserModel';
 import { saveDailySnapshot } from '../services/ProductSnapshot';
 import TransactionSyncService from '../services/TransactionSyncService';
+import { logError } from '../utils/logging';
 
 /**
  * Cron job to create daily snapshots for all users
@@ -39,7 +40,7 @@ export const createDailySnapshotsForAllUsers = async (
           userId,
           error: error instanceof Error ? error.message : 'Unknown error',
         });
-        console.error(`Failed to create snapshot for user ${userId}:`, error);
+        logError(`Failed to create snapshot for user ${userId}:`, error);
       }
     }
 
@@ -48,7 +49,7 @@ export const createDailySnapshotsForAllUsers = async (
       results,
     });
   } catch (error) {
-    console.error('Error in daily snapshot cron job:', error);
+    logError('Error in daily snapshot cron job:', error);
     res.status(500).json({ error: 'Failed to create daily snapshots' });
   }
 };
@@ -72,7 +73,7 @@ export const syncTransactions = async (req: Request, res: Response) => {
       results,
     });
   } catch (error) {
-    console.error('Error in transaction sync cron job:', error);
+    logError('Error in transaction sync cron job:', error);
     res.status(500).json({ error: 'Failed to sync transactions' });
   }
 };

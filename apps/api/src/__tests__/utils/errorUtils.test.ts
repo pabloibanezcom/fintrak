@@ -63,7 +63,7 @@ describe('errorUtils', () => {
     });
   });
 
-  it('handles generic error and logs', () => {
+  it('handles generic error without logging in test env', () => {
     const res = createMockResponse();
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {
       // suppress expected log in test
@@ -71,10 +71,7 @@ describe('errorUtils', () => {
 
     handleGenericError(res as Response, 'update category', new Error('db error'));
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Error update category:',
-      expect.any(Error)
-    );
+    expect(consoleSpy).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       error: 'Failed to update category',

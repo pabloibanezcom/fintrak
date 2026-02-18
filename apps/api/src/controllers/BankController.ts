@@ -6,6 +6,7 @@ import BankConnection, {
 import { deleteFile, uploadFile } from '../services/s3Service';
 import TransactionSyncService from '../services/TransactionSyncService';
 import TrueLayerService from '../services/TrueLayerService';
+import { logError } from '../utils/logging';
 
 export const getProviders = async (
   _req: Request,
@@ -15,7 +16,7 @@ export const getProviders = async (
     const providers = TrueLayerService.getSupportedProviders();
     res.json(providers);
   } catch (error) {
-    console.error('Get providers error:', error);
+    logError('Get providers error:', error);
     res.status(500).json({
       error: 'Failed to fetch providers',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -49,7 +50,7 @@ export const getAuthorizationUrl = async (
 
     res.json({ authorizationUrl: authUrl, redirectUri: finalRedirectUri });
   } catch (error) {
-    console.error('Get authorization URL error:', error);
+    logError('Get authorization URL error:', error);
     res.status(500).json({
       error: 'Failed to generate authorization URL',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -153,7 +154,7 @@ export const handleCallback = async (
       accounts: connectedAccounts,
     });
   } catch (error) {
-    console.error('Handle callback error:', error);
+    logError('Handle callback error:', error);
     res.status(500).json({
       error: 'Failed to exchange authorization code',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -215,7 +216,7 @@ export const getConnections = async (
 
     res.json(connections);
   } catch (error) {
-    console.error('Get connections error:', error);
+    logError('Get connections error:', error);
     res.status(500).json({
       error: 'Failed to fetch connections',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -263,7 +264,7 @@ export const getAccounts = async (
 
         allAccounts.push(...accountsWithBank);
       } catch (err) {
-        console.error(
+        logError(
           `Failed to fetch accounts from ${connection.bankName}:`,
           err
         );
@@ -273,7 +274,7 @@ export const getAccounts = async (
 
     res.json(allAccounts);
   } catch (error) {
-    console.error('Get accounts error:', error);
+    logError('Get accounts error:', error);
     res.status(500).json({
       error: 'Failed to fetch accounts',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -318,7 +319,7 @@ export const getBalance = async (
 
     res.json(balance);
   } catch (error) {
-    console.error('Get balance error:', error);
+    logError('Get balance error:', error);
     res.status(500).json({
       error: 'Failed to fetch balance',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -369,7 +370,7 @@ export const getTransactions = async (
 
     res.json(transactions);
   } catch (error) {
-    console.error('Get transactions error:', error);
+    logError('Get transactions error:', error);
     res.status(500).json({
       error: 'Failed to fetch transactions',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -409,7 +410,7 @@ export const updateConnection = async (
         try {
           await deleteFile(currentConnection.logo);
         } catch (err) {
-          console.error('Failed to delete old bank logo:', err);
+          logError('Failed to delete old bank logo:', err);
         }
       }
 
@@ -441,7 +442,7 @@ export const updateConnection = async (
 
     res.json(connection);
   } catch (error) {
-    console.error('Update connection error:', error);
+    logError('Update connection error:', error);
     res.status(500).json({
       error: 'Failed to update connection',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -484,7 +485,7 @@ export const deleteConnection = async (
 
     res.json({ message: 'Bank connection deleted successfully' });
   } catch (error) {
-    console.error('Delete connection error:', error);
+    logError('Delete connection error:', error);
     res.status(500).json({
       error: 'Failed to delete connection',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -511,7 +512,7 @@ export const syncUserTransactions = async (
       ...result,
     });
   } catch (error) {
-    console.error('Sync transactions error:', error);
+    logError('Sync transactions error:', error);
     res.status(500).json({
       error: 'Failed to sync transactions',
       message: error instanceof Error ? error.message : 'Unknown error',

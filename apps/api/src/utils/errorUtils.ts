@@ -35,6 +35,9 @@ export const handleGenericError = (
   operation: string,
   error: any
 ): Response => {
-  console.error(`Error ${operation}:`, error);
+  // Keep runtime logging in non-test environments without polluting test output.
+  if (process.env.NODE_ENV !== 'test') {
+    console.error(`Error ${operation}:`, error);
+  }
   return res.status(500).json({ error: `Failed to ${operation}` });
 };

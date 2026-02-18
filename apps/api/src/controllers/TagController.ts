@@ -4,6 +4,7 @@ import type { Tag } from '@fintrak/types';
 import type { Request, Response } from 'express';
 import TagModel from '../models/TagModel';
 import { requireAuth } from '../utils/authUtils';
+import { logError } from '../utils/logging';
 
 export const getTags = async (req: Request, res: Response) => {
   try {
@@ -13,7 +14,7 @@ export const getTags = async (req: Request, res: Response) => {
     const tags = await TagModel.find({ userId }).sort({ name: 1 });
     res.json(tags);
   } catch (error) {
-    console.error('Error fetching tags:', error);
+    logError('Error fetching tags:', error);
     res.status(500).json({ error: 'Failed to fetch tags' });
   }
 };
@@ -32,7 +33,7 @@ export const getTagById = async (req: Request, res: Response) => {
 
     res.json(tag);
   } catch (error) {
-    console.error('Error fetching tag:', error);
+    logError('Error fetching tag:', error);
     res.status(500).json({ error: 'Failed to fetch tag' });
   }
 };
@@ -64,7 +65,7 @@ export const createTag = async (req: Request, res: Response) => {
     const savedTag = await tag.save();
     res.status(201).json(savedTag);
   } catch (error) {
-    console.error('Error creating tag:', error);
+    logError('Error creating tag:', error);
     res.status(500).json({ error: 'Failed to create tag' });
   }
 };
@@ -92,7 +93,7 @@ export const updateTag = async (req: Request, res: Response) => {
 
     res.json(tag);
   } catch (error) {
-    console.error('Error updating tag:', error);
+    logError('Error updating tag:', error);
     res.status(500).json({ error: 'Failed to update tag' });
   }
 };
@@ -111,7 +112,7 @@ export const deleteTag = async (req: Request, res: Response) => {
 
     res.json({ message: 'Tag deleted successfully' });
   } catch (error) {
-    console.error('Error deleting tag:', error);
+    logError('Error deleting tag:', error);
     res.status(500).json({ error: 'Failed to delete tag' });
   }
 };
