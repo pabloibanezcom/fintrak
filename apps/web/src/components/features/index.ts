@@ -14,3 +14,4 @@ export {
   TransactionFilters,
   type TransactionFiltersValue,
 } from './TransactionFilters';
+export { TransactionSummary } from './TransactionSummary';

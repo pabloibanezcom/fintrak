@@ -10,6 +10,7 @@ import {
 import {
   type FilterOption,
   TransactionFilters,
+  TransactionSummary,
   type TransactionFiltersValue,
 } from '@/components/features';
 import { PageContainer, PageHeader } from '@/components/layout';
@@ -173,6 +174,11 @@ export default function BankTransactionsPage() {
         totalCount={total}
         banks={bankOptions}
         accounts={filteredAccountOptions}
+      />
+
+      <TransactionSummary
+        transactions={transactions}
+        linkedTransactionIds={linkedTransactionIds}
       />
 
       <TransactionList

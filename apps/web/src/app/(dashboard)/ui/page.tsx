@@ -58,6 +58,7 @@ const features: ShowroomItem[] = [
   { name: 'DropdownMenu', href: '/ui/dropdown-menu' },
   { name: 'Toaster', href: '/ui/toaster' },
   { name: 'TransactionFilters', href: '/ui/transaction-filters' },
+  { name: 'TransactionSummary', href: '/ui/transaction-summary' },
 ];
 
 const layout: ShowroomItem[] = [
