@@ -1,4 +1,4 @@
-import type { UserProducts } from '@fintrak/types';
+import type { ProductSnapshot, UserProducts } from '@fintrak/types';
 
 /**
  * Result of comparing two numeric values
@@ -21,14 +21,6 @@ interface ItemComparison extends ComparisonMetrics {
 interface ProductGroupConfig {
   identifierKey: string;
   valueKey: string;
-}
-
-/**
- * Snapshot data structure
- */
-interface ProductSnapshot {
-  totalValue: number;
-  items: UserProducts['items'];
 }
 
 /**
@@ -145,7 +137,7 @@ export class ProductComparisonService {
    */
   static compareWithSnapshot(
     currentData: UserProducts,
-    previousSnapshot: ProductSnapshot,
+    previousSnapshot: ProductSnapshot['snapshot'],
     period: string,
     comparisonDate: Date
   ): ProductComparisonResult {

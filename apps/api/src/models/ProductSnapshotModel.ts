@@ -1,10 +1,9 @@
-import type { UserProducts } from '@fintrak/types';
+import type { ProductSnapshot as ProductSnapshotData } from '@fintrak/types';
 import mongoose, { Schema } from 'mongoose';
 
-export interface IProductSnapshot {
+export interface IProductSnapshot
+  extends Omit<ProductSnapshotData, 'id' | 'userId'> {
   userId: mongoose.Types.ObjectId;
-  date: Date;
-  snapshot: UserProducts;
   createdAt: Date;
 }
 

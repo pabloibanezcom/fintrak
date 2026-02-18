@@ -1,15 +1,7 @@
+import type { StoredBankAccount } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IBankAccount extends Document {
-  userId: string;
-  accountId: string;
-  bankId: string;
-  bankName: string;
-  name: string;
-  alias?: string;
-  iban?: string;
-  type: string;
-  currency: string;
+export interface IBankAccount extends Omit<StoredBankAccount, 'id'>, Document {
   createdAt: Date;
   updatedAt: Date;
 }

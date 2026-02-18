@@ -1,22 +1,9 @@
+import type { BankConnection, ConnectedAccount } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IConnectedAccount {
-  accountId: string;
-  iban?: string;
-  name?: string;
-  type: string;
-  currency?: string;
-}
+export interface IConnectedAccount extends ConnectedAccount {}
 
-export interface IBankConnection extends Document {
-  userId: string;
-  bankId: string; // e.g., 'santander', 'bbva'
-  bankName: string; // e.g., 'Santander', 'BBVA'
-  alias?: string; // Custom user alias for this bank
-  logo?: string; // S3 URL for bank logo
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: Date;
+export interface IBankConnection extends Omit<BankConnection, 'id'>, Document {
   connectedAccounts: IConnectedAccount[];
   createdAt: Date;
   updatedAt: Date;

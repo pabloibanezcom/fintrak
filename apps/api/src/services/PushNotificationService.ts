@@ -2,18 +2,13 @@ import Expo, {
   type ExpoPushMessage,
   type ExpoPushTicket,
 } from 'expo-server-sdk';
+import type { PushNotificationPayload } from '@fintrak/types';
 import type { IBankTransaction } from '../models/BankTransactionModel';
 import DeviceToken, { type IDeviceToken } from '../models/DeviceTokenModel';
 
 const expo = new Expo({
   accessToken: process.env.EXPO_ACCESS_TOKEN,
 });
-
-export interface NotificationPayload {
-  title: string;
-  body: string;
-  data?: Record<string, unknown>;
-}
 
 /**
  * Register a device for push notifications
@@ -53,7 +48,7 @@ export async function unregisterDevice(
  */
 export async function sendNotification(
   userId: string,
-  notification: NotificationPayload
+  notification: PushNotificationPayload
 ): Promise<ExpoPushTicket[]> {
   const tokens = await DeviceToken.find({ userId, active: true });
 

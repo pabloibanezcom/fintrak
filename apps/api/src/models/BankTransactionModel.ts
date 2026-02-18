@@ -1,22 +1,9 @@
+import type { StoredBankTransaction } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IBankTransaction extends Document {
-  userId: string;
-  accountId: string;
-  bankId: string;
-  transactionId: string;
-  timestamp: Date;
-  amount: number;
-  currency: string;
-  type: 'CREDIT' | 'DEBIT';
-  description: string;
-  merchantName?: string;
-  trueLayerCategory?: string;
-  status: 'pending' | 'settled';
-  processed: boolean;
-  notified: boolean;
-  dismissed: boolean;
-  raw: object;
+export interface IBankTransaction
+  extends Omit<StoredBankTransaction, 'id' | 'createdAt' | 'updatedAt'>,
+    Document {
   createdAt: Date;
   updatedAt: Date;
 }

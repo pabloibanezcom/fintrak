@@ -1,37 +1,9 @@
+import type { BankTransaction } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IBankTransaction extends Document {
-  transactionId: string;
-  bookingDate: string;
-  valueDate?: string;
-  transactionAmount: {
-    amount: string;
-    currency: string;
-  };
-  creditorName?: string;
-  debtorName?: string;
-  remittanceInformationUnstructured?: string;
-  bankTransactionCode?: string;
-  proprietaryBankTransactionCode?: string;
-  internalTransactionId?: string;
-  entryReference?: string;
-  mandateId?: string;
-  checkId?: string;
-  creditorId?: string;
-  bookingDateTime?: string;
-  valueDateTime?: string;
-  additionalInformation?: string;
-  additionalInformationStructured?: string;
-  balanceAfterTransaction?: {
-    balanceAmount: {
-      amount: string;
-      currency: string;
-    };
-    balanceType: string;
-    referenceDate: string;
-  };
-  accountId: string;
-  userId: string;
+export interface IBankTransaction
+  extends Omit<BankTransaction, 'id' | 'createdAt' | 'updatedAt'>,
+    Document {
   createdAt: Date;
   updatedAt: Date;
 }

@@ -38,3 +38,46 @@ export interface BankAccount {
   /** Available balance (if different from current) */
   availableBalance?: number;
 }
+
+/**
+ * Represents a persisted bank account connection record.
+ *
+ * @group Financial Types
+ */
+export interface StoredBankAccount {
+  /** Record identifier */
+  id?: string;
+
+  /** Owner user ID */
+  userId: string;
+
+  /** Provider account identifier */
+  accountId: string;
+
+  /** Bank/provider identifier */
+  bankId: string;
+
+  /** Bank/provider display name */
+  bankName: string;
+
+  /** Account display name */
+  name: string;
+
+  /** Optional user-defined alias */
+  alias?: string;
+
+  /** International Bank Account Number */
+  iban?: string;
+
+  /** Provider account type */
+  type: string;
+
+  /** ISO currency code */
+  currency: string;
+
+  /** Creation timestamp */
+  createdAt?: Date;
+
+  /** Last update timestamp */
+  updatedAt?: Date;
+}

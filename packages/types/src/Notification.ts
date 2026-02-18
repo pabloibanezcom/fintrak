@@ -106,8 +106,11 @@ export interface StoredBankTransaction {
   /** Whether push notification was sent */
   notified: boolean;
 
+  /** Whether the transaction was dismissed during review */
+  dismissed?: boolean;
+
   /** Raw TrueLayer response */
-  raw?: object;
+  raw?: unknown;
 
   /** When the record was created */
   createdAt?: Date;

@@ -1,10 +1,9 @@
+import type { DeviceToken } from '@fintrak/types';
 import mongoose, { type Document, Schema } from 'mongoose';
 
-export interface IDeviceToken extends Document {
-  userId: string;
-  token: string;
-  platform: 'ios' | 'android';
-  active: boolean;
+export interface IDeviceToken
+  extends Omit<DeviceToken, 'id' | 'createdAt' | 'updatedAt'>,
+    Document {
   createdAt: Date;
   updatedAt: Date;
 }
