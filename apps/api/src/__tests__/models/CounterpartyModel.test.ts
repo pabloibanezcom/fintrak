@@ -1,4 +1,5 @@
 import { counterpartySchemaDefinition } from '../../models/schemas/counterpartySchema';
+import { Schema } from 'mongoose';
 
 describe('CounterpartyModel Schema', () => {
   describe('schema definition', () => {
@@ -20,6 +21,7 @@ describe('CounterpartyModel Schema', () => {
         'address',
         'notes',
         'titleTemplate',
+        'defaultCategory',
       ];
 
       expectedFields.forEach((field) => {
@@ -49,6 +51,10 @@ describe('CounterpartyModel Schema', () => {
       expect(counterpartySchemaDefinition.phone).toEqual({ type: String });
       expect(counterpartySchemaDefinition.address).toEqual({ type: String });
       expect(counterpartySchemaDefinition.notes).toEqual({ type: String });
+      expect(counterpartySchemaDefinition.defaultCategory).toEqual({
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+      });
     });
   });
 

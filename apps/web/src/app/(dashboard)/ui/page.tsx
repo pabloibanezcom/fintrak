@@ -41,6 +41,7 @@ const dataDisplay: ShowroomItem[] = [
   { name: 'BankAccountCard', href: '/ui/bank-account-card' },
   { name: 'CategoryCard', href: '/ui/category-card' },
   { name: 'CategoryIconBox', href: '/ui/category-icon-box' },
+  { name: 'CounterpartyCard', href: '/ui/counterparty-card' },
   { name: 'InvestmentCard', href: '/ui/investment-card' },
   { name: 'SpendingLimitBar', href: '/ui/spending-limit-bar' },
   { name: 'StatCard', href: '/ui/stat-card' },

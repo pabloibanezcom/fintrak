@@ -6,6 +6,7 @@ import { Button, Input, Select } from '@/components/primitives';
 import {
   type Category,
   type Counterparty,
+  type CounterpartyType,
   categoriesService,
   counterpartiesService,
 } from '@/services';
@@ -31,7 +32,7 @@ export function CreateCounterpartyModal({
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: '',
-    type: 'company' as 'company' | 'person' | 'institution' | 'other',
+    type: 'company' as CounterpartyType,
     email: '',
     phone: '',
     address: '',
@@ -63,7 +64,7 @@ export function CreateCounterpartyModal({
           phone: counterparty.phone || '',
           address: counterparty.address || '',
           notes: counterparty.notes || '',
-          defaultCategory: counterparty.defaultCategory || '',
+          defaultCategory: counterparty.defaultCategory?.key || '',
         });
       } else {
         setFormData({
@@ -158,7 +159,7 @@ export function CreateCounterpartyModal({
             options={typeOptions}
             value={formData.type}
             onChange={(value) =>
-              setFormData((prev) => ({ ...prev, type: value as any }))
+              setFormData((prev) => ({ ...prev, type: value as CounterpartyType }))
             }
             disabled={isSubmitting}
           />

@@ -1,0 +1,91 @@
+.card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  border: 1px solid var(--color-border-light);
+  transition:
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    outline-color var(--transition-fast);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    var(--counterparty-hover-grad-start, transparent) 0%,
+    var(--counterparty-hover-grad-end, transparent) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 0;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card:hover {
+  background-color: var(--counterparty-hover-bg, var(--color-bg-secondary));
+  box-shadow: var(--shadow-md);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:active {
+  background-color: var(--counterparty-active-bg, var(--color-bg-tertiary));
+  box-shadow: var(--shadow-sm);
+}
+
+.card:focus-within {
+  background-color: var(--counterparty-hover-bg, var(--color-bg-secondary));
+  box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoryIcon {
+  flex-shrink: 0;
+}

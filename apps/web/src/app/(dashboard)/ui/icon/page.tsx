@@ -32,6 +32,7 @@ const iconNames = [
   'settings',
   'signOut',
   'spinner',
+  'subscription',
   'sun',
   'sync',
   'transfer',

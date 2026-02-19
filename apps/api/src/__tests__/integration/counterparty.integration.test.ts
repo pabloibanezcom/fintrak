@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import app from '../../app';
+import CategoryModel from '../../models/CategoryModel';
 import CounterpartyModel from '../../models/CounterpartyModel';
 
 describe('Counterparty Integration Tests', () => {
@@ -18,6 +19,7 @@ describe('Counterparty Integration Tests', () => {
 
   beforeEach(async () => {
     await CounterpartyModel.deleteMany({});
+    await CategoryModel.deleteMany({});
 
     // Seed test data
     await CounterpartyModel.create([
@@ -294,6 +296,41 @@ describe('Counterparty Integration Tests', () => {
   });
 
   describe('POST /api/counterparties', () => {
+    it('should create counterparty with defaultCategory key and return populated category', async () => {
+      await CategoryModel.create({
+        key: 'shopping',
+        name: { en: 'Shopping', es: 'Compras' },
+        color: '#f97316',
+        icon: 'shopping',
+        userId: testUserId,
+      });
+
+      const response = await request(app)
+        .post('/api/counterparties')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          key: 'ikea',
+          name: 'IKEA',
+          type: 'company',
+          defaultCategory: 'shopping',
+        })
+        .expect(201);
+
+      expect(response.body.defaultCategory).toEqual(
+        expect.objectContaining({
+          key: 'shopping',
+          color: '#f97316',
+          icon: 'shopping',
+        })
+      );
+      expect(response.body.defaultCategory.name).toEqual(
+        expect.objectContaining({
+          en: 'Shopping',
+          es: 'Compras',
+        })
+      );
+    });
+
     it('should create new counterparty with titleTemplate', async () => {
       const newCounterparty = {
         key: 'spotify',

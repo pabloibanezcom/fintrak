@@ -20,6 +20,29 @@ const asCounterpartyDoc = <T extends Record<string, unknown>>(data: T) =>
     toJSON: () => ({ ...data }),
   }) as any;
 
+const mockFindWithPagination = (result: any[]) => {
+  const populate = jest.fn().mockResolvedValue(result);
+  const skip = jest.fn().mockReturnValue({ populate });
+  const limit = jest.fn().mockReturnValue({ skip });
+  const sort = jest.fn().mockReturnValue({ limit });
+
+  mockCounterpartyModel.find.mockReturnValue({ sort } as any);
+
+  return { sort, limit, skip, populate };
+};
+
+const mockFindOneWithPopulate = (result: any) => {
+  const populate = jest.fn().mockResolvedValue(result);
+  mockCounterpartyModel.findOne.mockReturnValue({ populate } as any);
+  return { populate };
+};
+
+const mockFindOneAndUpdateWithPopulate = (result: any) => {
+  const populate = jest.fn().mockResolvedValue(result);
+  mockCounterpartyModel.findOneAndUpdate.mockReturnValue({ populate } as any);
+  return { populate };
+};
+
 describe('CounterpartyController', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
@@ -46,13 +69,7 @@ describe('CounterpartyController', () => {
   describe('searchCounterparties', () => {
     beforeEach(() => {
       req.query = {};
-      mockCounterpartyModel.find.mockReturnValue({
-        sort: jest.fn().mockReturnValue({
-          limit: jest.fn().mockReturnValue({
-            skip: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      } as any);
+      mockFindWithPagination([]);
       mockCounterpartyModel.countDocuments.mockResolvedValue(0);
     });
 
@@ -77,13 +94,7 @@ describe('CounterpartyController', () => {
 
       req.query = { limit: '10', offset: '0' };
 
-      mockCounterpartyModel.find.mockReturnValue({
-        sort: jest.fn().mockReturnValue({
-          limit: jest.fn().mockReturnValue({
-            skip: jest.fn().mockResolvedValue(mockCounterpartyDocs),
-          }),
-        }),
-      } as any);
+      mockFindWithPagination(mockCounterpartyDocs);
       mockCounterpartyModel.countDocuments.mockResolvedValue(2);
 
       await searchCounterparties(req as Request, res as Response);
@@ -272,13 +283,7 @@ describe('CounterpartyController', () => {
 
       req.query = { limit: '10', offset: '20' };
 
-      mockCounterpartyModel.find.mockReturnValue({
-        sort: jest.fn().mockReturnValue({
-          limit: jest.fn().mockReturnValue({
-            skip: jest.fn().mockResolvedValue(mockCounterpartyDocs),
-          }),
-        }),
-      } as any);
+      mockFindWithPagination(mockCounterpartyDocs);
       mockCounterpartyModel.countDocuments.mockResolvedValue(50);
 
       await searchCounterparties(req as Request, res as Response);
@@ -299,13 +304,7 @@ describe('CounterpartyController', () => {
     it('should handle empty search results', async () => {
       req.query = { name: 'nonexistent', limit: '50', offset: '0' };
 
-      mockCounterpartyModel.find.mockReturnValue({
-        sort: jest.fn().mockReturnValue({
-          limit: jest.fn().mockReturnValue({
-            skip: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      } as any);
+      mockFindWithPagination([]);
       mockCounterpartyModel.countDocuments.mockResolvedValue(0);
 
       await searchCounterparties(req as Request, res as Response);
@@ -362,12 +361,15 @@ describe('CounterpartyController', () => {
 
     it('should create counterparty with titleTemplate successfully', async () => {
       mockCounterpartyModel.findOne.mockResolvedValue(null);
-      const mockSave = jest.fn().mockResolvedValue({
+      const savedCounterparty = {
         key: 'amazon',
         name: 'Amazon',
         type: 'company',
         titleTemplate: 'Compra en {name}',
         userId: 'userId123',
+      };
+      const mockSave = jest.fn().mockResolvedValue({
+        populate: jest.fn().mockResolvedValue(savedCounterparty),
       });
       (mockCounterpartyModel as any).mockImplementation(() => ({
         save: mockSave,
@@ -391,11 +393,14 @@ describe('CounterpartyController', () => {
       };
 
       mockCounterpartyModel.findOne.mockResolvedValue(null);
-      const mockSave = jest.fn().mockResolvedValue({
+      const savedCounterparty = {
         key: 'local_shop',
         name: 'Local Shop',
         type: 'company',
         userId: 'userId123',
+      };
+      const mockSave = jest.fn().mockResolvedValue({
+        populate: jest.fn().mockResolvedValue(savedCounterparty),
       });
       (mockCounterpartyModel as any).mockImplementation(() => ({
         save: mockSave,
@@ -446,17 +451,17 @@ describe('CounterpartyController', () => {
         titleTemplate: 'Pedido {name}',
         userId: 'userId123',
       };
-      mockCounterpartyModel.findOneAndUpdate.mockResolvedValue(
-        updatedCounterparty as any
-      );
+      mockFindOneAndUpdateWithPopulate(updatedCounterparty as any);
 
       await updateCounterparty(req as Request, res as Response);
 
       expect(mockCounterpartyModel.findOneAndUpdate).toHaveBeenCalledWith(
         { key: 'amazon', userId: 'userId123' },
         {
-          name: 'Amazon España',
-          titleTemplate: 'Pedido {name}',
+          $set: {
+            name: 'Amazon España',
+            titleTemplate: 'Pedido {name}',
+          },
         },
         { new: true, runValidators: true }
       );
@@ -475,24 +480,24 @@ describe('CounterpartyController', () => {
         type: 'company',
         userId: 'userId123',
       };
-      mockCounterpartyModel.findOneAndUpdate.mockResolvedValue(
-        updatedCounterparty as any
-      );
+      mockFindOneAndUpdateWithPopulate(updatedCounterparty as any);
 
       await updateCounterparty(req as Request, res as Response);
 
       expect(mockCounterpartyModel.findOneAndUpdate).toHaveBeenCalledWith(
         { key: 'amazon', userId: 'userId123' },
         {
-          name: 'Amazon',
-          titleTemplate: null,
+          $set: {
+            name: 'Amazon',
+            titleTemplate: null,
+          },
         },
         { new: true, runValidators: true }
       );
     });
 
     it('should return 404 if counterparty not found', async () => {
-      mockCounterpartyModel.findOneAndUpdate.mockResolvedValue(null);
+      mockFindOneAndUpdateWithPopulate(null);
 
       await updateCounterparty(req as Request, res as Response);
 
@@ -516,9 +521,7 @@ describe('CounterpartyController', () => {
         titleTemplate: 'Compra en {name}',
         userId: 'userId123',
       };
-      mockCounterpartyModel.findOne.mockResolvedValue(
-        asCounterpartyDoc(mockCounterparty)
-      );
+      mockFindOneWithPopulate(asCounterpartyDoc(mockCounterparty));
 
       await getCounterpartyById(req as Request, res as Response);
 
@@ -530,7 +533,7 @@ describe('CounterpartyController', () => {
     });
 
     it('should return 404 if counterparty not found', async () => {
-      mockCounterpartyModel.findOne.mockResolvedValue(null);
+      mockFindOneWithPopulate(null);
 
       await getCounterpartyById(req as Request, res as Response);
 

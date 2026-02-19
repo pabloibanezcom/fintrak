@@ -20,6 +20,8 @@ export { type Category, categoriesService } from './categories';
 export {
   type CounterpartiesResponse,
   type Counterparty,
+  type CounterpartyType,
+  type UpsertCounterpartyPayload,
   counterpartiesService,
   type SearchCounterpartiesParams,
 } from './counterparties';

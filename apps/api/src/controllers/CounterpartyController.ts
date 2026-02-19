@@ -2,6 +2,7 @@
 
 import type { Counterparty } from '@fintrak/types';
 import type { Request, Response } from 'express';
+import CategoryModel from '../models/CategoryModel';
 import CounterpartyModel, {
   type ICounterparty,
 } from '../models/CounterpartyModel';
@@ -62,6 +63,44 @@ async function validateParent(
   }
 
   return parent;
+}
+
+/**
+ * Resolve a category key/object into a Category ObjectId reference.
+ * Accepts key string, { key }, null/empty (to clear), or undefined (no change).
+ */
+async function resolveDefaultCategoryRef(
+  defaultCategoryInput: unknown,
+  userId: string,
+  res: Response
+): Promise<string | null | undefined> {
+  if (defaultCategoryInput === undefined) return undefined;
+  if (defaultCategoryInput === null || defaultCategoryInput === '') return null;
+
+  let categoryKey: string | null = null;
+  if (typeof defaultCategoryInput === 'string') {
+    categoryKey = defaultCategoryInput;
+  } else if (
+    typeof defaultCategoryInput === 'object' &&
+    defaultCategoryInput !== null &&
+    'key' in defaultCategoryInput &&
+    typeof (defaultCategoryInput as { key?: unknown }).key === 'string'
+  ) {
+    categoryKey = (defaultCategoryInput as { key: string }).key;
+  }
+
+  if (!categoryKey) {
+    res.status(400).json({ error: 'defaultCategory must be a category key' });
+    return undefined;
+  }
+
+  const category = await CategoryModel.findOne({ key: categoryKey, userId });
+  if (!category) {
+    res.status(400).json({ error: 'Default category not found' });
+    return undefined;
+  }
+
+  return String(category._id);
 }
 
 export const searchCounterparties = async (req: Request, res: Response) => {
@@ -129,7 +168,8 @@ export const searchCounterparties = async (req: Request, res: Response) => {
     const counterparties = await CounterpartyModel.find(query)
       .sort(sort)
       .limit(Number(limit))
-      .skip(Number(offset));
+      .skip(Number(offset))
+      .populate('defaultCategory', 'key name color icon');
 
     // Get total count for pagination
     const totalCount = await CounterpartyModel.countDocuments(query);
@@ -148,7 +188,7 @@ export const searchCounterparties = async (req: Request, res: Response) => {
       const parents = await CounterpartyModel.find({
         userId,
         key: { $in: parentKeys },
-      });
+      }).populate('defaultCategory', 'key name color icon');
       parentMap = new Map(parents.map((p) => [p.key, p]));
     }
 
@@ -190,7 +230,10 @@ export const getCounterpartyById = async (req: Request, res: Response) => {
     if (!userId) return;
     const { id } = req.params;
 
-    const counterparty = await CounterpartyModel.findOne({ key: id, userId });
+    const counterparty = await CounterpartyModel.findOne({ key: id, userId }).populate(
+      'defaultCategory',
+      'key name color icon'
+    );
     if (!counterparty) {
       return handleNotFoundError(res, 'Counterparty');
     }
@@ -201,7 +244,7 @@ export const getCounterpartyById = async (req: Request, res: Response) => {
       parent = await CounterpartyModel.findOne({
         key: counterparty.parentKey,
         userId,
-      });
+      }).populate('defaultCategory', 'key name color icon');
     }
 
     res.json(resolveWithParent(counterparty, parent));
@@ -214,7 +257,9 @@ export const createCounterparty = async (req: Request, res: Response) => {
   try {
     const userId = requireAuth(req, res);
     if (!userId) return;
-    const counterpartyData: Counterparty = req.body;
+    const counterpartyData = req.body as Counterparty & {
+      defaultCategory?: unknown;
+    };
 
     // Check if counterparty with same key already exists for this user
     const existingCounterparty = await CounterpartyModel.findOne({
@@ -238,12 +283,24 @@ export const createCounterparty = async (req: Request, res: Response) => {
       if (!parent) return;
     }
 
+    const defaultCategoryRef = await resolveDefaultCategoryRef(
+      counterpartyData.defaultCategory,
+      userId,
+      res
+    );
+    if (defaultCategoryRef === undefined && counterpartyData.defaultCategory !== undefined)
+      return;
+
     const counterparty = new CounterpartyModel({
       ...counterpartyData,
+      defaultCategory: defaultCategoryRef || undefined,
       userId,
     });
 
-    const savedCounterparty = await counterparty.save();
+    const savedCounterparty = await (await counterparty.save()).populate(
+      'defaultCategory',
+      'key name color icon'
+    );
     res.status(201).json(savedCounterparty);
   } catch (error) {
     return handleGenericError(res, 'create counterparty', error);
@@ -255,7 +312,9 @@ export const updateCounterparty = async (req: Request, res: Response) => {
     const userId = requireAuth(req, res);
     if (!userId) return;
     const { id } = req.params;
-    const updateData: Partial<Counterparty> = req.body;
+    const updateData = req.body as Partial<Counterparty> & {
+      defaultCategory?: unknown;
+    };
 
     // Validate parent if being updated
     if (updateData.parentKey) {
@@ -275,11 +334,38 @@ export const updateCounterparty = async (req: Request, res: Response) => {
       }
     }
 
+    const updatePayload: Record<string, unknown> = { ...updateData };
+    const unsetPayload: Record<string, ''> = {};
+
+    const defaultCategoryRef = await resolveDefaultCategoryRef(
+      updateData.defaultCategory,
+      userId,
+      res
+    );
+    if (defaultCategoryRef === undefined && updateData.defaultCategory !== undefined)
+      return;
+
+    if (updateData.defaultCategory !== undefined) {
+      if (defaultCategoryRef === null) {
+        unsetPayload.defaultCategory = '';
+        delete updatePayload.defaultCategory;
+      } else {
+        updatePayload.defaultCategory = defaultCategoryRef;
+      }
+    }
+
+    const updateQuery: Record<string, Record<string, unknown>> = {
+      $set: updatePayload,
+    };
+    if (Object.keys(unsetPayload).length > 0) {
+      updateQuery.$unset = unsetPayload;
+    }
+
     const counterparty = await CounterpartyModel.findOneAndUpdate(
       { key: id, userId },
-      updateData,
+      updateQuery,
       { new: true, runValidators: true }
-    );
+    ).populate('defaultCategory', 'key name color icon');
 
     if (!counterparty) {
       return handleNotFoundError(res, 'Counterparty');

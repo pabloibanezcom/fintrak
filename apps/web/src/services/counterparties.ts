@@ -1,9 +1,26 @@
 import { apiClient } from './api';
+import type { Category } from './categories';
+
+export type CounterpartyType = 'company' | 'person' | 'institution' | 'other';
 
 export interface Counterparty {
   key: string;
   name: string;
-  type?: 'company' | 'person' | 'institution' | 'other';
+  type?: CounterpartyType;
+  logo?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  titleTemplate?: string;
+  parentKey?: string;
+  defaultCategory?: Category;
+}
+
+export interface UpsertCounterpartyPayload {
+  key?: string;
+  name?: string;
+  type?: CounterpartyType;
   logo?: string;
   email?: string;
   phone?: string;
@@ -26,7 +43,7 @@ export interface CounterpartiesResponse {
 
 export interface SearchCounterpartiesParams {
   name?: string;
-  type?: 'company' | 'person' | 'institution' | 'other';
+  type?: CounterpartyType;
   parentKey?: string;
   limit?: number;
   offset?: number;
@@ -60,13 +77,15 @@ export const counterpartiesService = {
     return apiClient.get<Counterparty>(`/counterparties/${id}`);
   },
 
-  create: async (data: Partial<Counterparty>): Promise<Counterparty> => {
+  create: async (
+    data: UpsertCounterpartyPayload
+  ): Promise<Counterparty> => {
     return apiClient.post<Counterparty>('/counterparties', data);
   },
 
   update: async (
     id: string,
-    data: Partial<Counterparty>
+    data: UpsertCounterpartyPayload
   ): Promise<Counterparty> => {
     return apiClient.put<Counterparty>(`/counterparties/${id}`, data);
   },

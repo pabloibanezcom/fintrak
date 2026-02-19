@@ -1,3 +1,5 @@
+import type { Category } from './Category';
+
 /**
  * Represents a person, company, or organization involved in financial transactions.
  * Used to track who money was paid to (payee) or received from (source).
@@ -35,6 +37,6 @@ export interface Counterparty {
   /** Key of the parent counterparty (for child/location counterparties) */
   parentKey?: string;
 
-  /** Default category key for transactions with this counterparty */
-  defaultCategory?: string;
+  /** Default category reference for transactions with this counterparty */
+  defaultCategory?: Category;
 }

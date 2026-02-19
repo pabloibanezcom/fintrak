@@ -2,19 +2,26 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  CounterpartyAvatarBox,
+  TransactionList,
+  type TransactionListItem,
+} from '@/components/data-display';
 import { PageContainer, SectionHeader } from '@/components/layout';
 import { CreateCounterpartyModal } from '@/components/modals';
-import { Avatar, Button, Card, Icon } from '@/components/primitives';
+import { Button, Card, Icon, isValidIconName } from '@/components/primitives';
 import {
   type Counterparty,
   counterpartiesService,
   type UserTransaction,
   userTransactionsService,
 } from '@/services';
-import { formatCurrency, formatDate, getLocalizedText, toast } from '@/utils';
+import { formatCurrency, toast } from '@/utils';
 
 export default function CounterpartyDetailPage() {
+  const locale = useLocale() as 'en' | 'es';
   const params = useParams();
   const router = useRouter();
   const counterpartyKey = params.counterpartyKey as string;
@@ -78,15 +85,6 @@ export default function CounterpartyDetailPage() {
     fetchCounterparty();
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  };
-
   // Calculate statistics
   const stats = transactions.reduce(
     (acc, tx) => {
@@ -102,6 +100,30 @@ export default function CounterpartyDetailPage() {
     { totalExpenses: 0, expenseCount: 0, totalIncome: 0, incomeCount: 0 }
   );
 
+  const transactionListItems: TransactionListItem[] = useMemo(
+    () =>
+      transactions.map((tx) => {
+        const categoryLabel = tx.category
+          ? tx.category.name[locale] || tx.category.name.en
+          : undefined;
+        const subtitleParts = [tx.description, categoryLabel].filter(
+          Boolean
+        ) as string[];
+
+        return {
+          id: tx._id,
+          title: tx.title,
+          description:
+            subtitleParts.length > 0 ? subtitleParts.join(' • ') : undefined,
+          amount: tx.amount,
+          currency: tx.currency,
+          date: tx.date,
+          type: tx.type === 'income' ? 'credit' : 'debit',
+        };
+      }),
+    [locale, transactions]
+  );
+
   if (!counterparty) {
     return (
       <PageContainer>
@@ -109,6 +131,11 @@ export default function CounterpartyDetailPage() {
       </PageContainer>
     );
   }
+
+  const category = counterparty.defaultCategory;
+  const secondaryText = category
+    ? category.name[locale] || category.key
+    : counterparty.type;
 
   return (
     <PageContainer>
@@ -118,8 +145,8 @@ export default function CounterpartyDetailPage() {
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 'var(--spacing-xs)',
-          marginBottom: 'var(--spacing-md)',
+          gap: 'var(--spacing-1)',
+          marginBottom: 'var(--spacing-4)',
         }}
       >
         <Icon name="arrowLeft" size={16} />
@@ -131,49 +158,44 @@ export default function CounterpartyDetailPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 'var(--spacing-lg)',
+          marginBottom: 'var(--spacing-6)',
         }}
       >
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--spacing-md)',
+            gap: 'var(--spacing-4)',
           }}
         >
-          <Avatar
-            src={counterparty.logo}
-            alt={counterparty.name}
-            fallback={getInitials(counterparty.name)}
-            size="lg"
-          />
+          <CounterpartyAvatarBox counterparty={counterparty} size="lg" />
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
               {counterparty.name}
             </h1>
-            <p
-              style={{
-                color: 'var(--color-text-secondary)',
-                margin: '0.25rem 0 0',
-              }}
-            >
-              {counterparty.type && (
-                <span
-                  style={{
-                    display: 'inline-block',
-                    padding: '0.125rem 0.5rem',
-                    marginRight: '0.5rem',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--color-background-secondary)',
-                    fontSize: '0.75rem',
-                    fontWeight: '500',
-                  }}
-                >
-                  {counterparty.type}
-                </span>
-              )}
-              Counterparty details and transactions
-            </p>
+            {secondaryText && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-1)',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: '500',
+                }}
+              >
+                {category?.icon && isValidIconName(category.icon) && (
+                  <Icon
+                    name={category.icon}
+                    size={14}
+                    style={
+                      category.color ? { color: category.color } : undefined
+                    }
+                  />
+                )}
+                <span>{secondaryText}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -278,78 +300,13 @@ export default function CounterpartyDetailPage() {
 
       <div className="flex-col">
         <SectionHeader title="Transactions" />
-
-        {isLoading ? (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            Loading transactions...
-          </div>
-        ) : transactions.length === 0 ? (
-          <Card className="card-container">
-            <p>No transactions found for this counterparty.</p>
-          </Card>
-        ) : (
-          <div className="flex-col">
-            {transactions.map((tx) => (
-              <Card key={tx._id} className="card-container" padding="sm">
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: 'var(--spacing-md)',
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>
-                      {tx.title}
-                    </div>
-                    {tx.description && (
-                      <div
-                        style={{
-                          fontSize: '0.875rem',
-                          color: 'var(--color-text-secondary)',
-                          marginBottom: '0.25rem',
-                        }}
-                      >
-                        {tx.description}
-                      </div>
-                    )}
-                    <div
-                      style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--color-text-secondary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <span>{formatDate(tx.date)}</span>
-                      {tx.category && (
-                        <>
-                          <span>•</span>
-                          <span>{getLocalizedText(tx.category.name)}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      fontWeight: '600',
-                      whiteSpace: 'nowrap',
-                      color:
-                        tx.type === 'income'
-                          ? 'var(--color-success)'
-                          : 'var(--color-error)',
-                    }}
-                  >
-                    {tx.type === 'income' ? '+' : '-'}
-                    {formatCurrency(tx.amount, tx.currency)}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+        <TransactionList
+          transactions={transactionListItems}
+          isLoading={isLoading}
+          showBankInfo={false}
+          emptyMessage="No transactions found for this counterparty."
+          formatAmount={(amount, currency) => formatCurrency(amount, currency)}
+        />
       </div>
 
       <CreateCounterpartyModal
