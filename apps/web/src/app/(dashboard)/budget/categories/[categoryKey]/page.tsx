@@ -3,17 +3,22 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  CategoryIconBox,
+  TransactionList,
+  type TransactionListItem,
+} from '@/components/data-display';
 import { PageContainer, SectionHeader } from '@/components/layout';
 import { CreateCategoryModal } from '@/components/modals';
-import { Button, Card, Icon, isValidIconName } from '@/components/primitives';
+import { Button, Card, Icon } from '@/components/primitives';
 import {
   type Category,
   categoriesService,
   type UserTransaction,
   userTransactionsService,
 } from '@/services';
-import { formatCurrency, formatDate, toast } from '@/utils';
+import { formatCurrency, toast } from '@/utils';
 
 export default function CategoryDetailPage() {
   const locale = useLocale() as 'en' | 'es';
@@ -95,6 +100,25 @@ export default function CategoryDetailPage() {
     { totalExpenses: 0, expenseCount: 0, totalIncome: 0, incomeCount: 0 }
   );
 
+  const transactionListItems: TransactionListItem[] = useMemo(
+    () =>
+      transactions.map((tx) => {
+        const subtitleParts = [tx.description, tx.counterparty?.name].filter(
+          Boolean
+        ) as string[];
+        return {
+          id: tx._id,
+          title: tx.title,
+          description: subtitleParts.length > 0 ? subtitleParts.join(' • ') : undefined,
+          amount: tx.amount,
+          currency: tx.currency,
+          date: tx.date,
+          type: tx.type === 'income' ? 'credit' : 'debit',
+        };
+      }),
+    [transactions]
+  );
+
   if (!category) {
     return (
       <PageContainer>
@@ -111,8 +135,8 @@ export default function CategoryDetailPage() {
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 'var(--spacing-xs)',
-          marginBottom: 'var(--spacing-md)',
+          gap: 'var(--spacing-1)',
+          marginBottom: 'var(--spacing-4)',
         }}
       >
         <Icon name="arrowLeft" size={16} />
@@ -124,43 +148,17 @@ export default function CategoryDetailPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 'var(--spacing-lg)',
+          marginBottom: 'var(--spacing-6)',
         }}
       >
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--spacing-md)',
+            gap: 'var(--spacing-4)',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '64px',
-              height: '64px',
-              borderRadius: 'var(--radius-lg)',
-              backgroundColor: category.color
-                ? `${category.color}15`
-                : undefined,
-              color: category.color || undefined,
-            }}
-          >
-            {category.icon && isValidIconName(category.icon) ? (
-              <Icon name={category.icon} size={32} />
-            ) : (
-              <span style={{ fontSize: '1.5rem', fontWeight: '600' }}>
-                {category.name[locale]
-                  .split(' ')
-                  .map((n) => n[0])
-                  .slice(0, 2)
-                  .join('')
-                  .toUpperCase()}
-              </span>
-            )}
-          </div>
+          <CategoryIconBox category={category} locale={locale} size={64} />
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
               {category.name[locale]}
@@ -277,78 +275,13 @@ export default function CategoryDetailPage() {
 
       <div className="flex-col">
         <SectionHeader title="Transactions" />
-
-        {isLoading ? (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            Loading transactions...
-          </div>
-        ) : transactions.length === 0 ? (
-          <Card className="card-container">
-            <p>No transactions found for this category.</p>
-          </Card>
-        ) : (
-          <div className="flex-col">
-            {transactions.map((tx) => (
-              <Card key={tx._id} className="card-container" padding="sm">
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: 'var(--spacing-md)',
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>
-                      {tx.title}
-                    </div>
-                    {tx.description && (
-                      <div
-                        style={{
-                          fontSize: '0.875rem',
-                          color: 'var(--color-text-secondary)',
-                          marginBottom: '0.25rem',
-                        }}
-                      >
-                        {tx.description}
-                      </div>
-                    )}
-                    <div
-                      style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--color-text-secondary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <span>{formatDate(tx.date)}</span>
-                      {tx.counterparty && (
-                        <>
-                          <span>•</span>
-                          <span>{tx.counterparty.name}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      fontWeight: '600',
-                      whiteSpace: 'nowrap',
-                      color:
-                        tx.type === 'income'
-                          ? 'var(--color-success)'
-                          : 'var(--color-error)',
-                    }}
-                  >
-                    {tx.type === 'income' ? '+' : '-'}
-                    {formatCurrency(tx.amount, tx.currency)}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+        <TransactionList
+          transactions={transactionListItems}
+          isLoading={isLoading}
+          showBankInfo={false}
+          emptyMessage="No transactions found for this category."
+          formatAmount={(amount, currency) => formatCurrency(amount, currency)}
+        />
       </div>
 
       <CreateCategoryModal

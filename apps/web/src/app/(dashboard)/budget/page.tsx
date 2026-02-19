@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 import { PageContainer } from '@/components/layout';
@@ -65,6 +66,30 @@ export default function BudgetPage() {
         >
           {t('common.comingSoon')}
         </p>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--spacing-2)',
+            marginTop: 'var(--spacing-2)',
+            alignItems: 'center',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-tertiary)',
+            }}
+          >
+            Quick links
+          </span>
+          <Link href="/budget/categories" className="link-primary">
+            /budget/categories
+          </Link>
+          <Link href="/budget/counterparties" className="link-primary">
+            /budget/counterparties
+          </Link>
+        </div>
       </Card>
     </PageContainer>
   );

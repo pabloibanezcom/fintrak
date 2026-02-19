@@ -28,6 +28,7 @@ export { NotificationsIcon } from './Notifications';
 export { OtherIcon } from './Other';
 export { OverviewIcon } from './Overview';
 export { PayrollIcon } from './Payroll';
+export { PlusIcon } from './Plus';
 export { ReportsIcon } from './Reports';
 export { SearchIcon } from './Search';
 export { SettingsIcon } from './Settings';

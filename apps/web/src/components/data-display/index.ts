@@ -3,6 +3,8 @@ export {
   type BankAccountCardProps,
   type BankAccountItem,
 } from './BankAccountCard';
+export { CategoryCard, type CategoryCardProps } from './CategoryCard';
+export { CategoryIconBox, type CategoryIconBoxProps } from './CategoryIconBox';
 export {
   InvestmentCard,
   type InvestmentCardProps,
