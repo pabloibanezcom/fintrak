@@ -11,6 +11,7 @@ import {
   counterpartiesService,
 } from '@/services';
 import { getLocalizedText, toast } from '@/utils';
+import { LogoPicker } from './LogoPicker';
 import styles from './CreateCounterpartyModal.module.css';
 
 export interface CreateCounterpartyModalProps {
@@ -33,6 +34,7 @@ export function CreateCounterpartyModal({
   const [formData, setFormData] = useState({
     name: '',
     type: 'company' as CounterpartyType,
+    logo: '',
     email: '',
     phone: '',
     address: '',
@@ -60,6 +62,7 @@ export function CreateCounterpartyModal({
         setFormData({
           name: counterparty.name,
           type: counterparty.type || 'company',
+          logo: counterparty.logo || '',
           email: counterparty.email || '',
           phone: counterparty.phone || '',
           address: counterparty.address || '',
@@ -70,6 +73,7 @@ export function CreateCounterpartyModal({
         setFormData({
           name: '',
           type: 'company',
+          logo: '',
           email: '',
           phone: '',
           address: '',
@@ -96,6 +100,7 @@ export function CreateCounterpartyModal({
       if (counterparty) {
         await counterpartiesService.update(counterparty.key, {
           ...formData,
+          logo: formData.logo || undefined,
           email: formData.email || undefined,
           phone: formData.phone || undefined,
           address: formData.address || undefined,
@@ -106,6 +111,7 @@ export function CreateCounterpartyModal({
       } else {
         await counterpartiesService.create({
           ...formData,
+          logo: formData.logo || undefined,
           email: formData.email || undefined,
           phone: formData.phone || undefined,
           address: formData.address || undefined,
@@ -144,6 +150,15 @@ export function CreateCounterpartyModal({
         {error && <div className={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          <LogoPicker
+            currentLogo={formData.logo}
+            counterpartyName={formData.name}
+            onSelect={(url) =>
+              setFormData((prev) => ({ ...prev, logo: url }))
+            }
+            onRemove={() => setFormData((prev) => ({ ...prev, logo: '' }))}
+          />
+
           <Input
             label="Name *"
             value={formData.name}

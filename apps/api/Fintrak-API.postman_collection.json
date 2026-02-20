@@ -663,7 +663,7 @@
                   "key": "file",
                   "type": "file",
                   "src": "",
-                  "description": "Excel file (.xlsx) containing transactions. Supports BBVA 'Últimos movimientos' format or standard format with columns: date, description, amount, currency (optional), type (optional), category (optional), periodicity (optional)"
+                  "description": "Excel file (.xlsx) containing transactions. Supports BBVA '\u00daltimos movimientos' format or standard format with columns: date, description, amount, currency (optional), type (optional), category (optional), periodicity (optional)"
                 }
               ]
             },
@@ -1027,7 +1027,7 @@
                   "key": "file",
                   "type": "file",
                   "src": "",
-                  "description": "JSON file containing counterparties. Expected format: [{\"key\": \"amazon_es\", \"name\": \"Amazon España\", \"type\": {\"key\": \"company\", \"name\": \"Empresa\"}, \"email\": \"customerservice@amazon.es\", \"notes\": \"Tienda online\"}]"
+                  "description": "JSON file containing counterparties. Expected format: [{\"key\": \"amazon_es\", \"name\": \"Amazon Espa\u00f1a\", \"type\": {\"key\": \"company\", \"name\": \"Empresa\"}, \"email\": \"customerservice@amazon.es\", \"notes\": \"Tienda online\"}]"
                 }
               ]
             },
@@ -2789,7 +2789,7 @@
                 "accounts"
               ]
             },
-            "description": "⚠️ DEPRECATED: This endpoint has been removed. Bank accounts are now included in the unified GET /api/products endpoint, which returns accounts from all sources (MyInvestor and TrueLayer) in the 'bankAccounts' field."
+            "description": "\u26a0\ufe0f DEPRECATED: This endpoint has been removed. Bank accounts are now included in the unified GET /api/products endpoint, which returns accounts from all sources (MyInvestor and TrueLayer) in the 'bankAccounts' field."
           },
           "response": []
         },
@@ -3522,6 +3522,173 @@
         }
       ],
       "description": "Upload media files to AWS S3 organized by user ID and media type"
+    },
+    {
+      "name": "Logos",
+      "item": [
+        {
+          "name": "Search Logos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rootUrl}}/api/logos/search?q=Apple",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "logos",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Apple",
+                  "description": "Search term. \"logo png\" is appended automatically."
+                }
+              ]
+            },
+            "description": "Search DuckDuckGo images for logos matching the query. Returns up to 12 results with thumbnail and full image URLs."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{rootUrl}}/api/logos/search?q=Apple",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logos",
+                    "search"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "Apple"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\"results\":[{\"title\":\"Apple Logo PNG\",\"url\":\"https://example.com/apple-logo.png\",\"thumbnail\":\"https://tse1.mm.bing.net/th?id=example\"}]}"
+            }
+          ]
+        },
+        {
+          "name": "Pick Logo (download & upload to S3)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"url\": \"https://example.com/apple-logo.png\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{rootUrl}}/api/logos/pick",
+              "host": [
+                "{{rootUrl}}"
+              ],
+              "path": [
+                "api",
+                "logos",
+                "pick"
+              ]
+            },
+            "description": "Downloads an image from the provided URL and uploads it to S3 under users/{userId}/counterparty-logo/. Returns the S3 URL to store as the counterparty logo."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"url\": \"https://example.com/apple-logo.png\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{rootUrl}}/api/logos/pick",
+                  "host": [
+                    "{{rootUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "logos",
+                    "pick"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\"url\": \"https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/abc123/counterparty-logo/8f2a1b3c.png\"}"
+            }
+          ]
+        }
+      ],
+      "description": "Logo search and S3 upload endpoints for counterparty logos"
     },
     {
       "name": "Notifications",

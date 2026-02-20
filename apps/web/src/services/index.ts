@@ -25,6 +25,7 @@ export {
   type SearchCounterpartiesParams,
   type UpsertCounterpartyPayload,
 } from './counterparties';
+export { type LogoSearchResult, logosService } from './logos';
 export {
   type UserTransaction,
   type UserTransactionsResponse,
