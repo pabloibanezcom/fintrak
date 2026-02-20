@@ -230,10 +230,10 @@ export const getCounterpartyById = async (req: Request, res: Response) => {
     if (!userId) return;
     const { id } = req.params;
 
-    const counterparty = await CounterpartyModel.findOne({ key: id, userId }).populate(
-      'defaultCategory',
-      'key name color icon'
-    );
+    const counterparty = await CounterpartyModel.findOne({
+      key: id,
+      userId,
+    }).populate('defaultCategory', 'key name color icon');
     if (!counterparty) {
       return handleNotFoundError(res, 'Counterparty');
     }
@@ -288,7 +288,10 @@ export const createCounterparty = async (req: Request, res: Response) => {
       userId,
       res
     );
-    if (defaultCategoryRef === undefined && counterpartyData.defaultCategory !== undefined)
+    if (
+      defaultCategoryRef === undefined &&
+      counterpartyData.defaultCategory !== undefined
+    )
       return;
 
     const counterparty = new CounterpartyModel({
@@ -342,7 +345,10 @@ export const updateCounterparty = async (req: Request, res: Response) => {
       userId,
       res
     );
-    if (defaultCategoryRef === undefined && updateData.defaultCategory !== undefined)
+    if (
+      defaultCategoryRef === undefined &&
+      updateData.defaultCategory !== undefined
+    )
       return;
 
     if (updateData.defaultCategory !== undefined) {

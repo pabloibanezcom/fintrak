@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { AuthDivider } from '@/components/primitives';
-import { Card, Icon } from '@/components/primitives';
+import { AuthDivider, Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function AuthDividerShowroomPage() {

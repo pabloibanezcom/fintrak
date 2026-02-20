@@ -79,9 +79,7 @@ export default function ModalShowroomPage() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Without Close Button</h2>
         <Card className={styles.showcase}>
-          <Button onClick={() => setNoCloseOpen(true)}>
-            No Close Button
-          </Button>
+          <Button onClick={() => setNoCloseOpen(true)}>No Close Button</Button>
         </Card>
 
         <Modal

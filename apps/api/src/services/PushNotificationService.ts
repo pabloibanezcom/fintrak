@@ -1,8 +1,8 @@
+import type { PushNotificationPayload } from '@fintrak/types';
 import Expo, {
   type ExpoPushMessage,
   type ExpoPushTicket,
 } from 'expo-server-sdk';
-import type { PushNotificationPayload } from '@fintrak/types';
 import type { IBankTransaction } from '../models/BankTransactionModel';
 import DeviceToken, { type IDeviceToken } from '../models/DeviceTokenModel';
 

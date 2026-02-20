@@ -264,10 +264,7 @@ export const getAccounts = async (
 
         allAccounts.push(...accountsWithBank);
       } catch (err) {
-        logError(
-          `Failed to fetch accounts from ${connection.bankName}:`,
-          err
-        );
+        logError(`Failed to fetch accounts from ${connection.bankName}:`, err);
         // Continue with other banks even if one fails
       }
     }

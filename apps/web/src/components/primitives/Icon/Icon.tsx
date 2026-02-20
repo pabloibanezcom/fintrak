@@ -45,8 +45,8 @@ import {
   SyncIcon,
   TaxIcon,
   TransferIcon,
-  TrashIcon,
   TransportIcon,
+  TrashIcon,
   UtilitiesIcon,
 } from './icons';
 

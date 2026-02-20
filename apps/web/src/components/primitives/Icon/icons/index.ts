@@ -41,6 +41,6 @@ export { SunIcon } from './Sun';
 export { SyncIcon } from './Sync';
 export { TaxIcon } from './Tax';
 export { TransferIcon } from './Transfer';
-export { TrashIcon } from './Trash';
 export { TransportIcon } from './Transport';
+export { TrashIcon } from './Trash';
 export { UtilitiesIcon } from './Utilities';

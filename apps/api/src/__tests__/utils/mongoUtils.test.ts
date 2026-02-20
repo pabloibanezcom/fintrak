@@ -25,10 +25,15 @@ describe('mongoUtils', () => {
       nested: { keep: true },
     };
 
-    const result = prepareAggregationQuery(originalQuery, ['userId', 'accountId']);
+    const result = prepareAggregationQuery(originalQuery, [
+      'userId',
+      'accountId',
+    ]);
 
     expect(result.userId).toBeInstanceOf(mongoose.Types.ObjectId);
-    expect((result.userId as mongoose.Types.ObjectId).toString()).toBe(validUserId);
+    expect((result.userId as mongoose.Types.ObjectId).toString()).toBe(
+      validUserId
+    );
     expect(result.accountId).toBe('not-an-object-id');
     expect(result.amount).toEqual({ $gte: 100 });
     expect(result.nested).toEqual({ keep: true });

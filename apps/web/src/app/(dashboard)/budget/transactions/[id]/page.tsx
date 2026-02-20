@@ -184,9 +184,7 @@ export default function TransactionDetailPage() {
               >
                 Category
               </span>
-              <span style={{ fontWeight: '500' }}>
-                {categoryName}
-              </span>
+              <span style={{ fontWeight: '500' }}>{categoryName}</span>
             </div>
             <div>
               <span
@@ -215,9 +213,7 @@ export default function TransactionDetailPage() {
                 >
                   {isExpense ? 'Payee' : 'Source'}
                 </span>
-                <span style={{ fontWeight: '500' }}>
-                  {counterpartyName}
-                </span>
+                <span style={{ fontWeight: '500' }}>{counterpartyName}</span>
               </div>
             )}
             <div>

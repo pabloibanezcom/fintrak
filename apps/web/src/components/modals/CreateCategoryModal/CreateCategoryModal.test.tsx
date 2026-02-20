@@ -166,7 +166,9 @@ describe('CreateCategoryModal', () => {
       });
     });
 
-    expect(toastSuccessSpy).toHaveBeenCalledWith('Category created successfully');
+    expect(toastSuccessSpy).toHaveBeenCalledWith(
+      'Category created successfully'
+    );
     expect(onSuccess).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -200,7 +202,9 @@ describe('CreateCategoryModal', () => {
       });
     });
 
-    expect(toastSuccessSpy).toHaveBeenCalledWith('Category updated successfully');
+    expect(toastSuccessSpy).toHaveBeenCalledWith(
+      'Category updated successfully'
+    );
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

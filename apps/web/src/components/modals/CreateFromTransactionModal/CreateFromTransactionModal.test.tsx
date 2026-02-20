@@ -206,11 +206,7 @@ describe('CreateFromTransactionModal', () => {
 
   it('returns null when transaction is missing', () => {
     const { container } = render(
-      <CreateFromTransactionModal
-        isOpen
-        onClose={vi.fn()}
-        transaction={null}
-      />
+      <CreateFromTransactionModal isOpen onClose={vi.fn()} transaction={null} />
     );
 
     expect(container.firstChild).toBeNull();
@@ -291,7 +287,9 @@ describe('CreateFromTransactionModal', () => {
       });
     });
 
-    expect(toastSuccessSpy).toHaveBeenCalledWith('Expense created successfully');
+    expect(toastSuccessSpy).toHaveBeenCalledWith(
+      'Expense created successfully'
+    );
     expect(onSuccess).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -357,7 +355,10 @@ describe('CreateFromTransactionModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save note' }));
 
     await waitFor(() => {
-      expect(dismissTransactionSpy).toHaveBeenCalledWith('tx-1', 'Updated note');
+      expect(dismissTransactionSpy).toHaveBeenCalledWith(
+        'tx-1',
+        'Updated note'
+      );
     });
 
     expect(onDismissChange).toHaveBeenCalledWith('tx-1', true, 'Updated note');

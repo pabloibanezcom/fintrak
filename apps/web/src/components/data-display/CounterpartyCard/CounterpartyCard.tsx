@@ -1,7 +1,7 @@
 'use client';
 
+import { Link } from 'next-view-transitions';
 import type { CSSProperties } from 'react';
-import Link from 'next/link';
 import { Card, Icon, isValidIconName } from '@/components/primitives';
 import type { Category, Counterparty } from '@/services';
 import { CounterpartyAvatarBox } from '../CounterpartyAvatarBox';
@@ -66,9 +66,22 @@ export function CounterpartyCard({
   return (
     <Card className={styles.card} padding="sm" style={cardStyle}>
       <Link href={href} className={styles.link}>
-        <CounterpartyAvatarBox counterparty={counterpartyWithCategory} size="md" />
+        <CounterpartyAvatarBox
+          counterparty={counterpartyWithCategory}
+          size="md"
+          viewTransitionName={`cp-avatar-${counterparty.key}`}
+        />
         <div className={styles.info}>
-          <span className={styles.name}>{counterparty.name}</span>
+          <span
+            className={styles.name}
+            style={
+              {
+                viewTransitionName: `cp-name-${counterparty.key}`,
+              } as CSSProperties
+            }
+          >
+            {counterparty.name}
+          </span>
           {secondaryText && (
             <span className={styles.secondary}>
               {category?.icon && isValidIconName(category.icon) && (

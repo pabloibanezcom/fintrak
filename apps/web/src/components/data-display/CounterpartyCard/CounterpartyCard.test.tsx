@@ -39,7 +39,9 @@ describe('CounterpartyCard', () => {
     expect(screen.getByText('Coffee Shop Ltd')).toBeTruthy();
     expect(screen.getByText('Food & Dining')).toBeTruthy();
     const link = screen.getByRole('link');
-    expect(link.getAttribute('href')).toBe('/budget/counterparties/coffee-shop');
+    expect(link.getAttribute('href')).toBe(
+      '/budget/counterparties/coffee-shop'
+    );
   });
 
   it('shows counterparty type when default category is missing', () => {

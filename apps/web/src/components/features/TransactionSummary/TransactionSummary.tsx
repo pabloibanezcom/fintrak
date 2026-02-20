@@ -27,7 +27,10 @@ export function TransactionSummary({
 
       totalCount += 1;
       const currentTotal = totalsByCurrency.get(transaction.currency) || 0;
-      totalsByCurrency.set(transaction.currency, currentTotal + transaction.amount);
+      totalsByCurrency.set(
+        transaction.currency,
+        currentTotal + transaction.amount
+      );
 
       if (linkedTransactionIds.has(transaction._id)) {
         linkedCount += 1;

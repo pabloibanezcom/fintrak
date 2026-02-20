@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import type { InvestmentSummary } from '@fintrak/types';
+import Link from 'next/link';
 import { InvestmentCard } from '@/components/data-display';
 import { Card, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
@@ -43,8 +43,9 @@ export default function InvestmentCardShowroomPage() {
         </Link>
         <h1 className={styles.title}>InvestmentCard</h1>
         <p className={styles.subtitle}>
-          Displays an investment portfolio overview grouped by type (Funds, ETCs,
-          Crypto) with totals, profit/loss indicators, and a visibility toggle.
+          Displays an investment portfolio overview grouped by type (Funds,
+          ETCs, Crypto) with totals, profit/loss indicators, and a visibility
+          toggle.
         </p>
       </header>
 

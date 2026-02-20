@@ -1,1 +1,4 @@
-export { CounterpartyCard, type CounterpartyCardProps } from './CounterpartyCard';
+export {
+  CounterpartyCard,
+  type CounterpartyCardProps,
+} from './CounterpartyCard';

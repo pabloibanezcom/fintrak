@@ -1,7 +1,7 @@
 'use client';
 
-import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import { Card } from '@/components/primitives';
 import type { Category } from '@/services';
 import { CategoryIconBox } from '../CategoryIconBox';

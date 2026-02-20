@@ -18,7 +18,10 @@ describe('queryUtils', () => {
     const explicitReq = {
       query: { limit: '10', offset: '30' },
     } as unknown as Request;
-    expect(parsePaginationParams(explicitReq)).toEqual({ limit: 10, offset: 30 });
+    expect(parsePaginationParams(explicitReq)).toEqual({
+      limit: 10,
+      offset: 30,
+    });
   });
 
   it('parses sort params with validation and defaults', () => {

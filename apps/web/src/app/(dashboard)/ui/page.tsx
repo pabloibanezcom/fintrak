@@ -53,7 +53,10 @@ const modals: ShowroomItem[] = [
   { name: 'Modal', href: '/ui/modal' },
   { name: 'CreateCategoryModal', href: '/ui/create-category-modal' },
   { name: 'CreateCounterpartyModal', href: '/ui/create-counterparty-modal' },
-  { name: 'CreateFromTransactionModal', href: '/ui/create-from-transaction-modal' },
+  {
+    name: 'CreateFromTransactionModal',
+    href: '/ui/create-from-transaction-modal',
+  },
 ];
 
 const features: ShowroomItem[] = [

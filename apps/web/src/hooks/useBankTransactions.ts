@@ -11,6 +11,43 @@ import {
 
 const DEFAULT_LIMIT = 20;
 
+function getTransactionIdentity(tx: BankTransaction): string {
+  const normalizedId = tx._id?.trim();
+  if (normalizedId) return `id:${normalizedId}`;
+
+  const normalizedTransactionId = tx.transactionId?.trim();
+  if (normalizedTransactionId) return `tx:${normalizedTransactionId}`;
+
+  return `fallback:${tx.accountId}:${tx.timestamp}:${tx.amount}:${tx.currency}:${tx.type}`;
+}
+
+function mergeTransactionsByIdentity(
+  existing: BankTransaction[],
+  incoming: BankTransaction[]
+): BankTransaction[] {
+  const merged = [...existing];
+  const indexByIdentity = new Map<string, number>();
+
+  merged.forEach((tx, index) => {
+    indexByIdentity.set(getTransactionIdentity(tx), index);
+  });
+
+  incoming.forEach((tx) => {
+    const identity = getTransactionIdentity(tx);
+    const existingIndex = indexByIdentity.get(identity);
+
+    if (existingIndex === undefined) {
+      indexByIdentity.set(identity, merged.length);
+      merged.push(tx);
+      return;
+    }
+
+    merged[existingIndex] = tx;
+  });
+
+  return merged;
+}
+
 interface UseBankTransactionsOptions {
   accountId?: string;
   bankId?: string;
@@ -82,9 +119,11 @@ export function useBankTransactions(
         const response = await bankTransactionsService.getTransactions(params);
 
         if (isLoadMore) {
-          setTransactions((prev) => [...prev, ...response.transactions]);
+          setTransactions((prev) =>
+            mergeTransactionsByIdentity(prev, response.transactions)
+          );
         } else {
-          setTransactions(response.transactions);
+          setTransactions(mergeTransactionsByIdentity([], response.transactions));
         }
 
         setTotal(response.pagination.total);

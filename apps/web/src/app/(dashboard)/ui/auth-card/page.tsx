@@ -33,7 +33,11 @@ export default function AuthCardShowroomPage() {
                 }}
               >
                 <Input label="Email" placeholder="you@example.com" />
-                <Input label="Password" type="password" placeholder="********" />
+                <Input
+                  label="Password"
+                  type="password"
+                  placeholder="********"
+                />
                 <Button fullWidth>Sign In</Button>
               </div>
             </AuthCard>

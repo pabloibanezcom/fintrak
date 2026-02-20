@@ -88,3 +88,9 @@ svg {
   background-color: var(--color-primary-100);
   color: var(--color-primary-900);
 }
+
+/* View Transitions */
+::view-transition-group(*) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

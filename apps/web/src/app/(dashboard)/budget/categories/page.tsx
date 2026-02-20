@@ -74,7 +74,11 @@ export default function CategoriesPage() {
       ) : (
         <div className="grid-auto">
           {categories.map((category) => (
-            <CategoryCard key={category.key} category={category} locale={locale} />
+            <CategoryCard
+              key={category.key}
+              category={category}
+              locale={locale}
+            />
           ))}
         </div>
       )}

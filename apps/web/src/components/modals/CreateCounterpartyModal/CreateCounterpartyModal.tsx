@@ -159,7 +159,10 @@ export function CreateCounterpartyModal({
             options={typeOptions}
             value={formData.type}
             onChange={(value) =>
-              setFormData((prev) => ({ ...prev, type: value as CounterpartyType }))
+              setFormData((prev) => ({
+                ...prev,
+                type: value as CounterpartyType,
+              }))
             }
             disabled={isSubmitting}
           />

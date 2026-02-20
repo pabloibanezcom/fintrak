@@ -1,4 +1,7 @@
-import { GenericImportService, type ImportConfig } from '../../services/GenericImportService';
+import {
+  GenericImportService,
+  type ImportConfig,
+} from '../../services/GenericImportService';
 
 interface TestEntity {
   key: string;

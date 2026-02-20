@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ErrorMessage } from '@/components/primitives';
-import { Card, Icon } from '@/components/primitives';
+import { Card, ErrorMessage, Icon } from '@/components/primitives';
 import styles from '../showroom.module.css';
 
 export default function ErrorMessageShowroomPage() {
@@ -84,9 +83,7 @@ export default function ErrorMessageShowroomPage() {
                   <code>string</code>
                 </td>
                 <td>—</td>
-                <td>
-                  The error message to display. Returns null when empty.
-                </td>
+                <td>The error message to display. Returns null when empty.</td>
               </tr>
             </tbody>
           </table>

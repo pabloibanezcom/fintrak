@@ -6,13 +6,13 @@ export {
 export { CategoryCard, type CategoryCardProps } from './CategoryCard';
 export { CategoryIconBox, type CategoryIconBoxProps } from './CategoryIconBox';
 export {
-  CounterpartyCard,
-  type CounterpartyCardProps,
-} from './CounterpartyCard';
-export {
   CounterpartyAvatarBox,
   type CounterpartyAvatarBoxProps,
 } from './CounterpartyAvatarBox';
+export {
+  CounterpartyCard,
+  type CounterpartyCardProps,
+} from './CounterpartyCard';
 export {
   InvestmentCard,
   type InvestmentCardProps,

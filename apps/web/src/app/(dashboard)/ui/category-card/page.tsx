@@ -47,7 +47,11 @@ export default function CategoryCardShowroomPage() {
         <Card className={styles.showcase}>
           <div className="grid-auto">
             {sampleCategories.map((category) => (
-              <CategoryCard key={category.key} category={category} locale="en" />
+              <CategoryCard
+                key={category.key}
+                category={category}
+                locale="en"
+              />
             ))}
           </div>
         </Card>

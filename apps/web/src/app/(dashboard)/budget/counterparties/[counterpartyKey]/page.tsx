@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import { Link } from 'next-view-transitions';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   CounterpartyAvatarBox,
@@ -168,9 +168,22 @@ export default function CounterpartyDetailPage() {
             gap: 'var(--spacing-4)',
           }}
         >
-          <CounterpartyAvatarBox counterparty={counterparty} size="lg" />
+          <CounterpartyAvatarBox
+            counterparty={counterparty}
+            size="lg"
+            viewTransitionName={`cp-avatar-${counterpartyKey}`}
+          />
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0 }}>
+            <h1
+              style={
+                {
+                  fontSize: '1.5rem',
+                  fontWeight: '600',
+                  margin: 0,
+                  viewTransitionName: `cp-name-${counterpartyKey}`,
+                } as React.CSSProperties
+              }
+            >
               {counterparty.name}
             </h1>
             {secondaryText && (

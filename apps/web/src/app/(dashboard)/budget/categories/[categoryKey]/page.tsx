@@ -109,7 +109,8 @@ export default function CategoryDetailPage() {
         return {
           id: tx._id,
           title: tx.title,
-          description: subtitleParts.length > 0 ? subtitleParts.join(' • ') : undefined,
+          description:
+            subtitleParts.length > 0 ? subtitleParts.join(' • ') : undefined,
           amount: tx.amount,
           currency: tx.currency,
           date: tx.date,

@@ -30,8 +30,8 @@ export default function TopNavShowroomPage() {
             }}
           >
             The TopNav is always visible in the DashboardLayout. It cannot be
-            previewed in isolation as it depends on authentication, routing, i18n,
-            and theme contexts.
+            previewed in isolation as it depends on authentication, routing,
+            i18n, and theme contexts.
           </p>
         </Card>
       </section>

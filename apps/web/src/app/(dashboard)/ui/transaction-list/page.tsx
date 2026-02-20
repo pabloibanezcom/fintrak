@@ -119,9 +119,7 @@ export default function TransactionListShowroomPage() {
             }}
           >
             <li>Table layout with date, description, bank, account, amount</li>
-            <li>
-              Color-coded amounts: green for credits, red for debits
-            </li>
+            <li>Color-coded amounts: green for credits, red for debits</li>
             <li>Linked transaction indicator with navigation</li>
             <li>Dismissed transaction visual state</li>
             <li>Infinite scroll via IntersectionObserver</li>

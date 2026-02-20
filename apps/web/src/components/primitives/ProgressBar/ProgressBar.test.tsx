@@ -27,7 +27,9 @@ describe('ProgressBar', () => {
   });
 
   it('renders formatted values when showValue is enabled', () => {
-    render(<ProgressBar value={2500} max={10000} showValue variant="success" />);
+    render(
+      <ProgressBar value={2500} max={10000} showValue variant="success" />
+    );
 
     expect(screen.getByText('2,500 / 10,000')).toBeTruthy();
     const bar = screen.getByRole('progressbar') as HTMLDivElement;

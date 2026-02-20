@@ -47,15 +47,27 @@ export default function CategoryIconBoxShowroomPage() {
         <Card className={styles.showcase}>
           <div className={styles.row}>
             <div className={styles.item}>
-              <CategoryIconBox category={groceryCategory} locale="en" size={32} />
+              <CategoryIconBox
+                category={groceryCategory}
+                locale="en"
+                size={32}
+              />
               <span className={styles.label}>32</span>
             </div>
             <div className={styles.item}>
-              <CategoryIconBox category={groceryCategory} locale="en" size={40} />
+              <CategoryIconBox
+                category={groceryCategory}
+                locale="en"
+                size={40}
+              />
               <span className={styles.label}>40</span>
             </div>
             <div className={styles.item}>
-              <CategoryIconBox category={groceryCategory} locale="en" size={64} />
+              <CategoryIconBox
+                category={groceryCategory}
+                locale="en"
+                size={64}
+              />
               <span className={styles.label}>64</span>
             </div>
           </div>
@@ -67,15 +79,27 @@ export default function CategoryIconBoxShowroomPage() {
         <Card className={styles.showcase}>
           <div className={styles.row}>
             <div className={styles.item}>
-              <CategoryIconBox category={groceryCategory} locale="en" size={48} />
+              <CategoryIconBox
+                category={groceryCategory}
+                locale="en"
+                size={48}
+              />
               <span className={styles.label}>Icon category</span>
             </div>
             <div className={styles.item}>
-              <CategoryIconBox category={transportCategory} locale="en" size={48} />
+              <CategoryIconBox
+                category={transportCategory}
+                locale="en"
+                size={48}
+              />
               <span className={styles.label}>Different color</span>
             </div>
             <div className={styles.item}>
-              <CategoryIconBox category={fallbackCategory} locale="en" size={48} />
+              <CategoryIconBox
+                category={fallbackCategory}
+                locale="en"
+                size={48}
+              />
               <span className={styles.label}>Initials fallback</span>
             </div>
           </div>

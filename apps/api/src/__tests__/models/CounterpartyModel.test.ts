@@ -1,5 +1,5 @@
-import { counterpartySchemaDefinition } from '../../models/schemas/counterpartySchema';
 import { Schema } from 'mongoose';
+import { counterpartySchemaDefinition } from '../../models/schemas/counterpartySchema';
 
 describe('CounterpartyModel Schema', () => {
   describe('schema definition', () => {

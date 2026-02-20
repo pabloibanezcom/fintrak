@@ -52,15 +52,9 @@ export default function CounterpartyCardShowroomPage() {
         <h2 className={styles.sectionTitle}>Default</h2>
         <Card className={styles.showcase}>
           <div className="grid-auto">
-            <CounterpartyCard
-              counterparty={sampleCounterparties[0]}
-            />
-            <CounterpartyCard
-              counterparty={sampleCounterparties[1]}
-            />
-            <CounterpartyCard
-              counterparty={sampleCounterparties[2]}
-            />
+            <CounterpartyCard counterparty={sampleCounterparties[0]} />
+            <CounterpartyCard counterparty={sampleCounterparties[1]} />
+            <CounterpartyCard counterparty={sampleCounterparties[2]} />
           </div>
         </Card>
       </section>

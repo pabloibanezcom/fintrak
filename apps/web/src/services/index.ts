@@ -21,9 +21,9 @@ export {
   type CounterpartiesResponse,
   type Counterparty,
   type CounterpartyType,
-  type UpsertCounterpartyPayload,
   counterpartiesService,
   type SearchCounterpartiesParams,
+  type UpsertCounterpartyPayload,
 } from './counterparties';
 export {
   type UserTransaction,

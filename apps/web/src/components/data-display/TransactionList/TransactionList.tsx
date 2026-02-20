@@ -124,6 +124,20 @@ export function TransactionList({
   }
 
   const tableClass = showBankInfo ? styles.table : styles.tableSimple;
+  const transactionRowKeys = (() => {
+    const keyCounts = new Map<string, number>();
+
+    return transactions.map((tx, index) => {
+      const normalizedId = tx.id?.trim();
+      const baseKey =
+        normalizedId ||
+        `${tx.date}-${tx.type}-${Math.abs(tx.amount)}-${tx.currency}-${tx.title}-${index}`;
+      const seenCount = keyCounts.get(baseKey) ?? 0;
+      keyCounts.set(baseKey, seenCount + 1);
+
+      return seenCount === 0 ? baseKey : `${baseKey}-${seenCount}`;
+    });
+  })();
 
   return (
     <Card padding="md" className={styles.card}>
@@ -144,7 +158,8 @@ export function TransactionList({
             <div className={styles.empty}>{emptyMessage}</div>
           ) : (
             <>
-              {transactions.map((tx) => {
+              {transactions.map((tx, index) => {
+                const rowKey = transactionRowKeys[index];
                 const rowClass = [
                   styles.row,
                   onTransactionClick ? styles.clickable : '',
@@ -226,7 +241,7 @@ export function TransactionList({
 
                 return onTransactionClick ? (
                   <button
-                    key={tx.id}
+                    key={rowKey}
                     type="button"
                     className={rowClass}
                     onClick={() => onTransactionClick(tx)}
@@ -234,7 +249,7 @@ export function TransactionList({
                     {rowContent}
                   </button>
                 ) : (
-                  <div key={tx.id} className={rowClass}>
+                  <div key={rowKey} className={rowClass}>
                     {rowContent}
                   </div>
                 );

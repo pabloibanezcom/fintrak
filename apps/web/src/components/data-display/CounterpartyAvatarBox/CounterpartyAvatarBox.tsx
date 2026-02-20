@@ -9,6 +9,7 @@ export interface CounterpartyAvatarBoxProps {
   counterparty: Pick<Counterparty, 'name' | 'logo' | 'defaultCategory'>;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  viewTransitionName?: string;
 }
 
 function getInitials(name: string): string {
@@ -44,20 +45,27 @@ export function CounterpartyAvatarBox({
   counterparty,
   size = 'md',
   className,
+  viewTransitionName,
 }: CounterpartyAvatarBoxProps) {
   const color = counterparty.defaultCategory?.color;
-  const frameStyle: CSSProperties | undefined = color
-    ? ({
-        borderColor: withAlpha(color, 0.35),
-        boxShadow: `0 2px 10px ${withAlpha(color, 0.22)}`,
-        ...(counterparty.logo
-          ? {}
-          : {
-              '--avatar-bg-color': color,
-              '--avatar-fg-color': '#ffffff',
-            }),
-      } as CSSProperties)
-    : undefined;
+  const frameStyle: CSSProperties | undefined =
+    color || viewTransitionName
+      ? ({
+          ...(color
+            ? {
+                borderColor: withAlpha(color, 0.35),
+                boxShadow: `0 2px 10px ${withAlpha(color, 0.22)}`,
+                ...(counterparty.logo
+                  ? {}
+                  : {
+                      '--avatar-bg-color': color,
+                      '--avatar-fg-color': '#ffffff',
+                    }),
+              }
+            : {}),
+          ...(viewTransitionName ? { viewTransitionName } : {}),
+        } as CSSProperties)
+      : undefined;
 
   return (
     <div

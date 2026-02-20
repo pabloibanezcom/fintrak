@@ -10,8 +10,8 @@ import {
 import {
   type FilterOption,
   TransactionFilters,
-  TransactionSummary,
   type TransactionFiltersValue,
+  TransactionSummary,
 } from '@/components/features';
 import { PageContainer, PageHeader } from '@/components/layout';
 import { CreateFromTransactionModal } from '@/components/modals';
@@ -100,7 +100,9 @@ export default function BankTransactionsPage() {
           tx.description?.trim() ||
           'Bank transaction';
         const bankDescription =
-          tx.description && tx.description !== title ? tx.description : undefined;
+          tx.description && tx.description !== title
+            ? tx.description
+            : undefined;
         const dismissNote = tx.dismissNote?.trim() || undefined;
 
         return {

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import styles from './DateSelector.module.css';
 import { DateSelector } from './DateSelector';
+import styles from './DateSelector.module.css';
 
 function getCurrentMonthDayButton(day: string): HTMLButtonElement {
   const button = screen
@@ -177,7 +177,9 @@ describe('DateSelector', () => {
       />
     );
 
-    expect(screen.getByRole('button', { name: /Feb .* - Feb .*, 2026/i })).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: /Feb .* - Feb .*, 2026/i })
+    ).toBeTruthy();
 
     rerender(<DateSelector onChange={onChange} />);
     expect(screen.getByRole('button', { name: /Select dates/i })).toBeTruthy();

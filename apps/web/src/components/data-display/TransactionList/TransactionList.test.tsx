@@ -80,6 +80,7 @@ describe('TransactionList', () => {
   beforeEach(() => {
     ioInstances.length = 0;
     vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.stubGlobal(
       'IntersectionObserver',
       MockIntersectionObserver as unknown as typeof IntersectionObserver
@@ -154,5 +155,21 @@ describe('TransactionList', () => {
     );
 
     expect(onLoadMore).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders duplicate ids without key warnings', () => {
+    const duplicateIdRows: TransactionListItem[] = [
+      { ...transactions[0], id: 'dup-id' },
+      { ...transactions[1], id: 'dup-id' },
+    ];
+
+    const errorSpy = vi.spyOn(console, 'error');
+
+    render(<TransactionList transactions={duplicateIdRows} />);
+
+    const logOutput = errorSpy.mock.calls.flat().join(' ');
+    expect(logOutput).not.toContain(
+      'Each child in a list should have a unique "key" prop'
+    );
   });
 });

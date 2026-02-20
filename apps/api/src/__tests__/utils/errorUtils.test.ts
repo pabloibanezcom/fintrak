@@ -69,7 +69,11 @@ describe('errorUtils', () => {
       // suppress expected log in test
     });
 
-    handleGenericError(res as Response, 'update category', new Error('db error'));
+    handleGenericError(
+      res as Response,
+      'update category',
+      new Error('db error')
+    );
 
     expect(consoleSpy).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(500);

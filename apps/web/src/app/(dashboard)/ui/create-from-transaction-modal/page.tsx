@@ -50,17 +50,18 @@ export default function CreateFromTransactionModalShowroomPage() {
               paddingLeft: 'var(--spacing-4)',
             }}
           >
-            <li>Shows transaction details: amount, date, description, merchant</li>
             <li>
-              Displays bank logo and account name when available
+              Shows transaction details: amount, date, description, merchant
             </li>
+            <li>Displays bank logo and account name when available</li>
             <li>Category selector (loaded from API)</li>
-            <li>
-              Counterparty selector with parent-child grouping
-            </li>
+            <li>Counterparty selector with parent-child grouping</li>
             <li>Title override and description fields</li>
             <li>Dismiss toggle to skip transaction</li>
-            <li>Adapts title to &quot;Create Expense&quot; or &quot;Create Income&quot;</li>
+            <li>
+              Adapts title to &quot;Create Expense&quot; or &quot;Create
+              Income&quot;
+            </li>
             <li>Form validation and error handling</li>
           </ul>
         </Card>

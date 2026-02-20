@@ -15,8 +15,8 @@ export default function PageHeaderShowroomPage() {
         </Link>
         <h1 className={styles.title}>PageHeader</h1>
         <p className={styles.subtitle}>
-          A page-level header with title, optional subtitle, and an actions
-          slot for buttons or controls.
+          A page-level header with title, optional subtitle, and an actions slot
+          for buttons or controls.
         </p>
       </header>
 

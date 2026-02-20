@@ -77,9 +77,7 @@ export const counterpartiesService = {
     return apiClient.get<Counterparty>(`/counterparties/${id}`);
   },
 
-  create: async (
-    data: UpsertCounterpartyPayload
-  ): Promise<Counterparty> => {
+  create: async (data: UpsertCounterpartyPayload): Promise<Counterparty> => {
     return apiClient.post<Counterparty>('/counterparties', data);
   },
 

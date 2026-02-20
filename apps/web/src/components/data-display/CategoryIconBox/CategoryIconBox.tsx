@@ -55,7 +55,9 @@ export function CategoryIconBox({
     width: `${size}px`,
     height: `${size}px`,
     borderRadius: `${borderRadius}px`,
-    backgroundColor: category.color ? withOpacity(category.color, 0.8) : undefined,
+    backgroundColor: category.color
+      ? withOpacity(category.color, 0.8)
+      : undefined,
   } as CSSProperties;
 
   const classes = [styles.iconBox, className].filter(Boolean).join(' ');

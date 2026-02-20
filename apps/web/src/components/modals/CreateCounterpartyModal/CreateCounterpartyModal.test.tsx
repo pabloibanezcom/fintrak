@@ -160,7 +160,9 @@ describe('CreateCounterpartyModal', () => {
     fireEvent.change(screen.getByLabelText('Type'), {
       target: { value: 'company' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Create Counterparty' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Create Counterparty' })
+    );
 
     await waitFor(() => {
       expect(createCounterpartySpy).toHaveBeenCalledWith({

@@ -54,7 +54,7 @@ vi.mock('next-intl', () => ({
   useLocale: () => localeState.value,
   useTranslations: () => (key: string) =>
     (
-      {
+      ({
         overview: 'Overview',
         budget: 'Budget',
         banking: 'Banking',
@@ -70,7 +70,7 @@ vi.mock('next-intl', () => ({
         lightMode: 'Light mode',
         language: 'Language',
         searchPlaceholder: 'Search transactions...',
-      } as Record<string, string>
+      }) as Record<string, string>
     )[key] || key,
 }));
 

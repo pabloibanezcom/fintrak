@@ -14,8 +14,8 @@ export default function SyncOverlayShowroomPage() {
         </Link>
         <h1 className={styles.title}>SyncOverlay</h1>
         <p className={styles.subtitle}>
-          A full-screen loading overlay shown during data synchronization. Blocks
-          interaction while syncing bank transactions.
+          A full-screen loading overlay shown during data synchronization.
+          Blocks interaction while syncing bank transactions.
         </p>
       </header>
 

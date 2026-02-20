@@ -394,7 +394,10 @@ export function CreateFromTransactionModal({
               label="Description"
               value={formData.description}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, description: e.target.value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
               }
               placeholder="Add notes..."
             />

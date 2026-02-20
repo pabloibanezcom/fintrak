@@ -6,10 +6,7 @@ import { CounterpartyCard } from '@/components/data-display';
 import { PageContainer, PageHeader } from '@/components/layout';
 import { CreateCounterpartyModal } from '@/components/modals';
 import { Button, Icon } from '@/components/primitives';
-import {
-  type Counterparty,
-  counterpartiesService,
-} from '@/services';
+import { type Counterparty, counterpartiesService } from '@/services';
 import { toast } from '@/utils';
 
 export default function CounterpartiesPage() {

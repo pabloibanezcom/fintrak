@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
+    "dev": "pnpm run dev-api & pnpm run dev-web",
     "dev-api": "pnpm --filter api dev",
     "debug-api": "pnpm --filter api debug",
     "dev-mobile": "pnpm --filter mobile start",
