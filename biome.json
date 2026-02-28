@@ -12,6 +12,11 @@
       "trailingCommas": "es5"
     }
   },
+  "html": {
+    "formatter": {
+      "enabled": true
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -23,6 +28,10 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["apps/*/src/**/*", "packages/*/src/**/*"]
+    "includes": [
+      "apps/*/src/**/*",
+      "packages/*/src/**/*",
+      "prototypes/**/*.html"
+    ]
   }
 }
