@@ -49,6 +49,14 @@
       summary::-webkit-details-marker { display: none; }
       summary { list-style: none; }
 
+      @keyframes card-in {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .card-in {
+        animation: card-in 0.3s ease both;
+      }
+
       /* Scrollbar */
       .scrollable {
         scrollbar-width: thin;
@@ -607,13 +615,13 @@
                     >search</span
                   >
                   <input
-                    class="bg-white dark:bg-bg-dark-content border border-slate-200 dark:border-primary/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 w-full xl:w-56"
+                    class="bg-white dark:bg-bg-dark-content border border-slate-200 dark:border-primary/10 rounded-lg pl-10 pr-4 h-9 text-sm focus:ring-2 focus:ring-primary/50 w-full xl:w-56"
                     placeholder="Find specific entity..."
                     type="text"
                   >
                 </div>
                 <button
-                  class="hidden xl:flex bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center gap-2 shadow-lg shadow-primary/20"
+                  class="hidden xl:flex bg-primary hover:bg-primary/90 text-white px-4 h-9 rounded-lg text-sm font-semibold items-center gap-2 shadow-lg shadow-primary/20"
                 >
                   <span class="material-symbols-outlined text-lg">add</span>
                   Add Counterparty
@@ -669,13 +677,11 @@
               </div>
             </div>
 
-            <!-- Counterparties Table -->
-            <div
-              class="bg-white dark:bg-bg-dark-content rounded-xl border border-slate-200 dark:border-none shadow-sm overflow-hidden"
-            >
-              <!-- Table toolbar -->
+            <!-- Counterparties List -->
+            <div>
+              <!-- Toolbar -->
               <div
-                class="p-4 border-b border-slate-200 dark:border-primary/10 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50 dark:bg-primary/5"
+                class="bg-white dark:bg-bg-dark-content rounded-xl border border-slate-200 dark:border-none shadow-sm p-4 mb-3 flex flex-wrap items-center justify-between gap-4"
               >
                 <div class="flex items-center gap-4">
                   <div class="flex items-center gap-2">
@@ -692,253 +698,147 @@
                       <option>Utility</option>
                     </select>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span
-                      class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase"
-                      >Status:</span
-                    >
-                    <select
-                      class="bg-white dark:bg-bg-dark-content border border-slate-200 dark:border-primary/10 rounded-md text-xs font-medium py-1 px-2 focus:ring-primary"
-                    >
-                      <option>All Status</option>
-                      <option>Active</option>
-                      <option>Inactive</option>
-                    </select>
-                  </div>
                 </div>
               </div>
-              <!-- Unified responsive list -->
-              <div class="divide-y divide-slate-200 dark:divide-primary/10">
-                <!-- Column headers (xl+ only) -->
-                <div class="hidden xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:gap-x-4 px-6 py-4 bg-slate-50/30 dark:bg-transparent border-b border-slate-200 dark:border-primary/10">
-                  <span class="text-xs font-bold text-slate-500 uppercase">Counterparty</span>
-                  <span class="text-xs font-bold text-slate-500 uppercase">Type</span>
-                  <span class="text-xs font-bold text-slate-500 uppercase text-right">Spent (Month)</span>
-                  <span class="text-xs font-bold text-slate-500 uppercase text-center">Txns</span>
-                  <span class="text-xs font-bold text-slate-500 uppercase">Last Transaction</span>
-                  <span class="text-xs font-bold text-slate-500 uppercase">Status</span>
-                  <span class="text-xs font-bold text-slate-500 uppercase text-right">Actions</span>
-                </div>
+              <!-- Counterparty cards -->
+              <div class="flex flex-col gap-2" id="counterparty-list">
                 <!-- Item: Amazon -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/3773d3de882524d4f74ca7272de34408.png" alt="Amazon" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Amazon</p><p class="text-[11px] text-slate-500 uppercase font-medium">Shopping</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Amazon</p><p class="text-[11px] text-slate-500 uppercase font-medium">Shopping</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€245.80</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€245.80</p>
                     <span class="hidden xl:block text-sm font-medium text-center">8</span>
-                    <p class="hidden xl:block text-sm">Jan 15, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Jan 15, 2024 &middot; 8 txns</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Ayuntamiento Rivas -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/f05eeb2532cb4d0389a652366f42bc3e.png" alt="Ayuntamiento Rivas" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Ayuntamiento Rivas</p><p class="text-[11px] text-slate-500 uppercase font-medium">Tax</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Ayuntamiento Rivas</p><p class="text-[11px] text-slate-500 uppercase font-medium">Tax</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€120.00</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-purple-100 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400">INSTITUTION</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€120.00</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Feb 01, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Feb 01, 2024 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Carrefour -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/e9c75cd423a46356e04ee4979bfb216d.png" alt="Carrefour" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Carrefour</p><p class="text-[11px] text-slate-500 uppercase font-medium">Grocery</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Carrefour</p><p class="text-[11px] text-slate-500 uppercase font-medium">Grocery</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€312.45</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€312.45</p>
                     <span class="hidden xl:block text-sm font-medium text-center">12</span>
-                    <p class="hidden xl:block text-sm">Jan 28, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Jan 28, 2024 &middot; 12 txns</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: El Corte Inglés -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/ebbaed6cbaa42b22741e8e54ed221ae7.png" alt="El Corte Inglés" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">El Corte Inglés</p><p class="text-[11px] text-slate-500 uppercase font-medium">Shopping</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">El Corte Inglés</p><p class="text-[11px] text-slate-500 uppercase font-medium">Shopping</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€1,299.00</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€1,299.00</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Dec 12, 2023</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Dec 12, 2023 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Google -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/09e1fc634913a30a1fa4d554b8b9835f.png" alt="Google" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Google</p><p class="text-[11px] text-slate-500 uppercase font-medium">Subscriptions</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Google</p><p class="text-[11px] text-slate-500 uppercase font-medium">Subscriptions</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€3.99</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€3.99</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Feb 01, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Feb 01, 2024 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Mercadona -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/2869a610e86c6bf8f42d6b63dbbe6eeb.png" alt="Mercadona" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Mercadona</p><p class="text-[11px] text-slate-500 uppercase font-medium">Grocery</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Mercadona</p><p class="text-[11px] text-slate-500 uppercase font-medium">Grocery</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€423.60</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€423.60</p>
                     <span class="hidden xl:block text-sm font-medium text-center">15</span>
-                    <p class="hidden xl:block text-sm">Jan 30, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Jan 30, 2024 &middot; 15 txns</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Movistar -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/b518beb3722521b1e31502b3becedd85.png" alt="Movistar" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Movistar</p><p class="text-[11px] text-slate-500 uppercase font-medium">Utilities</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Movistar</p><p class="text-[11px] text-slate-500 uppercase font-medium">Utilities</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€52.90</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€52.90</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Jan 05, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Jan 05, 2024 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Naturgy -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/7ada344f152650365146774ee598b488.svg" alt="Naturgy" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Naturgy</p><p class="text-[11px] text-slate-500 uppercase font-medium">Utilities</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Naturgy</p><p class="text-[11px] text-slate-500 uppercase font-medium">Utilities</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€87.30</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€87.30</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Jan 10, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Jan 10, 2024 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Netflix -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/eea57f67d5389b33debcf442f05db184.png" alt="Netflix" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Netflix</p><p class="text-[11px] text-slate-500 uppercase font-medium">Subscriptions</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Netflix</p><p class="text-[11px] text-slate-500 uppercase font-medium">Subscriptions</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€17.99</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€17.99</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Feb 01, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Feb 01, 2024 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
                 <!-- Item: Spotify -->
-                <div class="px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[2fr_1fr_1fr_0.5fr_1fr_1fr_auto] xl:items-center xl:gap-x-4 hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                <a href="#" class="block px-4 py-4 xl:px-6 xl:grid xl:grid-cols-[1fr_6rem_6rem_3rem] xl:items-center xl:gap-x-4 bg-bg-light dark:bg-bg-dark rounded-xl border border-slate-200 dark:border-primary/10 shadow shadow-slate-200 dark:shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/20 hover:border-primary/40 dark:hover:border-primary/30 transition-all group cursor-pointer">
                   <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-slate-100 dark:bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden"><img src="https://fintrak-media-prod.s3.eu-west-1.amazonaws.com/users/68835f15998c6de77ad7a51b/counterparty-logo/88985fdd44ac3a0089df10564b1bbf8e.png" alt="Spotify" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="font-bold text-sm truncate">Spotify</p><p class="text-[11px] text-slate-500 uppercase font-medium">Subscriptions</p></div>
+                    <div class="min-w-0"><p class="font-bold text-sm truncate group-hover:text-primary transition-colors">Spotify</p><p class="text-[11px] text-slate-500 uppercase font-medium">Subscriptions</p></div>
                     <p class="ml-auto font-bold text-sm shrink-0 xl:hidden">€10.99</p>
                   </div>
                   <div class="mt-1 flex items-center justify-between xl:mt-0 xl:contents">
                     <span class="px-1.5 py-0.5 xl:px-2 xl:py-1 rounded-full text-[9px] xl:text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">COMPANY</span>
                     <p class="hidden xl:block font-bold text-sm text-right">€10.99</p>
                     <span class="hidden xl:block text-sm font-medium text-center">1</span>
-                    <p class="hidden xl:block text-sm">Feb 01, 2024</p>
-                    <div class="flex items-center gap-1 text-emerald-500"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div><span class="text-[10px] xl:text-xs font-semibold uppercase">Active</span></div>
                   </div>
-                  <div class="mt-1.5 flex items-center justify-between xl:mt-0 xl:contents">
-                    <p class="text-[11px] text-slate-400 xl:hidden">Feb 01, 2024 &middot; 1 txn</p>
-                    <div class="flex items-center gap-1.5 xl:justify-end">
-                      <button class="text-[10px] xl:text-[11px] font-bold text-primary hover:bg-primary/10 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">CATEGORIZE</button>
-                      <button class="text-[10px] xl:text-[11px] font-bold bg-slate-100 dark:bg-primary/10 hover:bg-slate-200 dark:hover:bg-primary/20 px-1.5 xl:px-2 py-0.5 xl:py-1 rounded">DETAILS</button>
-                    </div>
-                  </div>
-                </div>
+                </a>
+                <!-- Infinite scroll sentinel -->
+                <div id="scroll-sentinel" class="h-2"></div>
+              </div>
+              <!-- Loading spinner -->
+              <div id="scroll-loading" class="hidden justify-center items-center py-6 gap-2">
+                <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-xs text-slate-400">Loading more...</span>
               </div>
             </div>
           </div>
@@ -998,6 +898,44 @@
           syncThemeIcons();
         });
       });
+    </script>
+    <script>
+      // Infinite scroll
+      const list = document.getElementById('counterparty-list');
+      const sentinel = document.getElementById('scroll-sentinel');
+      const loading = document.getElementById('scroll-loading');
+      const templates = Array.from(list.querySelectorAll('a[href]'));
+      let templateIndex = 0;
+      let isLoading = false;
+
+      function loadMore() {
+        if (isLoading) return;
+        isLoading = true;
+        loading.classList.remove('hidden');
+        loading.classList.add('flex');
+
+        setTimeout(() => {
+          const fragment = document.createDocumentFragment();
+          for (let i = 0; i < 10; i++) {
+            const clone = templates[templateIndex % templates.length].cloneNode(true);
+            clone.classList.add('card-in');
+            clone.style.animationDelay = `${i * 50}ms`;
+            fragment.appendChild(clone);
+            templateIndex++;
+          }
+          list.insertBefore(fragment, sentinel);
+
+          loading.classList.add('hidden');
+          loading.classList.remove('flex');
+          isLoading = false;
+        }, 600);
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) loadMore();
+      }, { rootMargin: '200px' });
+
+      observer.observe(sentinel);
     </script>
   </body>
 </html>
